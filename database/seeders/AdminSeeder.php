@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RoleEnum;
 use App\Models\User;
 use Exception;
 use Illuminate\Database\Seeder;
@@ -22,9 +23,9 @@ class AdminSeeder extends Seeder
                     'email' => config('app.admin_email'),
                     'password' => config('app.admin_password'),
                 ]
-            )->assignRole('Super Admin');
+            )->assignRole(RoleEnum::SUPER_ADMIN->value);
 
-            Log::info('Admin user seeded successfully!', ['email' => $admin->email]);
+            Log::info('Super Admin user seeded successfully!', ['email' => $admin->email]);
         } catch (Exception $e) {
             Log::error('Error seeding users!', ['error' => $e->getMessage()]);
         }
