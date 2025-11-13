@@ -10,15 +10,14 @@ import {
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
-import AppLogoIcon from './app-logo-icon';
+import { Axis3dIcon, BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogoSvg from './app-logo-svg';
 
 const mainNavItems: NavItem[] = [
@@ -61,8 +60,8 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 h-[34px] w-[34px]">
-                                    <Menu className="h-5 w-5" />
+                                <Button variant="ghost" size="icon" className="mr-2 size-[34px] cursor-pointer">
+                                    <Menu className="size-5" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent
@@ -70,8 +69,9 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
                                 className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar"
                             >
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                                <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                                    <Axis3dIcon className="size-6" />
                                 </SheetHeader>
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
@@ -82,7 +82,7 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
                                                     href={item.href}
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
-                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                                    {item.icon && <Icon iconNode={item.icon} className="size-5" />}
                                                     <span>{item.title}</span>
                                                 </Link>
                                             ))}
@@ -97,7 +97,7 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
                                                     rel="noopener noreferrer"
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
-                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                                    {item.icon && <Icon iconNode={item.icon} className="size-5" />}
                                                     <span>{item.title}</span>
                                                 </a>
                                             ))}
