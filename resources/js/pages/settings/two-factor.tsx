@@ -1,6 +1,6 @@
-import HeadingSmall from '@/components/heading-small';
-import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
-import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
+import HeadingSmall from '@/components/common/heading-small';
+import TwoFactorSetupModal from '@/components/extras/two-factor-setup-modal';
+import TwoFactorRecoveryCodes from '@/components/forms/two-factor-recovery-codes';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';

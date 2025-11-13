@@ -5,7 +5,7 @@ import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { Activity, useCallback, useEffect, useRef, useState } from 'react';
 import slugify from 'slugify';
-import AlertError from './alert-error';
+import AlertError from '../feedback/alert-error';
 
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];

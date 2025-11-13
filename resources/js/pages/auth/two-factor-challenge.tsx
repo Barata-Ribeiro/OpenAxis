@@ -1,4 +1,4 @@
-import InputError from '@/components/input-error';
+import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';

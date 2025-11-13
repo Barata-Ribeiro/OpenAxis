@@ -1,5 +1,6 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Icon } from '@/components/icon';
+import { Breadcrumbs } from '@/components/common/breadcrumbs';
+import { Icon } from '@/components/common/icon';
+import { UserMenuContent } from '@/components/navigation/complement/user-menu-content';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
