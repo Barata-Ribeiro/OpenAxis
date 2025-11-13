@@ -1,0 +1,40 @@
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { Link } from '@inertiajs/react';
+import { Activity, Fragment } from 'react';
+import slugify from 'slugify';
+
+export function Breadcrumbs({ breadcrumbs }: Readonly<{ breadcrumbs: BreadcrumbItemType[] }>) {
+    return (
+        <Activity mode={breadcrumbs.length > 0 ? 'visible' : 'hidden'}>
+            <Breadcrumb>
+                <BreadcrumbList>
+                    {breadcrumbs.map((item, index) => {
+                        const isLast = index === breadcrumbs.length - 1;
+                        return (
+                            <Fragment key={`bc-${slugify(item.title)}`}>
+                                <BreadcrumbItem>
+                                    {isLast ? (
+                                        <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                                    ) : (
+                                        <BreadcrumbLink asChild>
+                                            <Link href={item.href}>{item.title}</Link>
+                                        </BreadcrumbLink>
+                                    )}
+                                </BreadcrumbItem>
+                                {!isLast && <BreadcrumbSeparator />}
+                            </Fragment>
+                        );
+                    })}
+                </BreadcrumbList>
+            </Breadcrumb>
+        </Activity>
+    );
+}
