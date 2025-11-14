@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -18,6 +19,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
  * @property-read int|null $products_count
+ * @method static \Database\Factories\ProductCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory query()
@@ -33,7 +35,8 @@ use OwenIt\Auditing\Contracts\Auditable;
  */
 class ProductCategory extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    /** @use HasFactory<ProductCategory> */
+    use HasFactory, \OwenIt\Auditing\Auditable;
 
     /**
      * The attributes that are mass assignable.

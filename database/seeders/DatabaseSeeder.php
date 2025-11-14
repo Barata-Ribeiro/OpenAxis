@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,5 +13,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([PermissionSeeder::class, RoleSeeder::class, AdminSeeder::class]);
+
+        if (App::environment('local', 'testing', 'staging')) {
+            $this->call([]); // TODO: Add seeder classes for local, testing, and staging environments
+        }
     }
 }
