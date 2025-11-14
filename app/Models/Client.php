@@ -5,11 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string|null $phone_number
+ * @property string $identification Social Security Number/Employer Identification Number of the client. If Brazilian, follow the CPF format or CNPJ for companies.
+ * @property string $client_type Type of client: individual or company. In Brazil would be Pessoa Física or Pessoa Jurídica.
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
  * @property-read int|null $addresses_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereClientType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereIdentification($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Client extends Model

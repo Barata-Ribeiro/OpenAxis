@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property numeric $selling_price Selling price of the product
  * @property int $current_stock Current stock level of the product
  * @property int $minimum_stock Minimum stock level of the product
+ * @property numeric $comission Commission percentage for the product
  * @property bool $is_active
  * @property int $product_category_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereComission($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCostPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCurrentStock($value)

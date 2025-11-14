@@ -5,10 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property-read \App\Models\User|null $user
+ * @property int $id
+ * @property string $first_name
+ * @property string $last_name
+ * @property \Illuminate\Support\Carbon|null $date_of_birth
+ * @property string|null $phone_number
+ * @property numeric $commission_rate Commission rate as a percentage (e.g., 15.00 for 15%)
+ * @property bool $is_active Indicates whether the vendor is currently active.
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $deleted_at
+ * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereDateOfBirth($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereLastName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUserId($value)
  * @mixin \Eloquent
  */
 class Vendor extends Model
