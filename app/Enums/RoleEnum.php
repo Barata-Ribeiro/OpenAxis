@@ -7,9 +7,10 @@ enum RoleEnum: string
     // case NAMEINAPP = 'name-in-database';
 
     case SUPER_ADMIN = 'super-admin';
-    case MANAGER = 'manager';
     case VENDOR = 'vendor';
-    case STOCK_CLERK = 'stock-clerk';
+    case BUYER = 'buyer';
+
+    case FINANCE = 'finance';
 
     /**
      * Get a human-readable label for this enum case.
@@ -24,9 +25,9 @@ enum RoleEnum: string
     {
         return match ($this) {
             self::SUPER_ADMIN => 'Super Admins',
-            self::MANAGER => 'Managers',
             self::VENDOR => 'Vendors',
-            self::STOCK_CLERK => 'Stock Clerks',
+            self::BUYER => 'Buyers',
+            self::FINANCE => 'Finance Team',
         };
     }
 }
