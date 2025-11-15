@@ -1,7 +1,7 @@
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/password/confirm';
@@ -15,22 +15,29 @@ export default function ConfirmPassword() {
         >
             <Head title="Confirm password" />
 
-            <Form {...store.form()} resetOnSuccess={['password']}>
+            <Form
+                {...store.form()}
+                resetOnSuccess={['password']}
+                disableWhileProcessing
+                className="space-y-6 inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
+            >
                 {({ processing, errors }) => (
-                    <div className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                    <>
+                        <Field>
+                            <FieldLabel htmlFor="password">Password</FieldLabel>
                             <Input
-                                id="password"
                                 type="password"
+                                id="password"
                                 name="password"
-                                placeholder="Password"
                                 autoComplete="current-password"
-                                autoFocus
+                                placeholder="Password"
+                                required
+                                aria-required
+                                aria-invalid={!!errors.password}
                             />
 
                             <InputError message={errors.password} />
-                        </div>
+                        </Field>
 
                         <div className="flex items-center">
                             <Button className="w-full" disabled={processing} data-test="confirm-password-button">
@@ -38,7 +45,7 @@ export default function ConfirmPassword() {
                                 Confirm password
                             </Button>
                         </div>
-                    </div>
+                    </>
                 )}
             </Form>
         </AuthLayout>
