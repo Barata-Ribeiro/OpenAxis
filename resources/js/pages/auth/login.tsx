@@ -2,6 +2,7 @@ import TextLink from '@/components/common/text-link';
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -23,45 +24,56 @@ export default function Login({ status, canResetPassword, canRegister }: Readonl
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
 
-            <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
+            <Form
+                {...store.form()}
+                resetOnSuccess={['password']}
+                className="flex flex-col gap-6 inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
+                disableWhileProcessing
+            >
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                            <Field>
+                                <FieldLabel htmlFor="email">Email address</FieldLabel>
                                 <Input
-                                    id="email"
                                     type="email"
+                                    id="email"
                                     name="email"
-                                    required
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
+                                    required
+                                    aria-required
+                                    aria-invalid={!!errors.email}
                                 />
                                 <InputError message={errors.email} />
-                            </div>
+                            </Field>
 
-                            <div className="grid gap-2">
+                            <Field>
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
+                                    <FieldLabel htmlFor="password">Password</FieldLabel>
+
+                                    <Activity mode={canResetPassword ? 'visible' : 'hidden'}>
                                         <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
                                             Forgot password?
                                         </TextLink>
-                                    )}
+                                    </Activity>
                                 </div>
+
                                 <Input
-                                    id="password"
                                     type="password"
+                                    id="password"
                                     name="password"
-                                    required
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                    required
+                                    aria-required
+                                    aria-invalid={!!errors.password}
                                 />
                                 <InputError message={errors.password} />
-                            </div>
+                            </Field>
 
                             <div className="flex items-center space-x-3">
                                 <Checkbox id="remember" name="remember" tabIndex={3} />
@@ -92,7 +104,7 @@ export default function Login({ status, canResetPassword, canRegister }: Readonl
                 )}
             </Form>
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            {status && <div className="mt-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
     );
 }
