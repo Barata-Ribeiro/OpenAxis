@@ -3216,7 +3216,7 @@ namespace PHPSTORM_META {
 'two-factor.confirm','two-factor.disable','two-factor.qr-code','two-factor.secret-key','two-factor.recovery-codes',
 'two-factor.regenerate-recovery-codes','home','dashboard',
 'profile.edit','profile.update','profile.destroy','user-password.edit','user-password.update',
-'appearance.edit','two-factor.show','storage.local',);
+'appearance.edit','two-factor.show','administrative.users.index','storage.local',);
         registerArgumentsSet('views', 
 'app','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line','laravel-exceptions-renderer::components.formatted-source',
 'laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method','laravel-exceptions-renderer::components.icons.alert',
