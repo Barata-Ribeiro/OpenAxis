@@ -1,3 +1,5 @@
+type PermissionAction = 'index' | 'show' | 'create' | 'edit' | 'destroy';
+
 export interface Role {
     id: number;
     name: string;
@@ -19,7 +21,7 @@ export interface RoleSummary extends Omit<Role, 'permissions'> {
 export interface Permission {
     id: number;
     title: string;
-    name: string;
+    name: `${string}.${PermissionAction}`;
     guard_name?: string;
     created_at: string;
     updated_at: string;
