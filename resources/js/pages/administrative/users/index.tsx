@@ -1,9 +1,18 @@
+import { DataTable } from '@/components/table/data-table';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { PaginationMeta } from '@/types';
+import { UserWithRelations } from '@/types/application/user';
 import { Head } from '@inertiajs/react';
+import { columns } from './column';
 
-export default function IndexPage({ users }) {
-    console.log(users);
+interface IndexPageProps {
+    users: PaginationMeta<UserWithRelations[]>;
+}
+
+export default function IndexPage({ users }: Readonly<IndexPageProps>) {
+    const { data, ...pagination } = users;
+
     return (
         <AppLayout>
             <Head title="System Users" />
@@ -12,7 +21,7 @@ export default function IndexPage({ users }) {
                 title="Users"
                 description="Listing all the registered users in the system, including the requesting user."
             >
-                <p>This is the users page.</p>
+                <DataTable columns={columns} data={data} pagination={pagination} />
             </PageLayout>
         </AppLayout>
     );
