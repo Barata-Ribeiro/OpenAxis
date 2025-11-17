@@ -1,7 +1,19 @@
 {
+    "name": "openaxis-erp",
+    "version": "0.0.5",
     "$schema": "https://json.schemastore.org/package.json",
     "private": true,
     "type": "module",
+    "author": {
+        "name": "João Mendes Jorge Barata Ribeiro",
+        "email": "jmj@barataribeiro.com",
+        "url": "https://github.barataribeiro.com/"
+    },
+    "license": "GPL-3.0-only",
+    "bugs": {
+        "url": "https://github.com/Barata-Ribeiro/OpenAxis/issues",
+        "email": "jmj@barataribeiro.com"
+    },
     "scripts": {
         "build": "vite build",
         "build:ssr": "vite build && vite build --ssr",
