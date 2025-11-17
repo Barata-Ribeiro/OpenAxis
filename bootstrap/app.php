@@ -6,9 +6,12 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -32,5 +35,25 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            Log::error('An exception occurred!', [
+                'message' => $exception->getMessage(),
+                'url' => $request->fullUrl(),
+                'action_user_id' => Auth::id(),
+            ]);
+
+            if (! app()->environment(['local', 'testing']) && in_array($response->getStatusCode(), [500, 503, 404])) {
+                return Inertia::render('ErrorPage', ['status' => $response->getStatusCode(), 'previousRoute' => url()->previous()])
+                    ->toResponse($request)
+                    ->setStatusCode($response->getStatusCode());
+            } elseif ($response->getStatusCode() === 419) {
+                return back()->with(['message' => 'The page expired, please try again.']);
+            } elseif (! app()->environment(['local', 'testing']) && $response->getStatusCode() === 403) {
+                return to_route('dashboard')->with(['error' => 'You do not have permission to access that resource.'])
+                    ->toResponse($request)
+                    ->setStatusCode($response->getStatusCode());
+            }
+
+            return $response;
+        });
     })->create();
