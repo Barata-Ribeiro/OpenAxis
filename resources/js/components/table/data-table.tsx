@@ -6,7 +6,7 @@ import { buildParams } from '@/lib/utils';
 import { PaginationMeta } from '@/types';
 import { router } from '@inertiajs/react';
 import type { Column, VisibilityState } from '@tanstack/react-table';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DataTableColumnVisibility from './data-table-column-visibility';
 import { DataTablePagination } from './data-table-pagination';
 
@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly
     });
 
     // Sync sorting state with server via Inertia
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (!pagination.path) return;
 
         const params = new URLSearchParams(globalThis.location.search);

@@ -1,5 +1,6 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -8,6 +9,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { normalizeString } from '@/lib/utils';
 import { UserWithRelations } from '@/types/application/user';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
@@ -19,6 +21,7 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
         enableSorting: true,
         enableHiding: false,
+        size: 40,
     },
     {
         accessorKey: 'name',
@@ -42,9 +45,12 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
     {
         accessorKey: 'roles',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
-        cell: ({ row }) => {
-            const roles = row.original.roles;
-            return roles?.map((role) => role.name).join(', ');
+        cell: function Cell({ row }) {
+            const rawRoles = row.original.roles;
+            const roles = rawRoles?.map((role) => normalizeString(role.name)).join(', ');
+            const badgeVariant = roles?.includes('Super Admin') ? 'default' : 'secondary';
+
+            return <Badge variant={badgeVariant}>{roles}</Badge>;
         },
         enableSorting: true,
     },
