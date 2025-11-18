@@ -1,5 +1,5 @@
 import { Column } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -56,10 +56,14 @@ export function DataTableColumnHeader<TData, TValue>({
                         Clear
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-                        <EyeOff />
-                        Hide
-                    </DropdownMenuItem>
+                    <Activity mode={column.getCanHide() ? 'visible' : 'hidden'}>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+                            <EyeOff />
+                            Hide
+                        </DropdownMenuItem>
+                    </Activity>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
