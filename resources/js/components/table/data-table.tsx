@@ -1,13 +1,13 @@
-'use no memo';
-
 import { ColumnDef, flexRender, getCoreRowModel, SortingState, useReactTable } from '@tanstack/react-table';
 
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { buildParams } from '@/lib/utils';
 import { PaginationMeta } from '@/types';
 import { router } from '@inertiajs/react';
-import type { Column } from '@tanstack/react-table';
+import type { Column, VisibilityState } from '@tanstack/react-table';
 import { useLayoutEffect, useState } from 'react';
+import DataTableColumnVisibility from './data-table-column-visibility';
 import { DataTablePagination } from './data-table-pagination';
 
 interface DataTableProps<TData, TValue> {
@@ -55,6 +55,8 @@ export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly
         return [{ id: sort_by, desc: sort_dir === 'desc' }];
     });
 
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+
     const table = useReactTable({
         columns,
         data,
@@ -69,8 +71,9 @@ export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly
             },
             columnPinning: { left: ['id'], right: ['actions'] },
         },
-        state: { sorting },
         onSortingChange: setSorting,
+        onColumnVisibilityChange: setColumnVisibility,
+        state: { sorting, columnVisibility },
     });
 
     // Sync sorting state with server via Inertia
@@ -96,9 +99,12 @@ export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly
     }, [sorting, pagination.path]);
 
     return (
-        <div className="mx-auto w-full flex-col space-y-4">
-            <div className="overflow-hidden rounded-md border">
-                {/* TODO: Add search and date filters */}
+        <Card className="mx-auto w-full flex-col space-y-4">
+            <CardHeader>
+                <DataTableColumnVisibility table={table} />
+            </CardHeader>
+
+            <CardContent className="border-y py-4">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -146,9 +152,11 @@ export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly
                         )}
                     </TableBody>
                 </Table>
-            </div>
+            </CardContent>
 
-            <DataTablePagination pagination={pagination} />
-        </div>
+            <CardFooter className="-mt-2 grid">
+                <DataTablePagination pagination={pagination} />
+            </CardFooter>
+        </Card>
     );
 }
