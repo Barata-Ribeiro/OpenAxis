@@ -10,7 +10,7 @@ import { resolveUrl } from '@/lib/utils';
 import administrative from '@/routes/administrative';
 import { NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { CloudAlertIcon, UsersIcon } from 'lucide-react';
+import { CloudAlertIcon, IdCardLanyardIcon, UsersIcon } from 'lucide-react';
 import { Activity } from 'react';
 
 export function NavSystem() {
@@ -22,6 +22,11 @@ export function NavSystem() {
             title: 'Users',
             href: administrative.users.index().url,
             icon: UsersIcon,
+        },
+        {
+            title: 'Roles',
+            href: administrative.roles.index().url,
+            icon: IdCardLanyardIcon,
         },
         {
             title: 'Test Broken Link',
