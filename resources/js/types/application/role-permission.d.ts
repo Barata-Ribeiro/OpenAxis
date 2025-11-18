@@ -7,6 +7,7 @@ export interface Role {
     permissions?: Permission[];
     created_at: string;
     updated_at: string;
+    users_count?: number;
 }
 
 export interface RolePivot {
