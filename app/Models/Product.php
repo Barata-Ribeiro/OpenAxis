@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Image|null $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Image> $images
  * @property-read int|null $images_count
+ * @property-read bool|null $images_exists
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
