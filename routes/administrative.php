@@ -11,5 +11,8 @@ Route::middleware(['auth', 'verified'])->prefix('administrative')->group(functio
 
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('administrative.users.index')->middleware('permission:user.index');
+
+        Route::get('/create', [UserController::class, 'create'])->name('administrative.users.create')->middleware('permission:user.create');
+        Route::post('/', [UserController::class, 'store'])->name('administrative.users.store')->middleware('permission:user.create');
     });
 });

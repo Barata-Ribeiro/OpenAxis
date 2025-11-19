@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserAccountRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\Admin\UserService;
+use Auth;
+use Exception;
 use Inertia\Inertia;
+use Log;
 
 class UserController extends Controller
 {
@@ -44,5 +48,28 @@ class UserController extends Controller
         return Inertia::render('administrative/users/index', [
             'users' => $users,
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('administrative/users/create');
+    }
+
+    public function store(UserAccountRequest $request)
+    {
+        $userId = Auth::id();
+        Log::info('User: Creating New User', ['action_user_id' => $userId]);
+
+        $validated = $request->validated();
+
+        try {
+            $this->userService->createUser($validated);
+
+            return to_route('administrative.users.index')->with('success', 'User created successfully.');
+        } catch (Exception $e) {
+            Log::error('User: A Creation Error Occurred', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->withInput()->with('error', 'An unknown error occurred while creating the user.');
+        }
     }
 }
