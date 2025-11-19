@@ -1,11 +1,14 @@
 import { ColumnDef, flexRender, getCoreRowModel, SortingState, useReactTable } from '@tanstack/react-table';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { buildParams } from '@/lib/utils';
 import { PaginationMeta } from '@/types';
-import { router } from '@inertiajs/react';
+import { RouteDefinition } from '@/wayfinder';
+import { Link, router } from '@inertiajs/react';
 import type { Column, ColumnFiltersState, Updater, VisibilityState } from '@tanstack/react-table';
+import { ClipboardPlusIcon } from 'lucide-react';
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
@@ -14,6 +17,7 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: PaginationMeta<TData[]>['data'];
     pagination: Omit<PaginationMeta<TData[]>, 'data'>;
+    createRoute?: RouteDefinition<'get'>;
 }
 
 type FilterValue = string | string[] | null;
@@ -47,7 +51,12 @@ function getCommonPinningStyles<TData>({
     };
 }
 
-export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly<DataTableProps<TData, TValue>>) {
+export function DataTable<TData, TValue>({
+    columns,
+    data,
+    pagination,
+    createRoute,
+}: Readonly<DataTableProps<TData, TValue>>) {
     const [path] = useState(pagination.path);
     const [params] = useState(new URLSearchParams(globalThis.location.search));
 
@@ -213,8 +222,22 @@ export function DataTable<TData, TValue>({ columns, data, pagination }: Readonly
 
     return (
         <Card className="mx-auto w-full flex-col space-y-4">
-            <CardHeader>
+            <CardHeader className="flex flex-wrap items-center justify-between gap-4">
                 <DataTableToolbar table={table} />
+                {createRoute && (
+                    <Button asChild>
+                        <Link
+                            href={createRoute}
+                            aria-label="Create new record of this type"
+                            title="Create new record of this type"
+                            prefetch
+                            as="button"
+                        >
+                            <ClipboardPlusIcon aria-hidden size={16} />
+                            Create
+                        </Link>
+                    </Button>
+                )}
             </CardHeader>
 
             <CardContent className="border-y py-4">
