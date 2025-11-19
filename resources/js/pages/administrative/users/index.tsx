@@ -1,4 +1,5 @@
 import { DataTable } from '@/components/table/data-table';
+import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import administrative from '@/routes/administrative';
@@ -14,6 +15,8 @@ interface IndexPageProps {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Users', href: administrative.users.index().url }];
 
 export default function IndexPage({ users }: Readonly<IndexPageProps>) {
+    const { can } = usePermission();
+
     const { data, ...pagination } = users;
 
     return (
@@ -28,7 +31,7 @@ export default function IndexPage({ users }: Readonly<IndexPageProps>) {
                     columns={columns}
                     data={data}
                     pagination={pagination}
-                    createRoute={administrative.users.create()}
+                    createRoute={can('user.create') ? administrative.users.create() : undefined}
                 />
             </PageLayout>
         </AppLayout>
