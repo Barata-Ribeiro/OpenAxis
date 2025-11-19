@@ -21,7 +21,7 @@ export default function DataTableColumnVisibility<TData>({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="ml-auto">
+                <Button variant="outline">
                     <Settings2 aria-hidden />
                     View
                 </Button>
