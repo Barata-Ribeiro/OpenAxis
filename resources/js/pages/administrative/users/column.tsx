@@ -10,10 +10,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { normalizeString } from '@/lib/utils';
+import { roleLabel, RoleNames } from '@/types/application/enums';
 import { UserWithRelations } from '@/types/application/user';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Ellipsis, XIcon } from 'lucide-react';
+import { CircleDashed, Ellipsis, XIcon } from 'lucide-react';
 
 export const columns: Array<ColumnDef<UserWithRelations>> = [
     {
@@ -52,7 +53,17 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
 
             return <Badge variant={badgeVariant}>{roles}</Badge>;
         },
+        meta: {
+            label: 'Roles',
+            variant: 'multiSelect',
+            options: Object.values(RoleNames).map((role) => ({
+                label: roleLabel(role),
+                value: role,
+            })),
+            icon: CircleDashed,
+        },
         enableSorting: true,
+        enableColumnFilter: true,
     },
     {
         accessorKey: 'created_at',
