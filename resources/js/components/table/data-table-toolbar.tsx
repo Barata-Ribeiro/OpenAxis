@@ -2,7 +2,6 @@
 
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { cn } from '@/lib/utils';
-import administrative from '@/routes/administrative';
 import { Form, Link } from '@inertiajs/react';
 import { Column, Table } from '@tanstack/react-table';
 import { EraserIcon } from 'lucide-react';
@@ -15,9 +14,10 @@ import { DataTableFacetedFilter } from './data-table-faceted-filter';
 
 interface DataTableToolbarProps<TData> extends ComponentProps<'div'> {
     table: Table<TData>;
+    path: string;
 }
 
-export function DataTableToolbar<TData>({ table, className, ...props }: Readonly<DataTableToolbarProps<TData>>) {
+export function DataTableToolbar<TData>({ table, className, path, ...props }: Readonly<DataTableToolbarProps<TData>>) {
     const columns = table.getAllColumns().filter((column) => column.getCanFilter());
 
     return (
@@ -28,7 +28,8 @@ export function DataTableToolbar<TData>({ table, className, ...props }: Readonly
             {...props}
         >
             <Form
-                {...administrative.users.index.form()}
+                action={path}
+                method="GET"
                 options={{ preserveScroll: true }}
                 className="inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
                 onError={() => toast.error('Failed to perform search. Please try again.')}
@@ -64,7 +65,7 @@ export function DataTableToolbar<TData>({ table, className, ...props }: Readonly
             <DataTableColumnVisibility table={table} />
 
             <Button variant="outline" size="icon" aria-label="Clear filters" title="Clear filters" asChild>
-                <Link href={administrative.users.index()} as="button" prefetch>
+                <Link href={path} as="button" prefetch>
                     <EraserIcon />
                 </Link>
             </Button>

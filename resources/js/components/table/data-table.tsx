@@ -223,7 +223,7 @@ export function DataTable<TData, TValue>({
     return (
         <Card className="mx-auto w-full flex-col space-y-4">
             <CardHeader className="flex flex-wrap items-center justify-between gap-4">
-                <DataTableToolbar table={table} />
+                <DataTableToolbar table={table} path={path} />
                 {createRoute && (
                     <Button asChild>
                         <Link
