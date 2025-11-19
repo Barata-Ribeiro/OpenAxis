@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Common\Helpers;
 use App\Interfaces\Admin\UserServiceInterface;
 use App\Models\User;
 use Carbon\Carbon;
@@ -10,14 +11,17 @@ use Illuminate\Support\Facades\DB;
 
 class UserService implements UserServiceInterface
 {
-    public function getPaginatedUsers(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, ?string $startDate, ?string $endDate): LengthAwarePaginator
+    public function getPaginatedUsers(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, ?string $startDate, ?string $endDate, $filters): LengthAwarePaginator
     {
+        $roles = Helpers::buildFiltersArray($filters, 'roles') ?? [];
+
         $users = User::query()
             ->select(['id', 'name', 'email', 'created_at', 'updated_at', 'deleted_at'])
             ->when($search, fn ($query, $search) => $query->whereLike('name', "%$search%")->orWhereLike('email', "%$search%"))
             ->when($startDate && $endDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]))
             ->when($startDate && ! $endDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($startDate)->endOfDay()]))
             ->when($endDate && ! $startDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($endDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]))
+            ->when(! empty($roles), fn ($q) => $q->whereHas('roles', fn ($roleQuery) => $roleQuery->whereIn('name', $roles)))
             ->with('roles:id,name');
 
         if ($sortBy === 'roles') {
