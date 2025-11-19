@@ -1,8 +1,10 @@
+import { RoleNames } from './enums';
+
 type PermissionAction = 'index' | 'show' | 'create' | 'edit' | 'destroy';
 
 export interface Role {
     id: number;
-    name: string;
+    name: RoleNames;
     guard_name?: string;
     permissions?: Permission[];
     created_at: string;

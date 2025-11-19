@@ -64,3 +64,24 @@ export interface ScrollMeta<T> {
     prev_cursor?: string;
     prev_page_url?: string;
 }
+
+// TanStack
+declare module '@tanstack/react-table' {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface ColumnMeta<TData extends RowData, TValue> {
+        label?: string;
+        // placeholder?: string;
+        variant?: FilterVariant;
+        options?: Option[];
+        // range?: [number, number];
+        // unit?: string;
+        icon?: React.FC<React.SVGProps<SVGSVGElement>>;
+    }
+}
+
+export interface Option {
+    label: string;
+    value: string;
+}
+
+export type FilterVariant = DataTableConfig['filterVariants'][number];
