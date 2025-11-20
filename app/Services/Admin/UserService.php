@@ -4,10 +4,12 @@ namespace App\Services\Admin;
 
 use App\Common\Helpers;
 use App\Interfaces\Admin\UserServiceInterface;
+use App\Mail\NewUserMail;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class UserService implements UserServiceInterface
 {
@@ -22,7 +24,8 @@ class UserService implements UserServiceInterface
             ->when($startDate && ! $endDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($startDate)->endOfDay()]))
             ->when($endDate && ! $startDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($endDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]))
             ->when(! empty($roles), fn ($q) => $q->whereHas('roles', fn ($roleQuery) => $roleQuery->whereIn('name', $roles)))
-            ->with('roles:id,name');
+            ->with('roles:id,name')
+            ->withTrashed();
 
         if ($sortBy === 'roles') {
             $rolesSub = DB::table('model_has_roles')
@@ -38,5 +41,14 @@ class UserService implements UserServiceInterface
         }
 
         return $users->paginate($perPage)->withQueryString();
+    }
+
+    public function createUser($data): User
+    {
+        $user = User::create($data);
+
+        Mail::to($user->email)->send(new NewUserMail($user->name, $user->email, $data['password']));
+
+        return $user;
     }
 }

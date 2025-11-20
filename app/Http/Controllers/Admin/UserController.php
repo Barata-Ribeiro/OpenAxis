@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserAccountRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\User;
 use App\Services\Admin\UserService;
 use Auth;
 use Exception;
@@ -63,13 +64,43 @@ class UserController extends Controller
         $validated = $request->validated();
 
         try {
-            $this->userService->createUser($validated);
+            $user = $this->userService->createUser($validated);
 
-            return to_route('administrative.users.index')->with('success', 'User created successfully.');
+            return to_route('administrative.users.index')->with('success', $user->name." account's created successfully.");
         } catch (Exception $e) {
             Log::error('User: A Creation Error Occurred', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
 
             return back()->withInput()->with('error', 'An unknown error occurred while creating the user.');
+        }
+    }
+
+    public function edit(User $user)
+    {
+        $user->load('roles');
+
+        return Inertia::render('administrative/users/edit', [
+            'user' => $user,
+        ]);
+    }
+
+    public function destroy(User $user)
+    {
+        $userId = Auth::id();
+
+        if ($userId === $user->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        Log::info('User: Deleting User', ['action_user_id' => $userId, 'target_user_id' => $user->id]);
+
+        try {
+            $user->delete();
+
+            return to_route('administrative.users.index')->with('success', $user->name."'s account deleted successfully.");
+        } catch (Exception $e) {
+            Log::error('User: A Deletion Error Occurred', ['action_user_id' => $userId, 'target_user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unknown error occurred while deleting the user.');
         }
     }
 }
