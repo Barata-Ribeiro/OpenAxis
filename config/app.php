@@ -141,4 +141,14 @@ return [
     'admin_password' => env('APP_ADMIN_PASSWORD', '123456A#'),
     'admin_first_name' => env('APP_ADMIN_FIRST_NAME', 'Admin'),
     'admin_last_name' => env('APP_ADMIN_LAST_NAME', 'User'),
+
+    /*|--------------------------------------------------------------------------
+    | Autoloaded Service Providers
+    |--------------------------------------------------------------------------
+    | The service providers listed here will be automatically loaded on the
+    | request to your application. Feel free to add your own services to
+    | this array to grant expanded functionality to your applications.
+    |--------------------------------------------------------------------------*/
+    Asika\Agent\AgentServiceProvider::class,
+    'Agent' => Asika\Agent\Facades\Agent::class,
 ];

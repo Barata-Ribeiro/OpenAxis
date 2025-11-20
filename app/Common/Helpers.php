@@ -2,6 +2,8 @@
 
 namespace App\Common;
 
+use Asika\Agent\Agent;
+
 class Helpers
 {
     /**
@@ -93,5 +95,36 @@ class Helpers
 
         // Normalize and reindex
         return array_values(array_filter((array) $values));
+    }
+
+    /**
+     * Normalize and format a User-Agent string for consistent storage and display.
+     *
+     * This method accepts a raw User-Agent header value and returns a cleaned-up,
+     * single-line representation. Normalization commonly includes:
+     * - Trimming leading and trailing whitespace
+     * - Collapsing consecutive whitespace characters into a single space
+     * - Removing control and non-printable characters (such as line breaks)
+     * - Ensuring a valid UTF-8 string
+     *
+     * The purpose of this method is to produce a compact, predictable User-Agent
+     * that is safe to store in logs or databases and display in UIs without
+     * altering the meaningful product/version information.
+     *
+     * @param  string  $userAgent  The raw User-Agent header value to be normalized.
+     * @return string A normalized, single-line User-Agent string. If the input is
+     *                empty or contains no printable characters, an empty string is returned.
+     */
+    public static function formatUserAgent(string $userAgent): string
+    {
+        $agent = new Agent;
+        $agent->setUserAgent($userAgent);
+
+        $browser = $agent->browser() ?: 'Unknown Browser';
+        $version = $agent->version($browser) ?: '';
+        $os = $agent->platform() ?: 'Unknown OS';
+        $major = $version ? explode('.', $version)[0] : '';
+
+        return trim($browser.($major ? " {$major}" : '')." / {$os}");
     }
 }
