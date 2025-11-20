@@ -25,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
 			\App\Interfaces\Settings\SessionServiceInterface::class,
 			\App\Services\Settings\SessionService::class
 		);
+
+		$this->app->bind(
+			\App\Interfaces\Admin\RoleServiceInterface::class,
+			\App\Services\Admin\RoleService::class
+		);
     }
 
     /**
