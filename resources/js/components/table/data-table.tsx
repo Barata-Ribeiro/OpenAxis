@@ -3,13 +3,14 @@ import { ColumnDef, flexRender, getCoreRowModel, SortingState, useReactTable } f
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import useIsMounted from '@/hooks/use-mounted';
 import { buildParams } from '@/lib/utils';
 import { PaginationMeta } from '@/types';
 import { RouteDefinition } from '@/wayfinder';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import type { Column, ColumnFiltersState, Updater, VisibilityState } from '@tanstack/react-table';
 import { ClipboardPlusIcon } from 'lucide-react';
-import { type CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
@@ -57,8 +58,36 @@ export function DataTable<TData, TValue>({
     pagination,
     createRoute,
 }: Readonly<DataTableProps<TData, TValue>>) {
+    const page = usePage();
+    const isMounted = useIsMounted();
     const [path] = useState(pagination.path);
-    const [params] = useState(new URLSearchParams(globalThis.location.search));
+
+    const onFilteringNavigating = useEffectEvent((filtersParams: string | undefined) => {
+        if (!path) return;
+
+        router.get(path, buildParams({ filters: filtersParams }), {
+            preserveState: true,
+            replace: true,
+        });
+    });
+
+    const onSortingNavigating = useEffectEvent((sortBy: string | undefined, sortDir: string | undefined) => {
+        if (!path) return;
+
+        router.get(path, buildParams({ sort_by: sortBy, sort_dir: sortDir }), {
+            preserveState: true,
+            replace: true,
+        });
+    });
+
+    const params = useMemo(() => {
+        try {
+            const urlObj = new URL(page.url ?? globalThis.location.href, globalThis.location.origin);
+            return new URLSearchParams(urlObj.search);
+        } catch {
+            return new URLSearchParams(globalThis.location.search);
+        }
+    }, [page.url]);
 
     const [sorting, setSorting] = useState<SortingState>(() => {
         const sort_by = params.get('sort_by');
@@ -183,8 +212,6 @@ export function DataTable<TData, TValue>({
 
     // Sync sorting state with server via Inertia
     useEffect(() => {
-        if (!path) return;
-
         const currentSortBy = params.get('sort_by');
         const currentSortDir = params.get('sort_dir');
 
@@ -196,16 +223,11 @@ export function DataTable<TData, TValue>({
 
         if (currentSortBy === desiredSortBy && currentSortDir === desiredSortDir) return;
 
-        router.get(path, buildParams({ sort_by: desiredSortBy, sort_dir: desiredSortDir }), {
-            preserveState: true,
-            replace: true,
-        });
-    }, [sorting, path, params]);
+        onSortingNavigating(desiredSortBy, desiredSortDir);
+    }, [sorting, params]);
 
     // Sync filters state with server via Inertia
     useEffect(() => {
-        if (!path) return;
-
         const currentFilters = params.get('filters');
 
         const filtersParam = columnFilters?.length
@@ -214,11 +236,10 @@ export function DataTable<TData, TValue>({
 
         if (currentFilters === filtersParam) return;
 
-        router.get(path, buildParams({ filters: filtersParam }), {
-            preserveState: true,
-            replace: true,
-        });
-    }, [columnFilters, params, path]);
+        onFilteringNavigating(filtersParam);
+    }, [columnFilters, params]);
+
+    if (!isMounted) return null;
 
     return (
         <Card className="mx-auto w-full flex-col space-y-4">

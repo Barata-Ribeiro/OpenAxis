@@ -78,15 +78,15 @@ export function DataTableFacetedFilter<TData, TValue>({
             <PopoverTrigger asChild>
                 <Button variant="outline">
                     {selectedValues?.size > 0 ? (
-                        <button
-                            type="button"
+                        <div
+                            role="button"
                             aria-label={`Clear ${title} filter`}
                             tabIndex={0}
                             className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                             onClick={onReset}
                         >
                             <XCircle aria-hidden />
-                        </button>
+                        </div>
                     ) : (
                         <PlusCircle aria-hidden />
                     )}
