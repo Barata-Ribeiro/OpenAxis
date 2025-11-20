@@ -221,6 +221,7 @@ export function DataTable<TData, TValue>({
 
         if (sort) desiredSortDir = sort.desc ? 'desc' : 'asc';
 
+        if (!desiredSortBy && !desiredSortDir && !currentSortBy && !currentSortDir) return;
         if (currentSortBy === desiredSortBy && currentSortDir === desiredSortDir) return;
 
         onSortingNavigating(desiredSortBy, desiredSortDir);
@@ -234,6 +235,7 @@ export function DataTable<TData, TValue>({
             ? columnFilters.map((f) => `${f.id}:${f.value}`).join(',')
             : undefined;
 
+        if (!currentFilters && !filtersParam) return;
         if (currentFilters === filtersParam) return;
 
         onFilteringNavigating(filtersParam);
