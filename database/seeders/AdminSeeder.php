@@ -22,6 +22,7 @@ class AdminSeeder extends Seeder
                     'name' => config('app.admin_name'),
                     'email' => config('app.admin_email'),
                     'password' => config('app.admin_password'),
+                    'email_verified_at' => now(),
                 ]
             )->assignRole(RoleEnum::SUPER_ADMIN->value);
 

@@ -7,12 +7,14 @@ import { Form, Head, Link, usePage } from '@inertiajs/react';
 import HeadingSmall from '@/components/common/heading-small';
 import InputError from '@/components/feedback/input-error';
 import DeleteUser from '@/components/forms/delete-user';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
+import { BadgeCheckIcon } from 'lucide-react';
 import { Activity } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -25,6 +27,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVerifyEmail: boolean; status?: string }>) {
     const { auth } = usePage<SharedData>().props;
 
+    const mustVerify = mustVerifyEmail && auth.user.email_verified_at === null;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
@@ -35,51 +39,60 @@ export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVeri
 
                     <Form
                         {...ProfileController.update.form()}
-                        options={{
-                            preserveScroll: true,
-                        }}
-                        className="space-y-6"
+                        options={{ preserveScroll: true }}
+                        className="space-y-6 transition inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
+                        disableWhileProcessing
                     >
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
+                                <Field data-invalid={!!errors.name}>
+                                    <FieldLabel htmlFor="name">Name</FieldLabel>
 
                                     <Input
+                                        type="text"
                                         id="name"
-                                        className="mt-1 block w-full"
-                                        defaultValue={auth.user.name}
                                         name="name"
-                                        required
+                                        defaultValue={auth.user.name}
                                         autoComplete="name"
                                         placeholder="Full name"
+                                        required
+                                        aria-required
+                                        aria-invalid={!!errors.name}
                                     />
 
-                                    <InputError className="mt-2" message={errors.name} />
-                                </div>
+                                    <InputError message={errors.name} />
+                                </Field>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="email">Email address</Label>
+                                <Field data-invalid={!!errors.email}>
+                                    <FieldLabel htmlFor="email">
+                                        <span>Email address</span>
+                                        <Activity mode={mustVerify ? 'hidden' : 'visible'}>
+                                            <Badge
+                                                variant="secondary"
+                                                className="bg-blue-500 text-white dark:bg-blue-600"
+                                            >
+                                                <BadgeCheckIcon aria-hidden />
+                                                Verified
+                                            </Badge>
+                                        </Activity>
+                                    </FieldLabel>
 
                                     <Input
-                                        id="email"
                                         type="email"
-                                        className="mt-1 block w-full"
-                                        defaultValue={auth.user.email}
+                                        id="email"
                                         name="email"
-                                        required
+                                        defaultValue={auth.user.email}
                                         autoComplete="username"
                                         placeholder="Email address"
+                                        required
+                                        aria-required
+                                        aria-invalid={!!errors.email}
                                     />
 
-                                    <InputError className="mt-2" message={errors.email} />
-                                </div>
+                                    <InputError message={errors.email} />
+                                </Field>
 
-                                <Activity
-                                    mode={
-                                        mustVerifyEmail && auth.user.email_verified_at === null ? 'visible' : 'hidden'
-                                    }
-                                >
+                                <Activity mode={mustVerify ? 'visible' : 'hidden'}>
                                     <div>
                                         <p className="-mt-4 text-sm text-muted-foreground">
                                             Your email address is unverified.{' '}
@@ -101,7 +114,7 @@ export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVeri
                                 </Activity>
 
                                 <div className="flex items-center gap-4">
-                                    <Button disabled={processing} data-test="update-profile-button">
+                                    <Button type="submit" disabled={processing} data-test="update-profile-button">
                                         Save
                                     </Button>
 
