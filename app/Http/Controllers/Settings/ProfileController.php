@@ -53,11 +53,21 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        $user->forceDelete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Show the user's addresses settings page.
+     */
+    public function indexAddresses()
+    {
+        return Inertia::render('settings/addresses', [
+            'addresses' => Auth::user()->addresses,
+        ]);
     }
 }
