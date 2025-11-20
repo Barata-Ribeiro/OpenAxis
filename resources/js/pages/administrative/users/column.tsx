@@ -1,20 +1,28 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import { normalizeString } from '@/lib/utils';
+import administrative from '@/routes/administrative';
+import { SharedData } from '@/types';
 import { roleLabel, RoleNames } from '@/types/application/enums';
 import { UserWithRelations } from '@/types/application/user';
+import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CircleDashed, Ellipsis, XIcon } from 'lucide-react';
+import { CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
+import { useState } from 'react';
 
 export const columns: Array<ColumnDef<UserWithRelations>> = [
     {
@@ -91,30 +99,69 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
     {
         id: 'actions',
         cell: function Cell({ row }) {
+            const { auth } = usePage<SharedData>().props;
+            const { can } = usePermission();
+            const [open, setOpen] = useState(false);
+
+            const isCurrentUser = auth.user?.id === row.original.id;
+            const canEditUser = can('user.edit') && !isCurrentUser;
+            const canDeleteUser = can('user.destroy') && !isCurrentUser;
+            const isDeleted = row.original.deleted_at !== null;
+
             const nameToCopy = row.original.name;
             const emailToCopy = row.original.email;
 
             return (
-                <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Open menu"
-                            variant="ghost"
-                            className="flex size-8 p-0 data-[state=open]:bg-muted"
-                        >
-                            <Ellipsis aria-hidden size={16} />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <DropdownMenuCopyButton content={emailToCopy}>Copy Email</DropdownMenuCopyButton>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Open menu"
+                                variant="ghost"
+                                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                            >
+                                <Ellipsis aria-hidden size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={emailToCopy}>Copy Email</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <EyeIcon aria-hidden size={14} /> View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem disabled={!canEditUser}>
+                                    <EditIcon aria-hidden size={14} /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    disabled={!canDeleteUser || isDeleted}
+                                    onSelect={() => setOpen(true)}
+                                >
+                                    <DeleteIcon aria-hidden size={14} /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ActionConfirmationDialog
+                        open={open}
+                        setOpen={setOpen}
+                        title="Confirm Deletion"
+                        description={`Are you sure you want to soft delete user "${row.original.name}"? This action can be undone later.`}
+                        method="delete"
+                        route={administrative.users.destroy(row.original.id)}
+                    />
+                </>
             );
         },
         size: 40,
