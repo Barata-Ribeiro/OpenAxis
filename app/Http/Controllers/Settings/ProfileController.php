@@ -60,14 +60,4 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
-
-    /**
-     * Show the user's addresses settings page.
-     */
-    public function indexAddresses()
-    {
-        return Inertia::render('settings/addresses', [
-            'addresses' => Auth::user()->addresses,
-        ]);
-    }
 }
