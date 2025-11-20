@@ -13,7 +13,9 @@ namespace PHPSTORM_META {
     */
     override(new \Illuminate\Contracts\Container\Container, map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -117,7 +119,9 @@ namespace PHPSTORM_META {
         ]));
     override(\Illuminate\Container\Container::makeWith(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -221,7 +225,9 @@ namespace PHPSTORM_META {
         ]));
     override(\Illuminate\Contracts\Container\Container::get(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -325,7 +331,9 @@ namespace PHPSTORM_META {
         ]));
     override(\Illuminate\Contracts\Container\Container::make(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -429,7 +437,9 @@ namespace PHPSTORM_META {
         ]));
     override(\Illuminate\Contracts\Container\Container::makeWith(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -533,7 +543,9 @@ namespace PHPSTORM_META {
         ]));
     override(\App::get(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -637,7 +649,9 @@ namespace PHPSTORM_META {
         ]));
     override(\App::make(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -741,7 +755,9 @@ namespace PHPSTORM_META {
         ]));
     override(\App::makeWith(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -845,7 +861,9 @@ namespace PHPSTORM_META {
         ]));
     override(\app(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -949,7 +967,9 @@ namespace PHPSTORM_META {
         ]));
     override(\resolve(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -1053,7 +1073,9 @@ namespace PHPSTORM_META {
         ]));
     override(\Psr\Container\ContainerInterface::get(0), map([
         '' => '@',
+            'App\Interfaces\Admin\RoleServiceInterface' => \App\Services\Admin\RoleService::class,
             'App\Interfaces\Admin\UserServiceInterface' => \App\Services\Admin\UserService::class,
+            'App\Interfaces\Settings\SessionServiceInterface' => \App\Services\Settings\SessionService::class,
             'Illuminate\Bus\BatchRepository' => \Illuminate\Bus\DatabaseBatchRepository::class,
             'Illuminate\Contracts\Auth\Access\Gate' => \Illuminate\Auth\Access\Gate::class,
             'Illuminate\Contracts\Auth\StatefulGuard' => \Illuminate\Auth\SessionGuard::class,
@@ -3243,10 +3265,11 @@ namespace PHPSTORM_META {
 'password.confirmation','password.confirm.store','two-factor.login','two-factor.login.store','two-factor.enable',
 'two-factor.confirm','two-factor.disable','two-factor.qr-code','two-factor.secret-key','two-factor.recovery-codes',
 'two-factor.regenerate-recovery-codes','home','dashboard',
-'profile.edit','profile.update','profile.destroy','user-password.edit','user-password.update',
-'appearance.edit','two-factor.show','sessions.index','sessions.destroy','administrative.roles.index',
-'administrative.users.index','administrative.users.create','administrative.users.store','administrative.users.edit','administrative.users.update',
-'administrative.users.destroy','administrative.mailable.new-account','storage.local',);
+'profile.edit','profile.update','profile.destroy','profile.addresses','profile.addresses.store',
+'profile.addresses.update','profile.addresses.destroy','user-password.edit','user-password.update','appearance.edit',
+'two-factor.show','sessions.index','sessions.destroy','administrative.roles.index','administrative.users.index',
+'administrative.users.create','administrative.users.store','administrative.users.edit','administrative.users.update','administrative.users.destroy',
+'administrative.mailable.new-account','storage.local',);
         registerArgumentsSet('views', 
 'app','emails.new_account','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line',
 'laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method',
