@@ -8,8 +8,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import profile from '@/routes/profile';
 import { Address } from '@/types/application/address';
 import { addressTypeLabel } from '@/types/application/enums';
+import { Link } from '@inertiajs/react';
 import { MapPin, MoreVertical, Pencil, Star, StarIcon, Trash2 } from 'lucide-react';
 import { Activity } from 'react';
 
@@ -51,26 +53,40 @@ export default function AddressCard({ address }: Readonly<{ address: Address }>)
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="size-4" />
+                            <Button variant="ghost" size="icon" className="size-8">
+                                <MoreVertical size={16} />
                                 <span className="sr-only">Open menu</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem className="gap-2">
-                                <Pencil className="size-4" />
+                                <Pencil size={16} />
                                 Edit
                             </DropdownMenuItem>
                             <Activity mode={address.is_primary ? 'hidden' : 'visible'}>
-                                <DropdownMenuItem className="gap-2">
-                                    <Star className="size-4" />
-                                    Set as Primary
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href={profile.addresses.setPrimary(address.id)}
+                                        method="patch"
+                                        as="button"
+                                        className="block w-full"
+                                    >
+                                        <Star size={16} />
+                                        Set as Primary
+                                    </Link>
                                 </DropdownMenuItem>
                             </Activity>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-                                <Trash2 className="size-4" />
-                                Delete
+                            <DropdownMenuItem variant="destructive" asChild>
+                                <Link
+                                    className="block w-full"
+                                    href={profile.addresses.destroy(address.id)}
+                                    method="delete"
+                                    as="button"
+                                >
+                                    <Trash2 aria-hidden size={16} />
+                                    Delete
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
