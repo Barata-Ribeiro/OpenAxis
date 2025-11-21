@@ -3,12 +3,14 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NewUserMail extends Mailable
+class NewUserMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -20,6 +22,7 @@ class NewUserMail extends Mailable
     public function __construct(private $name, private $email, private $password)
     {
         $this->appName = config('app.name');
+        $this->afterCommit();
     }
 
     /**
@@ -27,7 +30,11 @@ class NewUserMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        return new Envelope(subject: $this->appName.' - Your new account');
+        return new Envelope(
+            from: new Address(config('mail.from.address'), config('mail.from.name')),
+            to: $this->email,
+            subject: $this->appName.' - Your new account'
+        );
     }
 
     /**
