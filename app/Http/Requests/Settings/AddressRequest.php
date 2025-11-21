@@ -26,7 +26,7 @@ class AddressRequest extends FormRequest
             'label' => ['nullable', 'string', 'max:100'],
             'street' => ['required', 'string', 'max:150'],
             'number' => ['required', 'string', 'max:20'],
-            'complement' => ['nullable', 'string', 'max:100'],
+            'complement' => ['required', 'string', 'max:100'],
             'neighborhood' => ['required', 'string', 'max:100'],
             'city' => ['required', 'string', 'max:100'],
             'state' => ['required', 'string', 'max:100'],
