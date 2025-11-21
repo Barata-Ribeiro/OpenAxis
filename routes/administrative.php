@@ -19,7 +19,10 @@ Route::middleware(['auth', 'verified'])->prefix('administrative')->group(functio
         Route::get('/{user}/edit', [UserController::class, 'edit'])->name('administrative.users.edit')->middleware('permission:user.edit');
         Route::patch('/{user}', [UserController::class, 'update'])->name('administrative.users.update')->middleware('permission:user.edit');
 
-        Route::delete('/{user}', [UserController::class, 'destroy'])->name('administrative.users.destroy')->middleware('permission:user.delete');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('administrative.users.destroy')->middleware('permission:user.destroy');
+        Route::delete('/{user}/force', [UserController::class, 'forceDestroy'])->name('administrative.users.force-destroy')->middleware('permission:user.destroy');
+
+        Route::get('/{user}', [UserController::class, 'show'])->name('administrative.users.show')->middleware('permission:user.show');
     });
 
     Route::prefix('mailable')->group(function () {

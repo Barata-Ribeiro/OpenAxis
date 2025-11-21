@@ -51,6 +51,22 @@ class UserController extends Controller
         ]);
     }
 
+    public function show(User $user)
+    {
+        $user->load(['roles.permissions:id,name,title', 'addresses']);
+
+        $permissions = $user->roles
+            ->flatMap(fn ($role) => $role->permissions ?? collect())
+            ->unique('id')
+            ->values();
+
+        $user->setRelation('permissions', $permissions);
+
+        return Inertia::render('administrative/users/show', [
+            'user' => $user,
+        ]);
+    }
+
     public function create()
     {
         return Inertia::render('administrative/users/create');
@@ -101,6 +117,27 @@ class UserController extends Controller
             Log::error('User: A Deletion Error Occurred', ['action_user_id' => $userId, 'target_user_id' => $user->id, 'error' => $e->getMessage()]);
 
             return back()->with('error', 'An unknown error occurred while deleting the user.');
+        }
+    }
+
+    public function forceDestroy(User $user)
+    {
+        $userId = Auth::id();
+
+        if ($userId === $user->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        Log::info('User: Permanently Deleting User', ['action_user_id' => $userId, 'target_user_id' => $user->id]);
+
+        try {
+            $user->forceDelete();
+
+            return to_route('administrative.users.index')->with('success', $user->name."'s account permanently deleted successfully.");
+        } catch (Exception $e) {
+            Log::error('User: A Permanent Deletion Error Occurred', ['action_user_id' => $userId, 'target_user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unknown error occurred while permanently deleting the user.');
         }
     }
 }
