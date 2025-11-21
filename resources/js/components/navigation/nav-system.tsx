@@ -51,29 +51,35 @@ export function NavSystem() {
 
     return (
         <SidebarGroup className="px-2 py-0">
-            {navigationGroups.map((group) => (
-                <Fragment key={group.title}>
-                    <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {group.items
-                            .filter((item) => item.canView !== false)
-                            .map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        isActive={page.url.startsWith(resolveUrl(item.href))}
-                                        tooltip={{ children: item.title }}
-                                    >
-                                        <Link href={item.href} prefetch>
-                                            {item.icon && <item.icon />}
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                    </SidebarMenu>
-                </Fragment>
-            ))}
+            {navigationGroups.map((group) => {
+                if (group.items.every((item) => item.canView === false)) {
+                    return null;
+                }
+
+                return (
+                    <Fragment key={group.title}>
+                        <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                        <SidebarMenu>
+                            {group.items
+                                .filter((item) => item.canView !== false)
+                                .map((item) => (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={page.url.startsWith(resolveUrl(item.href))}
+                                            tooltip={{ children: item.title }}
+                                        >
+                                            <Link href={item.href} prefetch>
+                                                {item.icon && <item.icon />}
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                        </SidebarMenu>
+                    </Fragment>
+                );
+            })}
         </SidebarGroup>
     );
 }
