@@ -1,3 +1,4 @@
+import { Address } from './address';
 import { Permission, Role } from './role-permission';
 
 export interface User {
@@ -14,6 +15,7 @@ export interface User {
 }
 
 export interface UserWithRelations extends User {
-    roles: Pick<Role, 'name'>[];
-    permissions: Pick<Permission, 'name'>[];
+    roles: (Pick<Role, 'name'> & Partial<Pick<Role, 'id'>>)[];
+    permissions?: (Pick<Permission, 'name'> & Partial<Pick<Permission, 'title'>>)[];
+    addresses?: Address[];
 }
