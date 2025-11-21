@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\User;
+use Faker\Generator as Faker;
 use Inertia\Testing\AssertableInertia;
+use Spatie\Permission\Models\Role;
 
 describe('tests for the "index" method of Admin\UserController', function () {
     $componentName = 'administrative/users/index';
@@ -109,5 +111,38 @@ describe('tests for the "index" method of Admin\UserController', function () {
             ->where('users.data.0.roles.0.name', 'super-admin')
             ->where('users.data.0.id', $admin->id)
         );
+    });
+});
+
+describe('tests for the "create" and "store" methods of Admin\UserController', function () {
+    $createComponent = 'administrative/users/create';
+
+    test('authenticated users who are not admins get a 403 response when accessing the create user page', function () {
+        $this->actingAs(User::factory()->create());
+
+        $this->get(route('administrative.users.create'))->assertForbidden();
+    });
+
+    test('authenticated admin users can visit the create user page', function () use ($createComponent) {
+        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+
+        $response = $this->get(route('administrative.users.create'));
+
+        $response->assertOk();
+        $response->assertInertia(fn (AssertableInertia $page) => $page->component($createComponent));
+    });
+
+    test('admin users can create new user accounts', function () {
+        $faker = app(Faker::class);
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $this->actingAs($admin)
+            ->post(route('administrative.users.store'), [
+                'name' => $faker->name(),
+                'email' => $faker->unique()->safeEmail(),
+                'password' => $faker->password(8, 16),
+                'role' => $faker->randomElement(Role::pluck('name')),
+            ])->assertRedirect(route('administrative.users.index'))
+            ->assertSessionHas('success');
     });
 });
