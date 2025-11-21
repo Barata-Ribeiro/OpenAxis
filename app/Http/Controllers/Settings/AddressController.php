@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\AddressRequest;
+use App\Models\Address;
 use Auth;
 use Exception;
 use Inertia\Inertia;
@@ -17,7 +18,7 @@ class AddressController extends Controller
     public function index()
     {
         return Inertia::render('settings/addresses', [
-            'addresses' => Auth::user()->addresses,
+            'addresses' => Auth::user()->addresses()->latest()->get(),
         ]);
     }
 
@@ -49,6 +50,42 @@ class AddressController extends Controller
             Log::error('Address: Failed to add address', ['action_user_id' => Auth::id(), 'error' => $e->getMessage()]);
 
             return back()->withInput()->with('error', 'Failed to add address. Please try again.');
+        }
+    }
+
+    /**
+     * Set an address as primary for the user.
+     */
+    public function setPrimary(Address $address)
+    {
+        try {
+            $addresses = Auth::user()->addresses();
+
+            $addresses->update(['is_primary' => 0]);
+
+            $addresses->whereId($address->id)->update(['is_primary' => 1]);
+
+            return to_route('profile.addresses')->with('success', 'Primary address updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Address: Failed to set primary address', ['action_user_id' => Auth::id(), 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'Failed to set primary address. Please try again.');
+        }
+    }
+
+    /**
+     * Delete an address for the user.
+     */
+    public function destroy(Address $address)
+    {
+        try {
+            Auth::user()->addresses()->whereId($address->id)->delete();
+
+            return to_route('profile.addresses')->with('success', 'Address deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Address: Failed to delete address', ['action_user_id' => Auth::id(), 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'Failed to delete address. Please try again.');
         }
     }
 }

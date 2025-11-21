@@ -18,6 +18,7 @@ Route::middleware('auth')->prefix('settings')->group(function () {
     Route::get('addresses', [AddressController::class, 'index'])->name('profile.addresses');
     Route::post('addresses', [AddressController::class, 'store'])->name('profile.addresses.store');
     Route::patch('addresses/{address}', [AddressController::class, 'update'])->name('profile.addresses.update');
+    Route::patch('addresses/{address}/set-primary', [AddressController::class, 'setPrimary'])->name('profile.addresses.set-primary');
     Route::delete('addresses/{address}', [AddressController::class, 'destroy'])->name('profile.addresses.destroy');
 
     Route::get('password', [PasswordController::class, 'edit'])->name('user-password.edit');
