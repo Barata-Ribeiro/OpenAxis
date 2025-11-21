@@ -32,7 +32,7 @@ class AddressRequest extends FormRequest
             'state' => ['required', 'string', 'max:100'],
             'postal_code' => ['required', 'string', 'max:20'],
             'country' => ['required', 'string', 'max:100'],
-            'is_primary' => ['boolean'],
+            'is_primary' => ['sometimes', 'in:on,1,0,true,false'],
         ];
     }
 }
