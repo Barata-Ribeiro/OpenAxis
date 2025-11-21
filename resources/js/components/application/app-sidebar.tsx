@@ -1,12 +1,12 @@
 import { NavFooter } from '@/components/navigation/nav-footer';
 import { NavMain } from '@/components/navigation/nav-main';
+import { NavSystem } from '@/components/navigation/nav-system';
 import { NavUser } from '@/components/navigation/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
-import { NavSystem } from '../navigation/nav-system';
+import { BugIcon, Folder, LayoutGrid } from 'lucide-react';
 import AppLogoSvg from './app-logo-svg';
 
 const mainNavItems: NavItem[] = [
@@ -20,13 +20,18 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/Barata-Ribeiro/OpenAxis',
         icon: Folder,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Report a Bug',
+        href: 'https://github.com/Barata-Ribeiro/OpenAxis/issues',
+        icon: BugIcon,
+    },
+    {
+        title: 'Developed by Barata Ribeiro',
+        href: 'https://barataribeiro.com/',
+        icon: undefined,
     },
 ];
 
