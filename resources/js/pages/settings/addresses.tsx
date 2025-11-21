@@ -2,6 +2,7 @@ import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 import HeadingSmall from '@/components/common/heading-small';
+import AddressCard from '@/components/extras/address-card';
 import EmptyAddress from '@/components/extras/empties/empty-address';
 import NewAddressModal from '@/components/extras/new-address-modal';
 import AppLayout from '@/layouts/app-layout';
@@ -31,7 +32,15 @@ export default function Addresses({ addresses: initialAddresses }: Readonly<{ ad
                         <NewAddressModal />
                     </div>
 
-                    {initialAddresses.length === 0 ? <EmptyAddress /> : <div>{/* TODO: List addresses here */}</div>}
+                    {initialAddresses.length === 0 ? (
+                        <EmptyAddress />
+                    ) : (
+                        <div className="grid grid-cols-1 gap-6">
+                            {initialAddresses.map((address) => (
+                                <AddressCard key={address.id} address={address} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </SettingsLayout>
         </AppLayout>
