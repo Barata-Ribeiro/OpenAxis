@@ -1,7 +1,7 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import RoleBadge from '@/components/common/role-badge';
 import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -13,12 +13,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { usePermission } from '@/hooks/use-permission';
-import { normalizeString } from '@/lib/utils';
 import administrative from '@/routes/administrative';
 import { SharedData } from '@/types';
 import { roleLabel, RoleNames } from '@/types/application/enums';
 import { UserWithRelations } from '@/types/application/user';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
@@ -56,10 +55,18 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
         cell: function Cell({ row }) {
             const rawRoles = row.original.roles;
-            const roles = rawRoles?.map((role) => normalizeString(role.name)).join(', ');
-            const badgeVariant = roles?.includes('Super Admin') ? 'default' : 'secondary';
 
-            return <Badge variant={badgeVariant}>{roles}</Badge>;
+            if (!rawRoles || rawRoles.length === 0) {
+                return <span className="text-muted-foreground">No Roles</span>;
+            }
+
+            return (
+                <ul className="flex flex-wrap items-center gap-1">
+                    {rawRoles.map((role) => (
+                        <RoleBadge key={role.name} role={role} />
+                    ))}
+                </ul>
+            );
         },
         meta: {
             label: 'Roles',
@@ -136,8 +143,14 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuGroup>
-                                <DropdownMenuItem>
-                                    <EyeIcon aria-hidden size={14} /> View
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        className="block w-full"
+                                        href={administrative.users.show(row.original.id)}
+                                        as="button"
+                                    >
+                                        <EyeIcon aria-hidden size={14} /> View
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem disabled={!canEditUser}>
                                     <EditIcon aria-hidden size={14} /> Edit
