@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use Str;
 
 /**
  * @property int $id
@@ -62,6 +63,28 @@ class ProductCategory extends Model implements Auditable
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($product) {
+            if (empty($product->slug) && ! empty($product->name)) {
+                $base = Str::slug($product->name);
+                $slug = $base;
+                $i = 1;
+
+                while (static::withTrashed()->whereSlug($slug)->exists()) {
+                    $slug = $base.'-'.$i++;
+                }
+
+                $product->slug = $slug;
+            }
+        });
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 
     /**
