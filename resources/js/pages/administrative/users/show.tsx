@@ -18,6 +18,7 @@ import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import administrative from '@/routes/administrative';
+import profile from '@/routes/profile';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { UserWithRelations } from '@/types/application/user';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -41,8 +42,11 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
     const isCurrentUser = auth.user?.id === user.id;
     const isUserSuperAdmin = user?.roles.some((role) => role.name === 'super-admin');
 
+    const canEdit = can('user.edit') && !isCurrentUser;
     const canSoftDelete = can('user.destroy') && !isCurrentUser && !user.deleted_at;
     const canPermanentDelete = can('user.destroy') && !isCurrentUser;
+
+    const editLink = canEdit ? administrative.users.edit(user.id) : profile.edit();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -79,7 +83,7 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-3">
                         <Activity mode={can('user.edit') ? 'visible' : 'hidden'}>
-                            <Link href={administrative.users.edit(user.id)} prefetch>
+                            <Link href={editLink} prefetch>
                                 <Button variant="secondary">
                                     <EditIcon aria-hidden size={16} />
                                     Edit User

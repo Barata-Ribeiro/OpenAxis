@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { usePermission } from '@/hooks/use-permission';
 import administrative from '@/routes/administrative';
+import profile from '@/routes/profile';
 import { SharedData } from '@/types';
 import { roleLabel, RoleNames } from '@/types/application/enums';
 import { UserWithRelations } from '@/types/application/user';
@@ -117,6 +118,7 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
 
             const nameToCopy = row.original.name;
             const emailToCopy = row.original.email;
+            const editRoute = canEditUser ? administrative.users.edit(row.original.id) : profile.edit();
 
             return (
                 <>
@@ -152,8 +154,10 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
                                         <EyeIcon aria-hidden size={14} /> View
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem disabled={!canEditUser}>
-                                    <EditIcon aria-hidden size={14} /> Edit
+                                <DropdownMenuItem disabled={!can('user.edit')} asChild>
+                                    <Link className="block w-full" href={editRoute} as="button">
+                                        <EditIcon aria-hidden size={14} /> Edit
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     variant="destructive"
