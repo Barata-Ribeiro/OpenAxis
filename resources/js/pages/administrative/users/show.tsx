@@ -10,10 +10,12 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useInitials } from '@/hooks/use-initials';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
@@ -31,6 +33,7 @@ interface UserShowProps {
 }
 
 export default function UserShow({ user }: Readonly<UserShowProps>) {
+    const getInitials = useInitials();
     const { auth } = usePage<SharedData>().props;
     const { can } = usePermission();
 
@@ -58,26 +61,38 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
             >
                 <div className="grid gap-8">
                     {/* Header with Back Button */}
-                    <header className="grid">
-                        <Link className="mb-4" href={administrative.users.index()} prefetch>
+                    <header className="grid gap-4">
+                        <Link href={administrative.users.index()} prefetch>
                             <Button variant="outline" size="sm">
                                 <ArrowLeft aria-hidden size={16} />
                                 List Users
                             </Button>
                         </Link>
 
-                        <div className="inline-flex items-center gap-x-2">
-                            <h1 className="text-text-balance text-3xl font-bold">{user.name}</h1>
+                        <div className="flex flex-wrap items-center-safe gap-2">
+                            <Avatar className="size-28 overflow-hidden rounded-full">
+                                <AvatarImage src={user.avatar?.original} alt={user.name} className="object-cover" />
+                                <AvatarFallback className="rounded-lg bg-neutral-200 text-4xl text-black dark:bg-neutral-700 dark:text-white">
+                                    {getInitials(user.name)}
+                                </AvatarFallback>
+                            </Avatar>
 
-                            {user.roles.length > 0 && (
-                                <ul className="flex flex-wrap items-center gap-1">
-                                    {user.roles.map((role) => (
-                                        <RoleBadge key={role.name} role={role} />
-                                    ))}
-                                </ul>
-                            )}
+                            <div className="flex flex-col gap-4">
+                                <div className="-items-center flex flex-wrap gap-2">
+                                    <h1 className="text-text-balance text-3xl font-bold">{user.name}</h1>
+
+                                    {user.roles.length > 0 && (
+                                        <ul className="flex flex-wrap items-center gap-1">
+                                            {user.roles.map((role) => (
+                                                <RoleBadge key={role.name} role={role} />
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+
+                                <p className="text-muted-foreground">{user.email}</p>
+                            </div>
                         </div>
-                        <p className="mt-1 text-muted-foreground">{user.email}</p>
                     </header>
 
                     {/* Action Buttons */}
