@@ -4,6 +4,7 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 
+import AvatarUpload from '@/components/avatar-upload';
 import HeadingSmall from '@/components/common/heading-small';
 import InputError from '@/components/feedback/input-error';
 import DeleteUser from '@/components/forms/delete-user';
@@ -15,7 +16,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
 import { BadgeCheckIcon } from 'lucide-react';
-import { Activity } from 'react';
+import { Activity, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,7 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVerifyEmail: boolean; status?: string }>) {
     const { auth } = usePage<SharedData>().props;
-
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const mustVerify = mustVerifyEmail && auth.user.email_verified_at === null;
 
     return (
@@ -41,10 +42,25 @@ export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVeri
                         {...ProfileController.update.form()}
                         options={{ preserveScroll: true }}
                         className="space-y-6 transition inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
+                        transform={(data) => ({
+                            ...data,
+                            avatar: avatarFile,
+                        })}
                         disableWhileProcessing
                     >
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
+                                <Field data-invalid={!!errors.avatar}>
+                                    <AvatarUpload
+                                        defaultAvatar={auth.user.avatar?.original}
+                                        onFileChange={(file) =>
+                                            setAvatarFile(file?.file instanceof File ? file.file : null)
+                                        }
+                                    />
+
+                                    <InputError message={errors.avatar} className="mt-2" />
+                                </Field>
+
                                 <Field data-invalid={!!errors.name}>
                                     <FieldLabel htmlFor="name">Name</FieldLabel>
 

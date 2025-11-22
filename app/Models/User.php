@@ -9,6 +9,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -30,6 +33,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
+ * @property-read mixed $avatar
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
+ * @property-read bool|null $media_exists
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read bool|null $notifications_exists
@@ -64,10 +71,18 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTrashed()
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements Auditable, MustVerifyEmail
+class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable, \OwenIt\Auditing\Auditable, SoftDeletes, TwoFactorAuthenticatable;
+    /**
+     * @use HasFactory<\Database\Factories\UserFactory>
+     * @use HasRoles<\Spatie\Permission\Traits\HasRoles>
+     * @use InteractsWithMedia<\Spatie\MediaLibrary\InteractsWithMedia>
+     * @use Notifiable<\Illuminate\Notifications\Notifiable>
+     * @use \OwenIt\Auditing\Auditable<\OwenIt\Auditing\Contracts\Auditable>
+     * @use SoftDeletes<\Illuminate\Database\Eloquent\SoftDeletes>
+     * @use TwoFactorAuthenticatable<\Laravel\Fortify\TwoFactorAuthenticatable>
+     */
+    use HasFactory, HasRoles, InteractsWithMedia, Notifiable, \OwenIt\Auditing\Auditable, SoftDeletes, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -90,6 +105,7 @@ class User extends Authenticatable implements Auditable, MustVerifyEmail
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
+        'media',
     ];
 
     /**
@@ -104,6 +120,38 @@ class User extends Authenticatable implements Auditable, MustVerifyEmail
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    protected $appends = ['avatar'];
+
+    public function getAvatarAttribute()
+    {
+        $media = $this->getFirstMedia('avatar');
+
+        if ($media) {
+            return [
+                'original' => $media->getUrl(),
+                'webp' => $media->getUrl('webp'),
+            ];
+        }
+
+        return null;
+    }
+
+    public function registerMediaCollections(?Media $media = null): void
+    {
+        $this
+            ->addMediaCollection('avatar')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
+            ->registerMediaConversions(function () {
+                $this
+                    ->addMediaConversion('webp')
+                    ->format('webp')
+                    ->width(100)
+                    ->height(100)
+                    ->sharpen(10);
+            });
     }
 
     public function addresses()

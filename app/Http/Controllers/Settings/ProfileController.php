@@ -35,6 +35,10 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
+        if ($request->hasFile('avatar')) {
+            $request->user()->addMediaFromRequest('avatar')->toMediaCollection('avatar');
+        }
+
         $request->user()->save();
 
         return to_route('profile.edit');

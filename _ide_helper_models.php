@@ -200,33 +200,6 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property string $imageable_type
- * @property int $imageable_id
- * @property string $path
- * @property string|null $alt Alternative text for the image
- * @property bool $is_cover
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $imageable
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereAlt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereImageableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereImageableType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereIsCover($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image wherePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Image whereUpdatedAt($value)
- * @mixin \Eloquent
- */
-	class Image extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property int $id
  * @property int $commercial_proposal_id
  * @property int $product_id
  * @property int $quantity
@@ -410,10 +383,6 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \App\Models\ProductCategory|null $category
- * @property-read \App\Models\Image|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Image> $images
- * @property-read int|null $images_count
- * @property-read bool|null $images_exists
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
@@ -682,6 +651,10 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
+ * @property-read mixed $avatar
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
+ * @property-read bool|null $media_exists
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read bool|null $notifications_exists
@@ -716,7 +689,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTrashed()
  * @mixin \Eloquent
  */
-	class User extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable, \Illuminate\Contracts\Auth\MustVerifyEmail {}
+	class User extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable, \Spatie\MediaLibrary\HasMedia, \Illuminate\Contracts\Auth\MustVerifyEmail {}
 }
 
 namespace App\Models{

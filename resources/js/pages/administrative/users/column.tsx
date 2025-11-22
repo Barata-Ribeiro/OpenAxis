@@ -2,6 +2,7 @@ import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-butto
 import RoleBadge from '@/components/common/role-badge';
 import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -12,6 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useInitials } from '@/hooks/use-initials';
 import { usePermission } from '@/hooks/use-permission';
 import administrative from '@/routes/administrative';
 import profile from '@/routes/profile';
@@ -35,6 +37,20 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
     {
         accessorKey: 'name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+        cell: function Cell({ row }) {
+            const getInitials = useInitials();
+            return (
+                <div className="inline-flex items-center gap-x-2">
+                    <Avatar className="size-6 overflow-hidden rounded-full">
+                        <AvatarImage src={row.original.avatar?.webp} alt={row.original.name} className="object-cover" />
+                        <AvatarFallback className="rounded-lg bg-neutral-200 text-xs text-black select-none dark:bg-neutral-700 dark:text-white">
+                            {getInitials(row.original.name)}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate font-medium">{row.getValue('name')}</span>
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
