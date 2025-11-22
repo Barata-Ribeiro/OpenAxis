@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Admin;
 
+use App\Http\Requests\Admin\EditUserRequest;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -33,4 +34,13 @@ interface UserServiceInterface
      * @throws \Throwable If user creation or email sending fails.
      */
     public function createUser(array $data): User;
+
+    /**
+     * Update the given user using validated edit request data.
+     *
+     * @param  User  $user  The user instance to update.
+     * @param  EditUserRequest  $data  The validated request containing the new attributes.
+     * @return User The updated user instance.
+     */
+    public function updateUser(User $user, EditUserRequest $data): User;
 }

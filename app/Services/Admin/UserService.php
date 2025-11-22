@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Common\Helpers;
+use App\Http\Requests\Admin\EditUserRequest;
 use App\Interfaces\Admin\UserServiceInterface;
 use App\Mail\NewUserMail;
 use App\Models\User;
@@ -48,6 +49,22 @@ class UserService implements UserServiceInterface
         $user = User::create($data);
 
         Mail::to($user->email)->send(new NewUserMail($user->name, $user->email, $data['password']));
+
+        return $user;
+    }
+
+    public function updateUser(User $user, EditUserRequest $data): User
+    {
+
+        $validated = $data->validated();
+
+        if (! $data->filled('password')) {
+            unset($validated['password']);
+            unset($validated['password_confirmation']);
+        }
+
+        $user->updateOrFail($validated);
+        $user->syncRoles($validated['role']);
 
         return $user;
     }

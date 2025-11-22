@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\EditUserRequest;
 use App\Http\Requests\Admin\UserAccountRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\User;
@@ -92,11 +93,27 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $user->load('roles');
+        $user->load(['roles:name']);
 
         return Inertia::render('administrative/users/edit', [
             'user' => $user,
         ]);
+    }
+
+    public function update(EditUserRequest $request, User $user)
+    {
+        $userId = Auth::id();
+        Log::info('User: Updating User', ['action_user_id' => $userId, 'target_user_id' => $user->id]);
+
+        try {
+            $this->userService->updateUser($user, $request);
+
+            return to_route('administrative.users.show', $user->id)->with('success', $user->name."'s account updated successfully.");
+        } catch (Exception $e) {
+            Log::error('User: An Update Error Occurred', ['action_user_id' => $userId, 'target_user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return back()->withInput()->with('error', 'An unknown error occurred while updating the user.');
+        }
     }
 
     public function destroy(User $user)
