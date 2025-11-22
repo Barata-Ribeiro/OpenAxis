@@ -21,10 +21,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \App\Models\ProductCategory|null $category
- * @property-read \App\Models\Image|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Image> $images
- * @property-read int|null $images_count
- * @property-read bool|null $images_exists
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
@@ -79,15 +75,5 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(ProductCategory::class);
-    }
-
-    public function images()
-    {
-        return $this->morphMany(Image::class, 'imageable');
-    }
-
-    public function cover()
-    {
-        return $this->morphOne(Image::class, 'imageable')->where('is_cover', true);
     }
 }
