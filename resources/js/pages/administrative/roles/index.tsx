@@ -12,7 +12,7 @@ interface IndexPageProps {
 
 export default function IndexPage({ roles }: Readonly<IndexPageProps>) {
     const { data, ...pagination } = roles;
-    console.log('Roles data:', data); // Debugging line
+
     return (
         <AppLayout>
             <Head title="System Roles" />
