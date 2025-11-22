@@ -76,20 +76,14 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
 
     const validateFile = useCallback(
         (file: File | FileMetadata): string | null => {
-            if (file instanceof File) {
-                if (file.size > maxSize) {
-                    return `File "${file.name}" exceeds the maximum size of ${formatBytes(maxSize)}.`;
-                }
-            } else {
-                if (file.size > maxSize) {
-                    return `File "${file.name}" exceeds the maximum size of ${formatBytes(maxSize)}.`;
-                }
+            if (file.size > maxSize) {
+                return `File "${file.name}" exceeds the maximum size of ${formatBytes(maxSize)}.`;
             }
 
             if (accept !== '*') {
                 const acceptedTypes = accept.split(',').map((type) => type.trim());
                 const fileType = file instanceof File ? file.type || '' : file.type;
-                const fileExtension = `.${file instanceof File ? file.name.split('.').pop() : file.name.split('.').pop()}`;
+                const fileExtension = `.${file.name.split('.').pop()}`;
 
                 const isAccepted = acceptedTypes.some((type) => {
                     if (type.startsWith('.')) {
@@ -103,7 +97,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
                 });
 
                 if (!isAccepted) {
-                    return `File "${file instanceof File ? file.name : file.name}" is not an accepted file type.`;
+                    return `File "${file.name}" is not an accepted file type.`;
                 }
             }
 
@@ -220,7 +214,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
                 onFilesAdded?.(validFiles);
 
                 setState((prev) => {
-                    const newFiles = !multiple ? validFiles : [...prev.files, ...validFiles];
+                    const newFiles = multiple ? [...prev.files, ...validFiles] : validFiles;
                     onFilesChange?.(newFiles);
                     return {
                         ...prev,
@@ -252,6 +246,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
             clearFiles,
             onFilesChange,
             onFilesAdded,
+            onError,
         ],
     );
 
@@ -260,8 +255,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
             setState((prev) => {
                 const fileToRemove = prev.files.find((file) => file.id === id);
                 if (
-                    fileToRemove &&
-                    fileToRemove.preview &&
+                    fileToRemove?.preview &&
                     fileToRemove.file instanceof File &&
                     fileToRemove.file.type.startsWith('image/')
                 ) {
@@ -323,11 +317,11 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
 
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 // In single file mode, only use the first file
-                if (!multiple) {
+                if (multiple) {
+                    addFiles(e.dataTransfer.files);
+                } else {
                     const file = e.dataTransfer.files[0];
                     addFiles([file]);
-                } else {
-                    addFiles(e.dataTransfer.files);
                 }
             }
         },
@@ -356,7 +350,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
                 type: 'file' as const,
                 onChange: handleFileChange,
                 accept: props.accept || accept,
-                multiple: props.multiple !== undefined ? props.multiple : multiple,
+                multiple: props.multiple ?? multiple,
                 ref: inputRef,
             };
         },
@@ -386,7 +380,7 @@ export const formatBytes = (bytes: number, decimals = 2): string => {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
+    const dm = Math.max(decimals, 0);
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
