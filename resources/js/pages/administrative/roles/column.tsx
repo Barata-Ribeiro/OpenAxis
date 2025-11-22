@@ -1,5 +1,6 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -9,10 +10,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { normalizeString } from '@/lib/utils';
+import { RoleNames } from '@/types/application/enums';
 import { Role } from '@/types/application/role-permission';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Ellipsis } from 'lucide-react';
+import { Ellipsis, InfinityIcon } from 'lucide-react';
 
 export const columns: Array<ColumnDef<Role>> = [
     {
@@ -25,11 +27,7 @@ export const columns: Array<ColumnDef<Role>> = [
     {
         accessorKey: 'name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-        cell: ({ row }) => (
-            <p>
-                {normalizeString(row.original.name)} ({row.original.users_count} users)
-            </p>
-        ),
+        cell: ({ row }) => normalizeString(row.original.name),
         enableSorting: true,
     },
     {
@@ -37,6 +35,42 @@ export const columns: Array<ColumnDef<Role>> = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Guard Name" />,
         cell: ({ row }) => normalizeString(row.original?.guard_name ?? 'N/A'),
         enableSorting: true,
+    },
+    {
+        accessorKey: 'users_count',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Users" />,
+        cell: ({ row }) => (
+            <Badge
+                className="h-5 min-w-5 px-2 font-mono tabular-nums"
+                variant="outline"
+                aria-label={`${row.original.users_count} user(s)`}
+                title={`${row.original.users_count} user(s)`}
+            >
+                {row.original.users_count}
+            </Badge>
+        ),
+        enableSorting: false,
+    },
+    {
+        accessorKey: 'permissions_count',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Permissions" />,
+        cell: function Cell({ row }) {
+            const count = row.original.permissions_count;
+            const isSuperAdmin = row.original.name === RoleNames.SUPER_ADMIN;
+            const label = isSuperAdmin ? 'Unlimited permissions' : `${count} permission(s)`;
+
+            return (
+                <Badge
+                    className="h-5 min-w-5 px-2 font-mono tabular-nums"
+                    variant="outline"
+                    aria-label={label}
+                    title={label}
+                >
+                    {isSuperAdmin ? <InfinityIcon aria-hidden size={16} /> : count}
+                </Badge>
+            );
+        },
+        enableSorting: false,
     },
     {
         accessorKey: 'created_at',
