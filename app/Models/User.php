@@ -11,6 +11,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -33,7 +34,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
  * @property-read mixed $avatar
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -104,11 +105,8 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
+        'media',
     ];
-
-    protected $with = ['media'];
-
-    protected $appends = ['avatar'];
 
     /**
      * Get the attributes that should be cast.
@@ -124,7 +122,9 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
         ];
     }
 
-    protected function getAvatarAttribute()
+    protected $appends = ['avatar'];
+
+    public function getAvatarAttribute()
     {
         $media = $this->getFirstMedia('avatar');
 
@@ -138,10 +138,11 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
         return null;
     }
 
-    public function registerMediaCollections(): void
+    public function registerMediaCollections(?Media $media = null): void
     {
         $this
             ->addMediaCollection('avatar')
+            ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->registerMediaConversions(function () {
                 $this
@@ -150,8 +151,7 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
                     ->width(100)
                     ->height(100)
                     ->sharpen(10);
-            })
-            ->singleFile();
+            });
     }
 
     public function addresses()

@@ -6,7 +6,7 @@ return [
      * The disk on which to store added files and derived images by default. Choose
      * one or more of the disks you've configured in config/filesystems.php.
      */
-    'disk_name' => env('MEDIA_DISK', 'media'),
+    'disk_name' => env('MEDIA_DISK', 'public'),
 
     /*
      * The maximum file size of an item in bytes.
@@ -66,12 +66,12 @@ return [
      * in the same session. You can opt to disable this for stateless usage of
      * the pro components.
      */
-    'enable_temporary_uploads_session_affinity' => true,
+    'enable_temporary_uploads_session_affinity' => false,
 
     /*
      * When enabled, Media Library pro will generate thumbnails for uploaded file.
      */
-    'generate_thumbnails_for_temporary_uploads' => true,
+    'generate_thumbnails_for_temporary_uploads' => false,
 
     /*
      * This is the class that is responsible for naming generated files.
