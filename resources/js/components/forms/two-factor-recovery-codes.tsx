@@ -6,6 +6,7 @@ import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { Activity, useCallback, useEffect, useRef, useState } from 'react';
 import slugify from 'slugify';
 import AlertError from '../feedback/alert-error';
+import { Spinner } from '../ui/spinner';
 
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];
@@ -76,6 +77,8 @@ export default function TwoFactorRecoveryCodes({
                             {...regenerateRecoveryCodes.form()}
                             options={{ preserveScroll: true }}
                             onSuccess={fetchRecoveryCodes}
+                            disableWhileProcessing
+                            className="space-y-6 inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
                         >
                             {({ processing }) => (
                                 <Button
@@ -84,7 +87,8 @@ export default function TwoFactorRecoveryCodes({
                                     disabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
-                                    <RefreshCw /> Regenerate Codes
+                                    {processing ? <Spinner /> : <RefreshCw aria-hidden />}
+                                    Regenerate Codes
                                 </Button>
                             )}
                         </Form>

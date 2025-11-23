@@ -3,6 +3,7 @@ import TwoFactorSetupModal from '@/components/extras/two-factor-setup-modal';
 import TwoFactorRecoveryCodes from '@/components/forms/two-factor-recovery-codes';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -88,10 +89,15 @@ export default function TwoFactor({
                                         Continue Setup
                                     </Button>
                                 ) : (
-                                    <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
+                                    <Form
+                                        {...enable.form()}
+                                        onSuccess={() => setShowSetupModal(true)}
+                                        disableWhileProcessing
+                                        className="inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
+                                    >
                                         {({ processing }) => (
                                             <Button type="submit" disabled={processing}>
-                                                <ShieldCheck />
+                                                {processing ? <Spinner /> : <ShieldCheck aria-hidden />}
                                                 Enable 2FA
                                             </Button>
                                         )}

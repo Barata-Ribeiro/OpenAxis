@@ -11,10 +11,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { Form } from '@inertiajs/react';
-import { useRef } from 'react';
+import { Activity, useRef } from 'react';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -47,26 +48,30 @@ export default function DeleteUser() {
                             options={{ preserveScroll: true }}
                             onError={() => passwordInput.current?.focus()}
                             resetOnSuccess
-                            className="space-y-6"
+                            disableWhileProcessing
+                            className="space-y-6 inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
                         >
                             {({ resetAndClearErrors, processing, errors }) => (
                                 <>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="password" className="sr-only">
+                                    <Field data-invalid={!!errors.password}>
+                                        <FieldLabel htmlFor="password" className="sr-only">
                                             Password
-                                        </Label>
+                                        </FieldLabel>
 
                                         <Input
-                                            id="password"
                                             type="password"
+                                            id="password"
                                             name="password"
                                             ref={passwordInput}
                                             placeholder="Password"
                                             autoComplete="current-password"
+                                            required
+                                            aria-required
+                                            aria-invalid={!!errors.password}
                                         />
 
                                         <InputError message={errors.password} />
-                                    </div>
+                                    </Field>
 
                                     <DialogFooter className="gap-2">
                                         <DialogClose asChild>
@@ -75,10 +80,16 @@ export default function DeleteUser() {
                                             </Button>
                                         </DialogClose>
 
-                                        <Button variant="destructive" disabled={processing} asChild>
-                                            <button type="submit" data-test="confirm-delete-user-button">
-                                                Delete account
-                                            </button>
+                                        <Button
+                                            type="submit"
+                                            variant="destructive"
+                                            disabled={processing}
+                                            data-test="confirm-delete-user-button"
+                                        >
+                                            <Activity mode={processing ? 'visible' : 'hidden'}>
+                                                <Spinner />
+                                            </Activity>
+                                            Delete account
                                         </Button>
                                     </DialogFooter>
                                 </>

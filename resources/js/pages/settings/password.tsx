@@ -5,12 +5,13 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
-import { useRef } from 'react';
+import { Activity, useRef } from 'react';
 
 import HeadingSmall from '@/components/common/heading-small';
 import { Button } from '@/components/ui/button';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { edit } from '@/routes/user-password';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -37,9 +38,7 @@ export default function Password() {
 
                     <Form
                         {...PasswordController.update.form()}
-                        options={{
-                            preserveScroll: true,
-                        }}
+                        options={{ preserveScroll: true }}
                         resetOnError={['password', 'password_confirmation', 'current_password']}
                         resetOnSuccess
                         onError={(errors) => {
@@ -51,59 +50,69 @@ export default function Password() {
                                 currentPasswordInput.current?.focus();
                             }
                         }}
-                        className="space-y-6"
+                        disableWhileProcessing
+                        className="space-y-6 inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
                     >
                         {({ errors, processing, recentlySuccessful }) => (
                             <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="current_password">Current password</Label>
+                                <Field data-invalid={!!errors.current_password}>
+                                    <FieldLabel htmlFor="current_password">Current password</FieldLabel>
 
                                     <Input
-                                        id="current_password"
                                         ref={currentPasswordInput}
-                                        name="current_password"
                                         type="password"
-                                        className="mt-1 block w-full"
+                                        id="current_password"
+                                        name="current_password"
                                         autoComplete="current-password"
                                         placeholder="Current password"
+                                        required
+                                        aria-required
+                                        aria-invalid={!!errors.current_password}
                                     />
 
                                     <InputError message={errors.current_password} />
-                                </div>
+                                </Field>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password">New password</Label>
+                                <Field data-invalid={!!errors.password}>
+                                    <FieldLabel htmlFor="password">New password</FieldLabel>
 
                                     <Input
-                                        id="password"
                                         ref={passwordInput}
-                                        name="password"
                                         type="password"
-                                        className="mt-1 block w-full"
+                                        id="password"
+                                        name="password"
                                         autoComplete="new-password"
                                         placeholder="New password"
+                                        required
+                                        aria-required
+                                        aria-invalid={!!errors.password}
                                     />
 
                                     <InputError message={errors.password} />
-                                </div>
+                                </Field>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password_confirmation">Confirm password</Label>
+                                <Field data-invalid={!!errors.password_confirmation}>
+                                    <FieldLabel htmlFor="password_confirmation">Confirm password</FieldLabel>
 
                                     <Input
+                                        type="password"
                                         id="password_confirmation"
                                         name="password_confirmation"
-                                        type="password"
-                                        className="mt-1 block w-full"
                                         autoComplete="new-password"
                                         placeholder="Confirm password"
+                                        required
+                                        aria-required
+                                        aria-invalid={!!errors.password_confirmation}
                                     />
 
                                     <InputError message={errors.password_confirmation} />
-                                </div>
+                                </Field>
 
                                 <div className="flex items-center gap-4">
                                     <Button disabled={processing} data-test="update-password-button">
+                                        <Activity mode={processing ? 'visible' : 'hidden'}>
+                                            <Spinner />
+                                        </Activity>
                                         Save password
                                     </Button>
 
