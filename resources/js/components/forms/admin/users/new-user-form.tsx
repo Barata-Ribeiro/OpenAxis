@@ -23,7 +23,7 @@ export default function NewUserForm() {
         >
             {({ processing, resetAndClearErrors, errors }) => (
                 <>
-                    <Field>
+                    <Field data-invalid={!!errors.name}>
                         <FieldLabel htmlFor="name">Name</FieldLabel>
 
                         <Input
@@ -38,7 +38,7 @@ export default function NewUserForm() {
                         <InputError className="mt-2" message={errors.name} />
                     </Field>
 
-                    <Field>
+                    <Field data-invalid={!!errors.email}>
                         <FieldLabel htmlFor="email">Email address</FieldLabel>
 
                         <Input
@@ -54,7 +54,7 @@ export default function NewUserForm() {
                         <InputError className="mt-2" message={errors.email} />
                     </Field>
 
-                    <Field>
+                    <Field data-invalid={!!errors.password}>
                         <FieldLabel htmlFor="password">
                             Password <span className="text-muted">(Optional)</span>
                         </FieldLabel>
@@ -71,7 +71,7 @@ export default function NewUserForm() {
                         <InputError className="mt-2" message={errors.password} />
                     </Field>
 
-                    <Field>
+                    <Field data-invalid={!!errors.role}>
                         <FieldLabel htmlFor="role">Role</FieldLabel>
 
                         <Select name="role" required aria-required>
