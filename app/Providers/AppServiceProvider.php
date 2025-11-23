@@ -30,6 +30,11 @@ class AppServiceProvider extends ServiceProvider
 			\App\Interfaces\Admin\RoleServiceInterface::class,
 			\App\Services\Admin\RoleService::class
 		);
+
+		$this->app->bind(
+			\App\Interfaces\Product\ProductCategoryServiceInterface::class,
+			\App\Services\Product\ProductCategoryService::class
+		);
     }
 
     /**
