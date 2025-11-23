@@ -25,7 +25,7 @@ class UserService implements UserServiceInterface
             ->when($startDate && ! $endDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($startDate)->endOfDay()]))
             ->when($endDate && ! $startDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($endDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]))
             ->when(! empty($roles), fn ($q) => $q->whereHas('roles', fn ($roleQuery) => $roleQuery->whereIn('name', $roles)))
-            ->with('roles:id,name')
+            ->with('roles:id,name', 'media')
             ->withTrashed();
 
         if ($sortBy === 'roles') {
