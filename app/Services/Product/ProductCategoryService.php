@@ -3,6 +3,7 @@
 namespace App\Services\Product;
 
 use App\Common\Helpers;
+use App\Http\Requests\Product\ProductCategoryRequest;
 use App\Interfaces\Product\ProductCategoryServiceInterface;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -20,5 +21,16 @@ class ProductCategoryService implements ProductCategoryServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function createCategory(ProductCategoryRequest $request): void
+    {
+        $validated = $request->validated();
+
+        ProductCategory::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'is_active' => $validated['is_active'],
+        ]);
     }
 }

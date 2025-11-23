@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Product;
 
+use App\Http\Requests\Product\ProductCategoryRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ProductCategoryServiceInterface
@@ -22,4 +23,19 @@ interface ProductCategoryServiceInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated collection of categories matching the provided criteria.
      */
     public function getPaginatedCategories(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Create a new product category from the provided request data.
+     *
+     * Implementations should validate and persist the category (and any related
+     * entities) to the application's data store. This method performs side effects
+     * only and does not return a value; failures should be reported via exceptions.
+     *
+     * @param  ProductCategoryRequest  $request  Validated request containing the attributes
+     *                                           required to create the product category.
+     *
+     * @throws \InvalidArgumentException If the provided request data is invalid.
+     * @throws \RuntimeException If the category could not be persisted.
+     */
+    public function createCategory(ProductCategoryRequest $request): void;
 }
