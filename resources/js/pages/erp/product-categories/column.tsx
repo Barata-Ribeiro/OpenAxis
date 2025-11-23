@@ -5,16 +5,21 @@ import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { usePermission } from '@/hooks/use-permission';
 import { normalizeString } from '@/lib/utils';
+import erp from '@/routes/erp';
 import { ProductCategory } from '@/types/erp/product-category';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CircleDashed, Ellipsis } from 'lucide-react';
+import { CircleDashed, EditIcon, Ellipsis } from 'lucide-react';
 
 export const columns: Array<ColumnDef<ProductCategory>> = [
     {
@@ -103,6 +108,8 @@ export const columns: Array<ColumnDef<ProductCategory>> = [
     {
         id: 'actions',
         cell: function Cell({ row }) {
+            const { can } = usePermission();
+
             const nameToCopy = row.original.name;
             const descriptionToCopy = row.original.description;
 
@@ -118,15 +125,30 @@ export const columns: Array<ColumnDef<ProductCategory>> = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={descriptionToCopy}>
+                                    Copy Description
+                                </DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <DropdownMenuCopyButton content={descriptionToCopy}>
-                                Copy Description
-                            </DropdownMenuCopyButton>
-                        </DropdownMenuItem>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem disabled={!can('user.edit')} asChild>
+                                <Link
+                                    className="block w-full"
+                                    href={erp.categories.edit(row.original.slug)}
+                                    as="button"
+                                >
+                                    <EditIcon aria-hidden size={14} /> Edit
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
