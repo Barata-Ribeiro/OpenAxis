@@ -71,18 +71,14 @@ class ProductCategory extends Model implements Auditable
 
     protected static function booted()
     {
-        static::creating(function ($product) {
-            if (empty($product->slug) && ! empty($product->name)) {
-                $base = Str::slug($product->name);
-                $slug = $base;
-                $i = 1;
-
-                while (static::withTrashed()->whereSlug($slug)->exists()) {
-                    $slug = $base.'-'.$i++;
-                }
-
-                $product->slug = $slug;
+        static::creating(function ($productCategory) {
+            if (empty($productCategory->slug) && ! empty($productCategory->name)) {
+                static::ensureUniqueSlug($productCategory);
             }
+        });
+
+        static::updating(function ($productCategory) {
+            static::ensureUniqueSlug($productCategory);
         });
     }
 
@@ -97,5 +93,18 @@ class ProductCategory extends Model implements Auditable
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    private static function ensureUniqueSlug($productCategory)
+    {
+        $base = Str::slug($productCategory->name);
+        $slug = $base;
+        $i = 1;
+
+        while (static::withTrashed()->whereSlug($slug)->where('id', '!=', $productCategory->id)->exists()) {
+            $slug = $base.'-'.$i++;
+        }
+
+        $productCategory->slug = $slug;
     }
 }
