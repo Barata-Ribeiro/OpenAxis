@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RoleEnum;
 use App\Models\User;
 use Faker\Generator as Faker;
 use Inertia\Testing\AssertableInertia;
@@ -15,9 +16,11 @@ describe('tests for the "index" method of Admin\UserController', function () {
     });
 
     test('authenticated admin users can visit the user administration page', function () {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $admin = User::where('email', config('app.admin_email'))->first();
 
-        $this->get(route('administrative.users.index'))->assertOk();
+        $this->actingAs($admin)
+            ->get(route('administrative.users.index'))
+            ->assertOk();
     });
 
     test('user administration page displays users', function () use ($componentName) {
@@ -144,5 +147,116 @@ describe('tests for the "create" and "store" methods of Admin\UserController', f
                 'role' => $faker->randomElement(Role::pluck('name')),
             ])->assertRedirect(route('administrative.users.index'))
             ->assertSessionHas('success');
+    });
+});
+
+describe('tests for "show", "edit", "update", "destroy" and "forceDestroy" methods of Admin\UserController', function () {
+    test('non-admin users cannot view a user (show) page', function () {
+        $this->actingAs(User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first());
+
+        $target = User::inRandomOrder()->first();
+
+        $this->get(route('administrative.users.show', $target->id))->assertForbidden();
+    });
+
+    test('admin users can view a user (show) page with permissions and addresses loaded', function () {
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $this->actingAs($admin);
+
+        $target = User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first();
+
+        $response = $this->get(route('administrative.users.show', $target->id));
+
+        $response->assertOk();
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('administrative/users/show')
+            ->has('user')
+            ->where('user.id', $target->id)
+            ->has('user.permissions')
+            ->has('user.addresses')
+        );
+    });
+
+    test('non-admin users cannot access edit page', function () {
+        $this->actingAs(User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first());
+
+        $target = User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first();
+
+        $this->get(route('administrative.users.edit', $target->id))->assertForbidden();
+    });
+
+    test('admin users can access edit page', function () {
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $target = User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first();
+
+        $this->actingAs($admin);
+
+        $response = $this->get(route('administrative.users.edit', $target->id));
+
+        $response->assertOk();
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('administrative/users/edit')
+            ->has('user')
+            ->where('user.id', $target->id)
+        );
+    });
+
+    test('admin users can update a user account', function () {
+        $faker = app(Faker::class);
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $target = User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first();
+
+        $randomRole = [RoleEnum::BUYER->value, RoleEnum::VENDOR->value, RoleEnum::FINANCE->value];
+
+        $this->actingAs($admin)
+            ->patch(route('administrative.users.update', $target->id), [
+                'name' => $faker->name(),
+                'email' => $faker->unique()->safeEmail(),
+                'role' => $faker->randomElement($randomRole),
+            ])->assertRedirect(route('administrative.users.show', $target->id))
+            ->assertSessionHas('success');
+    });
+
+    test('admin cannot delete their own account (destroy)', function () {
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $this->actingAs($admin)
+            ->delete(route('administrative.users.destroy', $admin->id))
+            ->assertSessionHas('error');
+    });
+
+    test('admin can delete other users (destroy)', function () {
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $target = User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first();
+
+        $this->actingAs($admin)
+            ->delete(route('administrative.users.destroy', $target->id))
+            ->assertRedirect(route('administrative.users.index'))
+            ->assertSessionHas('success');
+    });
+
+    test('admin cannot force-delete their own account (forceDestroy)', function () {
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $this->actingAs($admin)
+            ->delete(route('administrative.users.force-destroy', $admin->id))
+            ->assertSessionHas('error');
+    });
+
+    test('admin can permanently delete other users (forceDestroy)', function () {
+        $admin = User::where('email', config('app.admin_email'))->first();
+
+        $target = User::inRandomOrder()->whereHas('roles', fn ($q) => $q->where('name', '!=', RoleEnum::SUPER_ADMIN->value))->first();
+
+        $this->actingAs($admin)
+            ->delete(route('administrative.users.force-destroy', $target->id))
+            ->assertRedirect(route('administrative.users.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('users', ['id' => $target->id]);
     });
 });
