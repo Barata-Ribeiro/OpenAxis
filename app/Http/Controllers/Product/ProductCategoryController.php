@@ -96,4 +96,28 @@ class ProductCategoryController extends Controller
             return back()->withInput()->with('error', 'Failed to update product category.');
         }
     }
+
+    public function destroy(ProductCategory $category)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Product Category: Deleting category.', ['action_user_id' => $userId]);
+
+            if ($category->products()->exists()) {
+                return back()->with('error', 'Cannot delete category with associated products.');
+            }
+
+            $category->deleteOrFail();
+
+            return to_route('erp.categories.index')->with('success', 'Product category deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Product Category: Failed to delete category.', [
+                'action_user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Failed to delete product category.');
+        }
+    }
 }

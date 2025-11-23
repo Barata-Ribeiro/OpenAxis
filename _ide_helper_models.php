@@ -425,7 +425,7 @@ namespace App\Models{
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
@@ -435,6 +435,7 @@ namespace App\Models{
  * @method static \Database\Factories\ProductCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereDeletedAt($value)
@@ -444,10 +445,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereUpdatedAt($value)
- * @mixin \Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory withoutTrashed()
+ * @mixin \Eloquent
  */
 	class ProductCategory extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }

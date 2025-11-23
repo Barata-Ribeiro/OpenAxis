@@ -12,5 +12,7 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
 
         Route::get('/{category}/edit', [ProductCategoryController::class, 'edit'])->name('erp.categories.edit')->middleware('permission:product.edit');
         Route::patch('/{category}', [ProductCategoryController::class, 'update'])->name('erp.categories.update')->middleware('permission:product.edit');
+
+        Route::delete('/{category}', [ProductCategoryController::class, 'destroy'])->name('erp.categories.destroy')->middleware('permission:product.destroy');
     });
 });
