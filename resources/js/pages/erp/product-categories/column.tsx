@@ -1,4 +1,5 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,8 @@ import { ProductCategory } from '@/types/erp/product-category';
 import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CircleDashed, EditIcon, Ellipsis } from 'lucide-react';
+import { CircleDashed, DeleteIcon, EditIcon, Ellipsis } from 'lucide-react';
+import { useState } from 'react';
 
 export const columns: Array<ColumnDef<ProductCategory>> = [
     {
@@ -109,48 +111,67 @@ export const columns: Array<ColumnDef<ProductCategory>> = [
         id: 'actions',
         cell: function Cell({ row }) {
             const { can } = usePermission();
+            const [open, setOpen] = useState(false);
 
             const nameToCopy = row.original.name;
             const descriptionToCopy = row.original.description;
 
             return (
-                <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Open menu"
-                            variant="ghost"
-                            className="flex size-8 p-0 data-[state=open]:bg-muted"
-                        >
-                            <Ellipsis aria-hidden size={16} />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem asChild>
-                                <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <DropdownMenuCopyButton content={descriptionToCopy}>
-                                    Copy Description
-                                </DropdownMenuCopyButton>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem disabled={!can('user.edit')} asChild>
-                                <Link
-                                    className="block w-full"
-                                    href={erp.categories.edit(row.original.slug)}
-                                    as="button"
+                <>
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Open menu"
+                                variant="ghost"
+                                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                            >
+                                <Ellipsis aria-hidden size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={descriptionToCopy}>
+                                        Copy Description
+                                    </DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem disabled={!can('user.edit')} asChild>
+                                    <Link
+                                        className="block w-full"
+                                        href={erp.categories.edit(row.original.slug)}
+                                        as="button"
+                                    >
+                                        <EditIcon aria-hidden size={14} /> Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    disabled={!can('product.destroy')}
+                                    onSelect={() => setOpen(true)}
                                 >
-                                    <EditIcon aria-hidden size={14} /> Edit
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                    <DeleteIcon aria-hidden size={14} /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ActionConfirmationDialog
+                        open={open}
+                        setOpen={setOpen}
+                        title="Confirm Deletion"
+                        description={`Are you sure you want to delete the product category "${row.original.name}"? This action cannot be undone.`}
+                        method="delete"
+                        route={erp.categories.destroy(row.original.slug)}
+                    />
+                </>
             );
         },
         size: 40,
