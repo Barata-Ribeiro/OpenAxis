@@ -6,6 +6,7 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/password/confirm';
 import { Form, Head } from '@inertiajs/react';
+import { Activity } from 'react';
 
 export default function ConfirmPassword() {
     return (
@@ -23,7 +24,7 @@ export default function ConfirmPassword() {
             >
                 {({ processing, errors }) => (
                     <>
-                        <Field>
+                        <Field data-invalid={!!errors.password}>
                             <FieldLabel htmlFor="password">Password</FieldLabel>
                             <Input
                                 type="password"
@@ -41,7 +42,9 @@ export default function ConfirmPassword() {
 
                         <div className="flex items-center">
                             <Button className="w-full" disabled={processing} data-test="confirm-password-button">
-                                {processing && <Spinner />}
+                                <Activity mode={processing ? 'visible' : 'hidden'}>
+                                    <Spinner />
+                                </Activity>
                                 Confirm password
                             </Button>
                         </div>

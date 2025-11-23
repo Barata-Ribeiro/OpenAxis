@@ -12,6 +12,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import AuthLayout from '@/layouts/auth-layout';
 import { HelpCircle, InfoIcon } from 'lucide-react';
+import { Activity } from 'react';
 
 export default function Register() {
     return (
@@ -26,7 +27,7 @@ export default function Register() {
                 {({ processing, errors }) => (
                     <>
                         <div className="space-y-6">
-                            <Field>
+                            <Field data-invalid={!!errors.name}>
                                 <FieldLabel htmlFor="name">Name</FieldLabel>
                                 <Input
                                     type="text"
@@ -43,7 +44,7 @@ export default function Register() {
                                 <InputError message={errors.name} className="mt-2" />
                             </Field>
 
-                            <Field>
+                            <Field data-invalid={!!errors.email}>
                                 <FieldLabel htmlFor="email">Email address</FieldLabel>
                                 <InputGroup>
                                     <InputGroupInput
@@ -73,7 +74,7 @@ export default function Register() {
                                 <InputError message={errors.email} />
                             </Field>
 
-                            <Field>
+                            <Field data-invalid={!!errors.password}>
                                 <FieldLabel htmlFor="password">Password</FieldLabel>
                                 <InputGroup>
                                     <InputGroupInput
@@ -103,7 +104,7 @@ export default function Register() {
                                 <InputError message={errors.password} />
                             </Field>
 
-                            <Field>
+                            <Field data-invalid={!!errors.password_confirmation}>
                                 <FieldLabel htmlFor="password_confirmation">Confirm password</FieldLabel>
                                 <Input
                                     type="password"
@@ -120,7 +121,9 @@ export default function Register() {
                             </Field>
 
                             <Button type="submit" className="mt-2 w-full" tabIndex={5} data-test="register-user-button">
-                                {processing && <Spinner />}
+                                <Activity mode={processing ? 'visible' : 'hidden'}>
+                                    <Spinner />
+                                </Activity>
                                 Create account
                             </Button>
                         </div>

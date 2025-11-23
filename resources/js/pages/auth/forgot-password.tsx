@@ -10,6 +10,7 @@ import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import { Activity } from 'react';
 
 export default function ForgotPassword({ status }: Readonly<{ status?: string }>) {
     return (
@@ -26,7 +27,7 @@ export default function ForgotPassword({ status }: Readonly<{ status?: string }>
                 >
                     {({ processing, errors }) => (
                         <>
-                            <Field>
+                            <Field data-invalid={!!errors.email}>
                                 <FieldLabel htmlFor="email">Email address</FieldLabel>
                                 <Input
                                     type="email"
@@ -49,7 +50,9 @@ export default function ForgotPassword({ status }: Readonly<{ status?: string }>
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >
-                                    {processing && <Spinner />}
+                                    <Activity mode={processing ? 'visible' : 'hidden'}>
+                                        <Spinner />
+                                    </Activity>
                                     Email password reset link
                                 </Button>
                             </div>

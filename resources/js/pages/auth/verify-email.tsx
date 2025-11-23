@@ -26,7 +26,9 @@ export default function VerifyEmail({ status }: Readonly<{ status?: string }>) {
                 {({ processing }) => (
                     <>
                         <Button disabled={processing} variant="secondary">
-                            {processing && <Spinner />}
+                            <Activity mode={processing ? 'visible' : 'hidden'}>
+                                <Spinner />
+                            </Activity>
                             Resend verification email
                         </Button>
 

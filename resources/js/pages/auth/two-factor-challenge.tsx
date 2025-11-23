@@ -55,7 +55,10 @@ export default function TwoFactorChallenge() {
                                         placeholder="Enter recovery code"
                                         autoFocus={showRecoveryInput}
                                         required
+                                        aria-required
+                                        aria-invalid={!!errors.recovery_code}
                                     />
+
                                     <InputError message={errors.recovery_code} />
                                 </>
                             ) : (

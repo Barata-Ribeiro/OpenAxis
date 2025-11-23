@@ -11,6 +11,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { InfoIcon } from 'lucide-react';
+import { Activity } from 'react';
 interface ResetPasswordProps {
     token: string;
     email: string;
@@ -30,8 +31,9 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
             >
                 {({ processing, errors }) => (
                     <div className="space-y-6">
-                        <Field>
+                        <Field data-invalid={!!errors.email}>
                             <FieldLabel htmlFor="email">Email</FieldLabel>
+
                             <Input
                                 type="email"
                                 id="email"
@@ -42,11 +44,13 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
                                 readOnly
                                 aria-invalid={!!errors.email}
                             />
+
                             <InputError message={errors.email} className="mt-2" />
                         </Field>
 
-                        <Field>
+                        <Field data-invalid={!!errors.password}>
                             <FieldLabel htmlFor="password">Password</FieldLabel>
+
                             <InputGroup>
                                 <InputGroupInput
                                     id="password"
@@ -60,6 +64,7 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
                                     aria-required
                                     aria-invalid={!!errors.password}
                                 />
+
                                 <InputGroupAddon align="inline-end">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -73,11 +78,13 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
                                     </Tooltip>
                                 </InputGroupAddon>
                             </InputGroup>
+
                             <InputError message={errors.password} />
                         </Field>
 
-                        <Field>
+                        <Field data-invalid={!!errors.password_confirmation}>
                             <FieldLabel htmlFor="password_confirmation">Confirm password</FieldLabel>
+
                             <Input
                                 type="password"
                                 id="password_confirmation"
@@ -89,6 +96,7 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
                                 aria-required
                                 aria-invalid={!!errors.password_confirmation}
                             />
+
                             <InputError message={errors.password_confirmation} className="mt-2" />
                         </Field>
 
@@ -98,7 +106,9 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
                             disabled={processing}
                             data-test="reset-password-button"
                         >
-                            {processing && <Spinner />}
+                            <Activity mode={processing ? 'visible' : 'hidden'}>
+                                <Spinner />
+                            </Activity>
                             Reset password
                         </Button>
                     </div>

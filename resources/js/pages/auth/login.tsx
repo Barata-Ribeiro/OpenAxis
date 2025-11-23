@@ -33,7 +33,7 @@ export default function Login({ status, canResetPassword, canRegister }: Readonl
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
-                            <Field>
+                            <Field data-invalid={!!errors.email}>
                                 <FieldLabel htmlFor="email">Email address</FieldLabel>
                                 <Input
                                     type="email"
@@ -50,7 +50,7 @@ export default function Login({ status, canResetPassword, canRegister }: Readonl
                                 <InputError message={errors.email} />
                             </Field>
 
-                            <Field>
+                            <Field data-invalid={!!errors.password}>
                                 <div className="flex items-center">
                                     <FieldLabel htmlFor="password">Password</FieldLabel>
 
@@ -75,7 +75,7 @@ export default function Login({ status, canResetPassword, canRegister }: Readonl
                                 <InputError message={errors.password} />
                             </Field>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center gap-3">
                                 <Checkbox id="remember" name="remember" tabIndex={3} />
                                 <Label htmlFor="remember">Remember me</Label>
                             </div>
@@ -87,7 +87,9 @@ export default function Login({ status, canResetPassword, canRegister }: Readonl
                                 disabled={processing}
                                 data-test="login-button"
                             >
-                                {processing && <Spinner />}
+                                <Activity mode={processing ? 'visible' : 'hidden'}>
+                                    <Spinner />
+                                </Activity>
                                 Log in
                             </Button>
                         </div>
