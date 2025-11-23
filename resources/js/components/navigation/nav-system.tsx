@@ -8,9 +8,10 @@ import {
 import { usePermission } from '@/hooks/use-permission';
 import { resolveUrl } from '@/lib/utils';
 import administrative from '@/routes/administrative';
+import erp from '@/routes/erp';
 import { NavGroup } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { IdCardLanyardIcon, MailIcon, UsersIcon } from 'lucide-react';
+import { IdCardLanyardIcon, MailIcon, TagsIcon, UsersIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
 export function NavSystem() {
@@ -47,7 +48,19 @@ export function NavSystem() {
         ],
     };
 
-    const navigationGroups: NavGroup[] = [adminGroup, mailableGroup];
+    const erpGroup: NavGroup = {
+        title: 'Enterprise Resource Planning',
+        items: [
+            {
+                title: 'Categories',
+                href: erp.categories.index().url,
+                icon: TagsIcon,
+                canView: can('product.index'),
+            },
+        ],
+    };
+
+    const navigationGroups: NavGroup[] = [erpGroup, adminGroup, mailableGroup];
 
     return (
         <SidebarGroup className="px-2 py-0">
