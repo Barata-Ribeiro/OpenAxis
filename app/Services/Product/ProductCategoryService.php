@@ -4,6 +4,7 @@ namespace App\Services\Product;
 
 use App\Common\Helpers;
 use App\Http\Requests\Product\ProductCategoryRequest;
+use App\Http\Requests\Product\UpdateProductCategoryRequest;
 use App\Interfaces\Product\ProductCategoryServiceInterface;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -28,6 +29,17 @@ class ProductCategoryService implements ProductCategoryServiceInterface
         $validated = $request->validated();
 
         ProductCategory::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'is_active' => $validated['is_active'],
+        ]);
+    }
+
+    public function updateCategory(UpdateProductCategoryRequest $request, ProductCategory $category): void
+    {
+        $validated = $request->validated();
+
+        $category->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'is_active' => $validated['is_active'],

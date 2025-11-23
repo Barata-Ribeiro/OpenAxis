@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\ProductCategoryRequest;
+use App\Http\Requests\Product\UpdateProductCategoryRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\ProductCategory;
 use App\Services\Product\ProductCategoryService;
 use Auth;
 use Exception;
@@ -65,6 +67,33 @@ class ProductCategoryController extends Controller
             ]);
 
             return back()->withInput()->with('error', 'Failed to create product category.');
+        }
+    }
+
+    public function edit(ProductCategory $category)
+    {
+        return Inertia::render('erp/product-categories/edit', [
+            'category' => $category,
+        ]);
+    }
+
+    public function update(ProductCategory $category, UpdateProductCategoryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Product Category: Update category.', ['action_user_id' => $userId]);
+
+            $this->productCategoryService->updateCategory($request, $category);
+
+            return to_route('erp.categories.index')->with('success', 'Product category updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Product Category: Failed to update category.', [
+                'action_user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'Failed to update product category.');
         }
     }
 }

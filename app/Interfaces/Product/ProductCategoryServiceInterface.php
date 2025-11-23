@@ -3,6 +3,8 @@
 namespace App\Interfaces\Product;
 
 use App\Http\Requests\Product\ProductCategoryRequest;
+use App\Http\Requests\Product\UpdateProductCategoryRequest;
+use App\Models\ProductCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ProductCategoryServiceInterface
@@ -38,4 +40,18 @@ interface ProductCategoryServiceInterface
      * @throws \RuntimeException If the category could not be persisted.
      */
     public function createCategory(ProductCategoryRequest $request): void;
+
+    /**
+     * Update the specified product category using the supplied request data.
+     *
+     * Applies validated attributes from the UpdateProductCategoryRequest to the
+     * given ProductCategory model and persists the changes.
+     *
+     * @param  UpdateProductCategoryRequest  $request  The validated request containing updated category attributes.
+     * @param  ProductCategory  $category  The category model instance to update.
+     *
+     * @throws \Illuminate\Validation\ValidationException If the request data fails validation.
+     * @throws \Throwable If an error occurs while persisting the update.
+     */
+    public function updateCategory(UpdateProductCategoryRequest $request, ProductCategory $category): void;
 }
