@@ -1,10 +1,9 @@
-'use client';
-
-import { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { formatBytes, useFileUpload, type FileWithPreview } from '@/hooks/use-file-upload';
 import { cn } from '@/lib/utils';
 import { TriangleAlert, User, X } from 'lucide-react';
+import { Activity } from 'react';
 
 interface AvatarUploadProps {
     maxSize?: number;
@@ -27,9 +26,7 @@ export default function AvatarUpload({
         maxSize,
         accept: 'image/*',
         multiple: false,
-        onFilesChange: (files) => {
-            onFileChange?.(files[0] || null);
-        },
+        onFilesChange: (files) => onFileChange?.(files[0] || null),
     });
 
     const currentFile = files[0];
@@ -41,23 +38,32 @@ export default function AvatarUpload({
         }
     };
 
+    const avatarDropZoneClass = cn(
+        'group/avatar relative size-24 cursor-pointer overflow-hidden rounded-full border border-dashed transition-colors',
+        isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/20',
+        previewUrl && 'border-solid',
+    );
+
     return (
         <div className={cn('flex flex-col items-center gap-4', className)}>
             {/* Avatar Preview */}
             <div className="relative">
                 <div
-                    className={cn(
-                        'group/avatar relative h-24 w-24 cursor-pointer overflow-hidden rounded-full border border-dashed transition-colors',
-                        isDragging
-                            ? 'border-primary bg-primary/5'
-                            : 'border-muted-foreground/25 hover:border-muted-foreground/20',
-                        previewUrl && 'border-solid',
-                    )}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Upload avatar"
+                    className={avatarDropZoneClass}
                     onDragEnter={handleDragEnter}
                     onDragLeave={handleDragLeave}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     onClick={openFileDialog}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                            e.preventDefault();
+                            openFileDialog();
+                        }
+                    }}
                 >
                     <input {...getInputProps()} className="sr-only" />
 
@@ -71,17 +77,18 @@ export default function AvatarUpload({
                 </div>
 
                 {/* Remove Button - only show when file is uploaded */}
-                {currentFile && (
+                <Activity mode={currentFile ? 'visible' : 'hidden'}>
                     <Button
+                        type="button"
                         size="icon"
                         variant="outline"
                         onClick={handleRemove}
                         className="absolute end-0 top-0 size-6 rounded-full"
                         aria-label="Remove avatar"
                     >
-                        <X className="size-3.5" />
+                        <X aria-hidden className="size-3.5" />
                     </Button>
-                )}
+                </Activity>
             </div>
 
             {/* Upload Instructions */}
@@ -92,20 +99,18 @@ export default function AvatarUpload({
 
             {/* Error Messages */}
             {errors.length > 0 && (
-                <Alert variant="destructive" appearance="light" className="mt-5">
-                    <AlertIcon>
-                        <TriangleAlert />
-                    </AlertIcon>
-                    <AlertContent>
-                        <AlertTitle>File upload error(s)</AlertTitle>
-                        <AlertDescription>
-                            {errors.map((error, index) => (
-                                <p key={index} className="last:mb-0">
+                <Alert variant="destructive" className="mt-5">
+                    <TriangleAlert aria-hidden />
+                    <AlertTitle>File upload error(s)</AlertTitle>
+                    <AlertDescription>
+                        <ul className="list-inside list-disc text-sm">
+                            {errors.map((error) => (
+                                <li key={error} className="last:mb-0">
                                     {error}
-                                </p>
+                                </li>
                             ))}
-                        </AlertDescription>
-                    </AlertContent>
+                        </ul>
+                    </AlertDescription>
                 </Alert>
             )}
         </div>
