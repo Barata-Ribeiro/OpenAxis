@@ -2,6 +2,7 @@
 
 use App\Enums\RoleEnum;
 use App\Models\User;
+use Carbon\Carbon;
 use Faker\Generator as Faker;
 use Inertia\Testing\AssertableInertia;
 use Spatie\Permission\Models\Role;
@@ -91,9 +92,11 @@ describe('tests for the "index" method of Admin\UserController', function () {
 
         $specificUser = User::factory()->create(['created_at' => '2023-01-15 12:00:00']);
 
+        $startMs = Carbon::parse('2023-01-01')->startOfDay()->valueOf();
+        $endMs = Carbon::parse('2023-01-31')->endOfDay()->valueOf();
+
         $response = $this->get(route('administrative.users.index', [
-            'start_date' => '2023-01-01',
-            'end_date' => '2023-01-31',
+            'filters' => "created_at:{$startMs},{$endMs}",
         ]));
 
         $response->assertOk();
@@ -105,13 +108,15 @@ describe('tests for the "index" method of Admin\UserController', function () {
     test('user administration page supports role filtering', function () use ($componentName) {
         $this->actingAs($admin = User::where('email', config('app.admin_email'))->first());
 
+        $role = RoleEnum::SUPER_ADMIN->value;
+
         $response = $this->get(route('administrative.users.index', [
-            'filters' => 'roles:super-admin',
+            'filters' => "roles:{$role}",
         ]));
 
         $response->assertOk();
         $response->assertInertia(fn (AssertableInertia $page) => $page->component($componentName)
-            ->where('users.data.0.roles.0.name', 'super-admin')
+            ->where('users.data.0.roles.0.name', $role)
             ->where('users.data.0.id', $admin->id)
         );
     });
