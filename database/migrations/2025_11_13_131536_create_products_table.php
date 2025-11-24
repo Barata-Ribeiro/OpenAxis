@@ -18,10 +18,10 @@ return new class extends Migration
 
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
-            $table->string('name', 100);
-            $table->text('description')->nullable();
-            $table->string('slug', 100)->unique();
+            $table->string('sku', 50)->unique()->comment('Stock Keeping Unit; a unique identifier for the product, example: TSBLMA101');
+            $table->string('name', 100)->comment('Name of the product');
+            $table->text('description')->nullable()->comment('Description of the product');
+            $table->string('slug', 100)->unique()->comment('Slug for the product');
             $table->decimal('cost_price', 10, 2)->comment('Cost price of the product');
             $table->decimal('selling_price', 10, 2)->comment('Selling price of the product');
             $table->integer('current_stock')->default(0)->comment('Current stock level of the product');
@@ -32,11 +32,11 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
+            $table->index('sku');
             $table->index(['name', 'is_active']);
-            $table->index('code');
 
             if ($this->isValidSql) {
-                $table->fullText(['code', 'name', 'description'], 'products_fulltext_index');
+                $table->fullText(['sku', 'name', 'description'], 'products_fulltext_index');
             }
         });
     }

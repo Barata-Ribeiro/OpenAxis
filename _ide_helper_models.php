@@ -412,6 +412,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withoutTrashed()
  * @mixin \Eloquent
+ * @property string $sku Stock Keeping Unit; a unique identifier for the product, example: TSBLMA101
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSku($value)
  */
 	class Product extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable, \Spatie\MediaLibrary\HasMedia {}
 }

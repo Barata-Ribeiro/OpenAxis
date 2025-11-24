@@ -12,10 +12,10 @@ use Str;
 
 /**
  * @property int $id
- * @property string $code
- * @property string $name
- * @property string|null $description
- * @property string $slug
+ * @property string $sku Stock Keeping Unit; a unique identifier for the product, example: TSBLMA101
+ * @property string $name Name of the product
+ * @property string|null $description Description of the product
+ * @property string $slug Slug for the product
  * @property numeric $cost_price Cost price of the product
  * @property numeric $selling_price Selling price of the product
  * @property int $current_stock Current stock level of the product
@@ -38,7 +38,6 @@ use Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereComission($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCostPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
@@ -51,6 +50,7 @@ use Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereProductCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSellingPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSku($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withTrashed(bool $withTrashed = true)
@@ -62,7 +62,7 @@ class Product extends Model implements Auditable, HasMedia
     use InteractsWithMedia, \OwenIt\Auditing\Auditable, SoftDeletes;
 
     protected $fillable = [
-        'code',
+        'sku',
         'name',
         'description',
         'slug',
@@ -99,20 +99,21 @@ class Product extends Model implements Auditable, HasMedia
         ];
     }
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     protected static function booted()
     {
         static::creating(function ($product) {
             if (empty($product->slug) && ! empty($product->name)) {
-                $base = Str::slug($product->name);
-                $slug = $base;
-                $i = 1;
-
-                while (static::withTrashed()->whereSlug($slug)->exists()) {
-                    $slug = $base.'-'.$i++;
-                }
-
-                $product->slug = $slug;
+                static::ensureUniqueSlug($product);
             }
+        });
+
+        static::updating(function ($product) {
+            static::ensureUniqueSlug($product);
         });
     }
 
@@ -121,11 +122,6 @@ class Product extends Model implements Auditable, HasMedia
         $media = $this->getMedia('products_images', ['is_cover' => true]);
 
         return $media->isNotEmpty() ? $media->firstOrFail() : null;
-    }
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
     }
 
     public function registerMediaCollections(?Media $media = null): void
@@ -139,5 +135,18 @@ class Product extends Model implements Auditable, HasMedia
     public function category()
     {
         return $this->belongsTo(ProductCategory::class);
+    }
+
+    private static function ensureUniqueSlug($product)
+    {
+        $base = Str::slug($product->name);
+        $slug = $base;
+        $i = 1;
+
+        while (static::withTrashed()->whereSlug($slug)->where('id', '!=', $product->id)->exists()) {
+            $slug = $base.'-'.$i++;
+        }
+
+        $product->slug = $slug;
     }
 }
