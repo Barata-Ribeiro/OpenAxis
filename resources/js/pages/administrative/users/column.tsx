@@ -23,7 +23,7 @@ import { UserWithRelations } from '@/types/application/user';
 import { Link, usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
+import { CalendarIcon, CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export const columns: Array<ColumnDef<UserWithRelations>> = [
@@ -101,6 +101,11 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
         cell: ({ row }) => format(row.original.created_at, 'PPpp'),
+        meta: {
+            label: 'Created At',
+            variant: 'dateRange',
+            icon: CalendarIcon,
+        },
         enableSorting: true,
     },
     {

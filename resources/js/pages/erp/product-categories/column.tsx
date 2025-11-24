@@ -23,7 +23,7 @@ import { format } from 'date-fns';
 import { CircleDashed, DeleteIcon, EditIcon, Ellipsis } from 'lucide-react';
 import { useState } from 'react';
 
-export const columns: Array<ColumnDef<ProductCategory>> = [
+export const columns: Array<ColumnDef<Required<ProductCategory>>> = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
@@ -116,6 +116,8 @@ export const columns: Array<ColumnDef<ProductCategory>> = [
             const nameToCopy = row.original.name;
             const descriptionToCopy = row.original.description;
 
+            const productsCount = row.original.products_count;
+
             return (
                 <>
                     <DropdownMenu modal={false}>
@@ -154,7 +156,7 @@ export const columns: Array<ColumnDef<ProductCategory>> = [
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     variant="destructive"
-                                    disabled={!can('product.destroy')}
+                                    disabled={!can('product.destroy') || productsCount > 0}
                                     onSelect={() => setOpen(true)}
                                 >
                                     <DeleteIcon aria-hidden size={14} /> Delete
