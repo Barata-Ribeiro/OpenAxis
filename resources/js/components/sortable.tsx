@@ -5,10 +5,10 @@ import { Progress } from '@/components/ui/progress';
 import { Sortable, SortableItem, SortableItemHandle } from '@/components/ui/sortable';
 import { cn } from '@/lib/utils';
 import { CircleX, CloudUpload, GripVertical, ImageIcon, TriangleAlert, XIcon } from 'lucide-react';
-import { Activity, useCallback, useEffect, useState } from 'react';
+import { Activity, useCallback, useEffect, useEffectEvent, useState } from 'react';
 import { toast } from 'sonner';
 
-interface ImageFile {
+export interface ImageFile {
     id: string;
     file: File;
     preview: string;
@@ -31,6 +31,10 @@ interface ImageUploadProps {
     className?: string;
     onImagesChange?: (images: ImageFile[]) => void;
     onUploadComplete?: (images: ImageFile[]) => void;
+    onOrderChange?: (images: ImageFile[]) => void;
+    value?: ImageFile[];
+    onRemoveImage?: (id: string) => void;
+    resetKey?: string | number;
 }
 
 export default function SortableImageUpload({
@@ -40,12 +44,22 @@ export default function SortableImageUpload({
     className,
     onImagesChange,
     onUploadComplete,
+    onOrderChange,
+    value,
+    onRemoveImage,
+    resetKey,
 }: Readonly<ImageUploadProps>) {
     const [images, setImages] = useState<ImageFile[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const [, setActiveId] = useState<string | null>(null);
     const [allImages, setAllImages] = useState<SortableImage[]>([]);
+    const onKeepingImagesInSync = useEffectEvent((value: ImageFile[] | undefined) => {
+        if (value) {
+            setImages(value);
+            setAllImages(value.map(createSortableImage));
+        }
+    });
 
     // Helper function to create SortableImage from ImageFile
     const createSortableImage = useCallback(
@@ -59,10 +73,16 @@ export default function SortableImageUpload({
     );
 
     // Ensure arrays never contain undefined items
+    useEffect(() => onKeepingImagesInSync(value), [value]);
+
+    // Reset internal state when resetKey changes
     useEffect(() => {
-        setAllImages((prev) => prev.filter((item) => item?.id));
-        setImages((prev) => prev.filter((item) => item?.id));
-    }, []);
+        if (resetKey !== undefined) {
+            setImages([]);
+            setAllImages([]);
+            setErrors([]);
+        }
+    }, [resetKey]);
 
     const validateFile = useCallback(
         (file: File): string | null => {
@@ -158,6 +178,9 @@ export default function SortableImageUpload({
 
     const removeImage = useCallback(
         (id: string) => {
+            // Notify parent first
+            onRemoveImage?.(id);
+
             // Remove from allImages
             setAllImages((prev) => prev.filter((img) => img.id !== id));
 
@@ -165,10 +188,13 @@ export default function SortableImageUpload({
             const uploadedImage = images.find((img) => img.id === id);
             if (uploadedImage) {
                 URL.revokeObjectURL(uploadedImage.preview);
-                setImages((prev) => prev.filter((img) => img.id !== id));
+                const newImages = images.filter((img) => img.id !== id);
+                setImages(newImages);
+                onImagesChange?.(newImages);
+                onOrderChange?.(newImages);
             }
         },
-        [images],
+        [images, onImagesChange, onOrderChange, onRemoveImage],
     );
 
     const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -258,6 +284,16 @@ export default function SortableImageUpload({
                             .filter((item): item is SortableImage => item !== null);
 
                         setAllImages(newAllImages);
+
+                        const newImagesOrder = newAllImages
+                            .map((si) => images.find((img) => img.id === si.id))
+                            .filter((img): img is ImageFile => !!img);
+
+                        if (newImagesOrder.length === images.length) {
+                            setImages(newImagesOrder);
+                            onImagesChange?.(newImagesOrder);
+                            onOrderChange?.(newImagesOrder);
+                        }
 
                         toast.success('Images reordered successfully!', {
                             description: `Images rearranged across both sections`,
