@@ -3467,7 +3467,8 @@ namespace PHPSTORM_META {
 'administrative.users.index','administrative.users.create','administrative.users.store','administrative.users.edit','administrative.users.update',
 'administrative.users.destroy','administrative.users.force-destroy','administrative.users.show','administrative.mailable.new-account','erp.categories.index',
 'erp.categories.create','erp.categories.store','erp.categories.edit','erp.categories.update','erp.categories.destroy',
-'storage.local',);
+'erp.products.index','erp.products.create','erp.products.store','erp.products.edit','erp.products.update',
+'erp.products.destroy','storage.local',);
         registerArgumentsSet('views', 
 'app','emails.new_account','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line',
 'laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method',
