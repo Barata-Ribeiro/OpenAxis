@@ -30,14 +30,26 @@ class QueryRequest extends FormRequest
 
             'search' => ['sometimes', 'string', 'between:1,255'],
 
-            'filters' => [
-                'sometimes',
-                'string',
-                'regex:/^(?:[A-Za-z0-9_]+:[A-Za-z0-9\-]+(?:,[A-Za-z0-9\-]+)*)(?:[;|](?:[A-Za-z0-9_]+:[A-Za-z0-9\-]+(?:,[A-Za-z0-9\-]+)*))*$/',
-            ],
-
-            'start_date' => ['sometimes', 'date'],
-            'end_date' => ['sometimes', 'date', 'after_or_equal:start_date'],
+            'filters' => ['sometimes', 'nullable', 'array'],
         ];
+    }
+
+    public function prepareForValidation(): void
+    {
+        $filters = $this->input('filters');
+
+        // Parse filters from string format "key1:value1,value2,key2:value3,value4..."
+        if (is_string($filters) && preg_match_all('/(?:^|,)\s*(\w+):([^,]*(?:,(?!\s*\w+:)[^,]*)*)/u', $filters, $m, PREG_SET_ORDER)) {
+            $filtersArray = [];
+            foreach ($m as $match) {
+                $key = $match[1];
+                $values = array_filter(array_map('trim', explode(',', $match[2])));
+                if (! empty($values)) {
+                    $filtersArray[$key] = array_values($values);
+                }
+            }
+
+            $this->merge(['filters' => $filtersArray]);
+        }
     }
 }
