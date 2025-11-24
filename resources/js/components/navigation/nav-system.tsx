@@ -11,7 +11,7 @@ import administrative from '@/routes/administrative';
 import erp from '@/routes/erp';
 import { NavGroup } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { IdCardLanyardIcon, MailIcon, TagsIcon, UsersIcon } from 'lucide-react';
+import { IdCardLanyardIcon, MailIcon, Package2Icon, TagsIcon, UsersIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
 export function NavSystem() {
@@ -51,6 +51,12 @@ export function NavSystem() {
     const erpGroup: NavGroup = {
         title: 'Enterprise Resource Planning',
         items: [
+            {
+                title: 'Products',
+                href: erp.products.index().url,
+                icon: Package2Icon,
+                canView: can('product.index'),
+            },
             {
                 title: 'Categories',
                 href: erp.categories.index().url,
