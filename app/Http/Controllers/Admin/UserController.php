@@ -28,8 +28,6 @@ class UserController extends Controller
         $sortBy = $validated['sort_by'] ?? 'id';
         $sortDir = $validated['sort_dir'] ?? 'asc';
         $search = trim($validated['search'] ?? '');
-        $startDate = $validated['start_date'] ?? null;
-        $endDate = $validated['end_date'] ?? null;
         $filters = $validated['filters'] ?? [];
 
         $allowedSorts = ['id', 'name', 'email', 'roles', 'created_at', 'updated_at', 'deleted_at'];
@@ -42,8 +40,6 @@ class UserController extends Controller
             $sortBy,
             $sortDir,
             $search,
-            $startDate,
-            $endDate,
             $filters
         );
 

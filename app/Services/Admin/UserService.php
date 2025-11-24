@@ -2,7 +2,6 @@
 
 namespace App\Services\Admin;
 
-use App\Common\Helpers;
 use App\Http\Requests\Admin\EditUserRequest;
 use App\Interfaces\Admin\UserServiceInterface;
 use App\Mail\NewUserMail;
@@ -14,17 +13,35 @@ use Illuminate\Support\Facades\Mail;
 
 class UserService implements UserServiceInterface
 {
-    public function getPaginatedUsers(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, ?string $startDate, ?string $endDate, $filters): LengthAwarePaginator
+    public function getPaginatedUsers(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
-        $roles = Helpers::buildFiltersArray($filters, 'roles') ?? [];
+        $roles = $filters['roles'] ?? [];
+        $createdAtRange = $filters['created_at'] ?? [];
+
+        $start = null;
+        $end = null;
+
+        if (! empty($createdAtRange) && count($createdAtRange) === 2) {
+            $tz = config('app.timezone', 'UTC');
+            $startTs = (int) $createdAtRange[0];
+            $endTs = (int) $createdAtRange[1];
+
+            $start = Carbon::createFromTimestampMs($startTs, $tz)
+                ->startOfDay()
+                ->clone()
+                ->toDateTimeString();
+
+            $end = Carbon::createFromTimestampMs($endTs, $tz)
+                ->endOfDay()
+                ->clone()
+                ->toDateTimeString();
+        }
 
         $users = User::query()
             ->select(['id', 'name', 'email', 'created_at', 'updated_at', 'deleted_at'])
             ->when($search, fn ($query, $search) => $query->whereLike('name', "%$search%")->orWhereLike('email', "%$search%"))
-            ->when($startDate && $endDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]))
-            ->when($startDate && ! $endDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($startDate)->endOfDay()]))
-            ->when($endDate && ! $startDate, fn ($q) => $q->whereBetween('created_at', [Carbon::parse($endDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]))
-            ->when(! empty($roles), fn ($q) => $q->whereHas('roles', fn ($roleQuery) => $roleQuery->whereIn('name', $roles)))
+            ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
+            ->when($roles, fn ($q) => $q->whereHas('roles', fn ($roleQuery) => $roleQuery->whereIn('name', $roles)))
             ->with('roles:id,name', 'media')
             ->withTrashed();
 
