@@ -12,9 +12,6 @@ interface ProductCategoryServiceInterface
     /**
      * Get filtered product categories.
      *
-     * @param  string|array|null  $filters
-     */
-    /**
      * Retrieve a paginated list of product categories with optional sorting, searching and filtering.
      *
      * @param  int|null  $perPage  Number of items per page. If null, the service's default pagination size will be used.
