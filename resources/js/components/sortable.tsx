@@ -1,0 +1,406 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Sortable, SortableItem, SortableItemHandle } from '@/components/ui/sortable';
+import { cn } from '@/lib/utils';
+import { CircleX, CloudUpload, GripVertical, ImageIcon, TriangleAlert, XIcon } from 'lucide-react';
+import { Activity, useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+interface ImageFile {
+    id: string;
+    file: File;
+    preview: string;
+    progress: number;
+    status: 'uploading' | 'completed' | 'error';
+    error?: string;
+}
+
+type SortableImage = {
+    id: string;
+    src: string;
+    alt: string;
+    type: 'default' | 'uploaded';
+};
+
+interface ImageUploadProps {
+    maxFiles?: number;
+    maxSize?: number;
+    accept?: string;
+    className?: string;
+    onImagesChange?: (images: ImageFile[]) => void;
+    onUploadComplete?: (images: ImageFile[]) => void;
+}
+
+export default function SortableImageUpload({
+    maxFiles = 5, // Changed to 5 as per UI reference
+    maxSize = 10 * 1024 * 1024, // 10MB as per UI reference
+    accept = 'image/*',
+    className,
+    onImagesChange,
+    onUploadComplete,
+}: Readonly<ImageUploadProps>) {
+    const [images, setImages] = useState<ImageFile[]>([]);
+    const [isDragging, setIsDragging] = useState(false);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [, setActiveId] = useState<string | null>(null);
+    const [allImages, setAllImages] = useState<SortableImage[]>([]);
+
+    // Helper function to create SortableImage from ImageFile
+    const createSortableImage = useCallback(
+        (imageFile: ImageFile): SortableImage => ({
+            id: imageFile.id,
+            src: imageFile.preview,
+            alt: imageFile.file.name,
+            type: 'uploaded',
+        }),
+        [],
+    );
+
+    // Ensure arrays never contain undefined items
+    useEffect(() => {
+        setAllImages((prev) => prev.filter((item) => item?.id));
+        setImages((prev) => prev.filter((item) => item?.id));
+    }, []);
+
+    const validateFile = useCallback(
+        (file: File): string | null => {
+            if (!file.type.startsWith('image/')) {
+                return 'File must be an image';
+            }
+            if (file.size > maxSize) {
+                return `File size must be less than ${(maxSize / 1024 / 1024).toFixed(1)}MB`;
+            }
+            if (images.length >= maxFiles) {
+                return `Maximum ${maxFiles} files allowed`;
+            }
+            return null;
+        },
+        [maxSize, maxFiles, images.length],
+    );
+
+    const simulateUpload = useCallback(
+        (imageFile: ImageFile) => {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    setImages((prev) =>
+                        prev.map((img) =>
+                            img.id === imageFile.id ? { ...img, progress: 100, status: 'completed' as const } : img,
+                        ),
+                    );
+
+                    // Check if all uploads are complete
+                    const updatedImages = images.map((img) =>
+                        img.id === imageFile.id ? { ...img, progress: 100, status: 'completed' as const } : img,
+                    );
+
+                    if (updatedImages.every((img) => img.status === 'completed')) {
+                        onUploadComplete?.(updatedImages);
+                    }
+                } else {
+                    setImages((prev) => prev.map((img) => (img.id === imageFile.id ? { ...img, progress } : img)));
+                }
+            }, 100);
+        },
+        [images, onUploadComplete],
+    );
+
+    const addImages = useCallback(
+        (files: FileList | File[]) => {
+            const newImages: ImageFile[] = [];
+            const newErrors: string[] = [];
+
+            for (const file of Array.from(files)) {
+                const error = validateFile(file);
+                if (error) {
+                    newErrors.push(`${file.name}: ${error}`);
+                    continue;
+                }
+
+                const imageFile: ImageFile = {
+                    id: `${Date.now()}-${Math.random()}`,
+                    file,
+                    preview: URL.createObjectURL(file),
+                    progress: 0,
+                    status: 'uploading',
+                };
+
+                newImages.push(imageFile);
+            }
+
+            if (newErrors.length > 0) {
+                setErrors((prev) => [...prev, ...newErrors]);
+            }
+
+            if (newImages.length > 0) {
+                const updatedImages = [...images, ...newImages];
+                setImages(updatedImages);
+                onImagesChange?.(updatedImages);
+
+                // Add new images to allImages for sorting
+                const newSortableImages = newImages.map(createSortableImage);
+                setAllImages((prev) => [...prev, ...newSortableImages]);
+
+                // Simulate upload progress
+                for (const imageFile of newImages) {
+                    simulateUpload(imageFile);
+                }
+            }
+        },
+        [validateFile, images, onImagesChange, createSortableImage, simulateUpload],
+    );
+
+    const removeImage = useCallback(
+        (id: string) => {
+            // Remove from allImages
+            setAllImages((prev) => prev.filter((img) => img.id !== id));
+
+            // If it's an uploaded image, also remove from images array and revoke URL
+            const uploadedImage = images.find((img) => img.id === id);
+            if (uploadedImage) {
+                URL.revokeObjectURL(uploadedImage.preview);
+                setImages((prev) => prev.filter((img) => img.id !== id));
+            }
+        },
+        [images],
+    );
+
+    const handleDragEnter = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    }, []);
+
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    }, []);
+
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }, []);
+
+    const handleDrop = useCallback(
+        (e: React.DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragging(false);
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                addImages(files);
+            }
+        },
+        [addImages],
+    );
+
+    const openFileDialog = useCallback(() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = accept;
+        input.onchange = (e) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files) {
+                addImages(target.files);
+            }
+        };
+        input.click();
+    }, [accept, addImages]);
+
+    const formatBytes = (bytes: number): string => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    };
+
+    return (
+        <div className={cn('w-full max-w-4xl', className)}>
+            {/* Instructions */}
+            <div className="mb-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                    Upload up to {maxFiles} images (JPG, PNG, GIF, WebP, max {formatBytes(maxSize)} each). <br />
+                    Drag and drop images to reorder.
+                    {images.length > 0 && ` ${images.length}/${maxFiles} uploaded.`}
+                </p>
+            </div>
+
+            {/* Image Grid with Sortable */}
+            <div className="mb-6">
+                {/* Combined Images Sortable */}
+                <Sortable
+                    value={allImages.map((item) => item.id)}
+                    onValueChange={(newItemIds) => {
+                        // Reconstruct the allImages array based on the new order
+                        const newAllImages = newItemIds
+                            .map((itemId) => {
+                                // First try to find in allImages (default images)
+                                const existingImage = allImages.find((img) => img.id === itemId);
+                                if (existingImage) return existingImage;
+
+                                // If not found, it's a newly uploaded image
+                                const uploadedImage = images.find((img) => img.id === itemId);
+                                if (uploadedImage) {
+                                    return createSortableImage(uploadedImage);
+                                }
+                                return null;
+                            })
+                            .filter((item): item is SortableImage => item !== null);
+
+                        setAllImages(newAllImages);
+
+                        toast.success('Images reordered successfully!', {
+                            description: `Images rearranged across both sections`,
+                            duration: 3000,
+                        });
+                    }}
+                    getItemValue={(item) => item}
+                    strategy="grid"
+                    className="grid auto-rows-fr grid-cols-5 gap-2.5"
+                    onDragStart={(event) => setActiveId(event.active.id as string)}
+                    onDragEnd={() => setActiveId(null)}
+                >
+                    {allImages.map((item) => (
+                        <SortableItem key={item.id} value={item.id}>
+                            <div className="group relative flex shrink-0 items-center justify-center rounded-md border border-border bg-accent/50 shadow-none transition-all duration-200 hover:z-10 hover:bg-accent/70 data-[dragging=true]:z-50">
+                                <img
+                                    src={item.src}
+                                    className="pointer-events-none h-[120px] w-full rounded-md object-cover"
+                                    alt={item.alt}
+                                />
+
+                                {/* Drag Handle */}
+                                <SortableItemHandle className="absolute start-2 top-2 cursor-grab opacity-0 group-hover:opacity-100 active:cursor-grabbing">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="size-6 rounded-full"
+                                        aria-label="Drag to reorder"
+                                        title="Drag to reorder"
+                                    >
+                                        <GripVertical aria-hidden className="size-3.5" />
+                                    </Button>
+                                </SortableItemHandle>
+
+                                {/* Remove Button Overlay */}
+                                <Button
+                                    onClick={() => removeImage(item.id)}
+                                    variant="outline"
+                                    size="icon"
+                                    className="absolute end-2 top-2 size-6 rounded-full opacity-0 shadow-sm group-hover:opacity-100"
+                                    aria-label="Remove image"
+                                    title="Remove image"
+                                >
+                                    <XIcon aria-hidden className="size-3.5" />
+                                </Button>
+                            </div>
+                        </SortableItem>
+                    ))}
+                </Sortable>
+            </div>
+
+            {/* Upload Area */}
+            <Card
+                className={cn(
+                    'rounded-md border-dashed shadow-none transition-colors',
+                    isDragging
+                        ? 'border-primary bg-primary/5'
+                        : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+                )}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+            >
+                <CardContent className="text-center">
+                    <div className="mx-auto mb-3 flex size-[32px] items-center justify-center rounded-full border border-border">
+                        <CloudUpload className="size-4" />
+                    </div>
+                    <h3 className="text-2sm mb-0.5 font-semibold text-foreground">
+                        Choose a file or drag & drop here.
+                    </h3>
+                    <span className="mb-3 block text-xs font-normal text-secondary-foreground">
+                        JPEG, PNG, up to {formatBytes(maxSize)}.
+                    </span>
+                    <Button type="button" size="sm" variant="outline" onClick={openFileDialog}>
+                        Browse File
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {/* Upload Progress Cards */}
+            {images.length > 0 && (
+                <div className="mt-6 space-y-3">
+                    {images.map((imageFile) => (
+                        <Card key={imageFile.id} className="rounded-md shadow-none">
+                            <CardContent className="flex items-center gap-2 p-3">
+                                <div className="flex size-[32px] shrink-0 items-center justify-center rounded-md border border-border">
+                                    <ImageIcon className="size-4 text-muted-foreground" />
+                                </div>
+                                <div className="flex w-full flex-col gap-1.5">
+                                    <div className="-mt-2 flex w-full items-center justify-between gap-2.5">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="text-xs leading-none font-medium text-foreground">
+                                                {imageFile.file.name}
+                                            </span>
+                                            <span className="text-xs leading-none font-normal text-muted-foreground">
+                                                {formatBytes(imageFile.file.size)}
+                                            </span>
+                                            <Activity mode={imageFile.status === 'uploading' ? 'visible' : 'hidden'}>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Uploading... {Math.round(imageFile.progress)}%
+                                                </p>
+                                            </Activity>
+                                        </div>
+                                        <Button
+                                            onClick={() => removeImage(imageFile.id)}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="size-6"
+                                            aria-label="Cancel upload"
+                                            title="Cancel upload"
+                                        >
+                                            <CircleX aria-hidden className="size-3.5" />
+                                        </Button>
+                                    </div>
+
+                                    <Progress
+                                        value={imageFile.progress}
+                                        className="h-1 transition-all duration-300 [&>div]:bg-foreground"
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+
+            {/* Error Messages */}
+            {errors.length > 0 && (
+                <Alert variant="destructive" className="mt-5">
+                    <TriangleAlert aria-hidden />
+                    <AlertTitle>File upload error(s)</AlertTitle>
+                    <AlertDescription>
+                        <ul className="list-inside list-disc text-sm">
+                            {errors.map((error) => (
+                                <li key={error} className="last:mb-0">
+                                    {error}
+                                </li>
+                            ))}
+                        </ul>
+                    </AlertDescription>
+                </Alert>
+            )}
+        </div>
+    );
+}
