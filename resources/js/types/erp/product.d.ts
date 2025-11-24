@@ -1,0 +1,25 @@
+import { ProductCategory } from './product-category';
+
+export interface Product {
+    id: number;
+    sku: string;
+    name: string;
+    description?: string;
+    slug: string;
+    cost_price: string;
+    selling_price: string;
+    current_stock: number;
+    minimum_stock?: number;
+    comission: string;
+    is_active: boolean;
+    product_category_id: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+
+    cover_image: unknown; // TODO: Define proper type later
+}
+
+interface ProductWithRelations extends Product {
+    category: Partial<ProductCategory>;
+}
