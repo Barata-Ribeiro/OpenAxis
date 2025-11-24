@@ -22,7 +22,7 @@ class ProductController extends Controller
         $search = trim($validated['search'] ?? '');
         $filters = $validated['filters'] ?? [];
 
-        $allowedSorts = ['id', 'sku', 'name', 'cost_price', 'selling_price', 'current_stock', 'comission', 'is_active', 'created_at', 'updated_at'];
+        $allowedSorts = ['id', 'sku', 'name', 'category_name', 'cost_price', 'selling_price', 'current_stock',  'comission', 'is_active', 'created_at', 'updated_at'];
         if (! in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }

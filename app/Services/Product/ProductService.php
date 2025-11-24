@@ -23,8 +23,14 @@ class ProductService implements ProductServiceInterface
         $isSql = $this->isSqlDriver;
 
         $createdAtRange = $filters['created_at'] ?? [];
-        $categories = $filters['categories'] ?? [];
+        $categories = $filters['category_name'] ?? [];
         $is_active = $filters['is_active'][0] ?? null;
+
+        $sortByStartsWithCategory = str_starts_with((string) $sortBy, 'category_name');
+
+        if (! empty($sortBy) && $sortByStartsWithCategory) {
+            $sortBy = str_replace('category_name', 'product_categories.name', $sortBy);
+        }
 
         $start = null;
         $end = null;
@@ -46,18 +52,23 @@ class ProductService implements ProductServiceInterface
         }
 
         return Product::query()
+            ->select('products.*')
             ->when($search, function ($qr) use ($search, $isSql) {
                 if ($isSql) {
                     $booleanQuery = Helpers::buildBooleanQuery($search);
-                    $qr->whereFullText(['sku', 'name', 'description'], $booleanQuery, ['mode' => 'boolean']);
+                    $qr->whereFullText(['products.sku', 'products.name', 'products.description'], $booleanQuery, ['mode' => 'boolean']);
                 } else {
-                    $qr->whenLike('sku', "%$search%")->orWhereLike('name', "%$search%")->orWhereLike('description', "%$search%");
+                    $qr->where(function ($q) use ($search) {
+                        $q->whereLike('products.sku', "%$search%")
+                            ->orWhereLike('products.name', "%$search%")
+                            ->orWhereLike('products.description', "%$search%");
+                    });
                 }
             })
-            ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
-            ->when($categories, fn ($q) => $q->whereIn('category_id', $categories))
-            ->when($is_active, fn ($query) => $query->where('is_active', filter_var($is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
-            ->when(str_starts_with($sortBy, 'category.'), fn ($qr) => $qr->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id'))
+            ->when($createdAtRange, fn ($q) => $q->whereBetween('products.created_at', [$start, $end]))
+            ->when($categories, fn ($q) => $q->whereHas('category', fn ($q2) => $q2->whereIn('name', $categories)))
+            ->when($is_active, fn ($query) => $query->where('products.is_active', filter_var($is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
+            ->when($sortByStartsWithCategory, fn ($qr) => $qr->leftJoin('product_categories', 'products.product_category_id', '=', 'product_categories.id'))
             ->with('category:id,name,slug', 'media')
             ->withTrashed()
             ->orderBy($sortBy, $sortDir)
