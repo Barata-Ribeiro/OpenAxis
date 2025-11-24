@@ -9,7 +9,7 @@ import { Head } from '@inertiajs/react';
 import { columns } from './column';
 
 interface IndexPageProps {
-    categories: PaginationMeta<ProductCategory[]>;
+    categories: PaginationMeta<Array<Required<ProductCategory>>>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Categories', href: erp.categories.index().url }];
