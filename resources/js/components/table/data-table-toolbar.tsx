@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Spinner } from '../ui/spinner';
 import DataTableColumnVisibility from './data-table-column-visibility';
+import { DataTableDateFilter } from './data-table-date-filter';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
 
 interface DataTableToolbarProps<TData> extends ComponentProps<'div'> {
@@ -85,35 +86,9 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
 
         switch (columnMeta.variant) {
             case 'text':
-                // return (
-                //     <Input
-                //         type="search"
-                //         placeholder={columnMeta.placeholder ?? columnMeta.label}
-                //         value={(column.getFilterValue() as string) ?? ''}
-                //         onChange={(event) => column.setFilterValue(event.target.value)}
-                //         className="h-8 w-40 lg:w-56"
-                //     />
-                // );
                 return null; // Text filters will not be implemented in the toolbar
 
             case 'number':
-                // return (
-                //     <div className="relative">
-                //         <Input
-                //             type="number"
-                //             inputMode="numeric"
-                //             placeholder={columnMeta.placeholder ?? columnMeta.label}
-                //             value={(column.getFilterValue() as string) ?? ''}
-                //             onChange={(event) => column.setFilterValue(event.target.value)}
-                //             className={cn('h-8 w-[120px]', columnMeta.unit && 'pr-8')}
-                //         />
-                //         {columnMeta.unit && (
-                //             <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-sm text-muted-foreground">
-                //                 {columnMeta.unit}
-                //             </span>
-                //         )}
-                //     </div>
-                // );
                 return null; // Number filters will not be implemented in the toolbar
 
             case 'range':
@@ -121,7 +96,13 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
 
             case 'date':
             case 'dateRange':
-                return null; // TODO: Implement date and date range filters in the toolbar
+                return (
+                    <DataTableDateFilter
+                        column={column}
+                        title={columnMeta.label ?? column.id}
+                        multiple={columnMeta.variant === 'dateRange'}
+                    />
+                );
 
             case 'select':
             case 'multiSelect':
