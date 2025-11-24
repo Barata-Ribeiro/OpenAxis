@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -34,6 +35,8 @@ use Str;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
+ *
+ * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product onlyTrashed()
@@ -55,11 +58,18 @@ use Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Product extends Model implements Auditable, HasMedia
 {
-    use InteractsWithMedia, \OwenIt\Auditing\Auditable, SoftDeletes;
+    /**
+     * @use HasFactory<\Database\Factories\ProductFactory>
+     * @use InteractsWithMedia
+     * @use \OwenIt\Auditing\Auditable
+     * @use SoftDeletes
+     */
+    use HasFactory, InteractsWithMedia, \OwenIt\Auditing\Auditable, SoftDeletes;
 
     protected $fillable = [
         'sku',
@@ -134,12 +144,12 @@ class Product extends Model implements Auditable, HasMedia
 
     public function category()
     {
-        return $this->belongsTo(ProductCategory::class);
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
     private static function ensureUniqueSlug($product)
     {
-        $base = Str::slug($product->name);
+        $base = Str::slug($product->name.'-'.$product->sku);
         $slug = $base;
         $i = 1;
 

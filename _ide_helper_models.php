@@ -368,10 +368,10 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property string $code
- * @property string $name
- * @property string|null $description
- * @property string $slug
+ * @property string $sku Stock Keeping Unit; a unique identifier for the product, example: TSBLMA101
+ * @property string $name Name of the product
+ * @property string|null $description Description of the product
+ * @property string $slug Slug for the product
  * @property numeric $cost_price Cost price of the product
  * @property numeric $selling_price Selling price of the product
  * @property int $current_stock Current stock level of the product
@@ -390,11 +390,11 @@ namespace App\Models{
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
+ * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereComission($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCostPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
@@ -407,13 +407,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereProductCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSellingPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSku($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withoutTrashed()
  * @mixin \Eloquent
- * @property string $sku Stock Keeping Unit; a unique identifier for the product, example: TSBLMA101
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSku($value)
  */
 	class Product extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable, \Spatie\MediaLibrary\HasMedia {}
 }

@@ -58,7 +58,7 @@ class ProductService implements ProductServiceInterface
             ->when($categories, fn ($q) => $q->whereIn('category_id', $categories))
             ->when($is_active, fn ($query) => $query->where('is_active', filter_var($is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
             ->when(str_starts_with($sortBy, 'category.'), fn ($qr) => $qr->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id'))
-            ->with('category', 'media')
+            ->with('category:id,name,slug', 'media')
             ->withTrashed()
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
