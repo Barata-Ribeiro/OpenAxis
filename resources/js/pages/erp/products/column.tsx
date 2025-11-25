@@ -14,6 +14,31 @@ export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWi
         enableHiding: false,
     },
     {
+        id: 'cover_image',
+        accessorKey: 'cover_image',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Cover Image" />,
+        cell: function Cell({ row }) {
+            const coverImageUrl = row.original.cover_image;
+            const altText = `Miniature representation of ${row.original.name}`;
+
+            return coverImageUrl ? (
+                <img
+                    src={coverImageUrl}
+                    alt={altText}
+                    className="aspect-square size-10 rounded-md object-cover"
+                    width={40}
+                    height={40}
+                />
+            ) : (
+                <div className="flex size-10 items-center justify-center rounded-md bg-muted text-sm font-medium text-muted-foreground select-none">
+                    N/A
+                </div>
+            );
+        },
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
         accessorKey: 'name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         enableSorting: true,

@@ -4,6 +4,7 @@ export interface Product {
     id: number;
     sku: string;
     name: string;
+    cover_image: string | null;
     description?: string;
     slug: string;
     cost_price: string;
@@ -16,8 +17,6 @@ export interface Product {
     created_at: string;
     updated_at: string;
     deleted_at: string;
-
-    cover_image: unknown; // TODO: Define proper type later
 }
 
 interface ProductWithRelations extends Product {
