@@ -1,11 +1,10 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Sortable, SortableItem, SortableItemHandle } from '@/components/ui/sortable';
 import { cn } from '@/lib/utils';
-import { CircleX, CloudUpload, GripVertical, ImageIcon, TriangleAlert, XIcon } from 'lucide-react';
-import { Activity, useCallback, useEffect, useEffectEvent, useState } from 'react';
+import { CloudUpload, GripVertical, TriangleAlert, XIcon } from 'lucide-react';
+import { useCallback, useEffect, useEffectEvent, useState } from 'react';
 import { toast } from 'sonner';
 
 export interface ImageFile {
@@ -30,7 +29,6 @@ interface ImageUploadProps {
     accept?: string;
     className?: string;
     onImagesChange?: (images: ImageFile[]) => void;
-    onUploadComplete?: (images: ImageFile[]) => void;
     onOrderChange?: (images: ImageFile[]) => void;
     value?: ImageFile[];
     onRemoveImage?: (id: string) => void;
@@ -43,7 +41,6 @@ export default function SortableImageUpload({
     accept = 'image/*',
     className,
     onImagesChange,
-    onUploadComplete,
     onOrderChange,
     value,
     onRemoveImage,
@@ -52,7 +49,6 @@ export default function SortableImageUpload({
     const [images, setImages] = useState<ImageFile[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
-    const [, setActiveId] = useState<string | null>(null);
     const [allImages, setAllImages] = useState<SortableImage[]>([]);
     const onKeepingImagesInSync = useEffectEvent((value: ImageFile[] | undefined) => {
         if (value) {
@@ -100,37 +96,6 @@ export default function SortableImageUpload({
         [maxSize, maxFiles, images.length],
     );
 
-    const simulateUpload = useCallback(
-        (imageFile: ImageFile) => {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 20;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-
-                    setImages((prev) =>
-                        prev.map((img) =>
-                            img.id === imageFile.id ? { ...img, progress: 100, status: 'completed' as const } : img,
-                        ),
-                    );
-
-                    // Check if all uploads are complete
-                    const updatedImages = images.map((img) =>
-                        img.id === imageFile.id ? { ...img, progress: 100, status: 'completed' as const } : img,
-                    );
-
-                    if (updatedImages.every((img) => img.status === 'completed')) {
-                        onUploadComplete?.(updatedImages);
-                    }
-                } else {
-                    setImages((prev) => prev.map((img) => (img.id === imageFile.id ? { ...img, progress } : img)));
-                }
-            }, 100);
-        },
-        [images, onUploadComplete],
-    );
-
     const addImages = useCallback(
         (files: FileList | File[]) => {
             const newImages: ImageFile[] = [];
@@ -166,14 +131,9 @@ export default function SortableImageUpload({
                 // Add new images to allImages for sorting
                 const newSortableImages = newImages.map(createSortableImage);
                 setAllImages((prev) => [...prev, ...newSortableImages]);
-
-                // Simulate upload progress
-                for (const imageFile of newImages) {
-                    simulateUpload(imageFile);
-                }
             }
         },
-        [validateFile, images, onImagesChange, createSortableImage, simulateUpload],
+        [validateFile, images, onImagesChange, createSortableImage],
     );
 
     const removeImage = useCallback(
@@ -303,8 +263,6 @@ export default function SortableImageUpload({
                     getItemValue={(item) => item}
                     strategy="grid"
                     className="grid auto-rows-fr grid-cols-5 gap-2.5"
-                    onDragStart={(event) => setActiveId(event.active.id as string)}
-                    onDragEnd={() => setActiveId(null)}
                 >
                     {allImages.map((item) => (
                         <SortableItem key={item.id} value={item.id}>
@@ -373,53 +331,6 @@ export default function SortableImageUpload({
                     </Button>
                 </CardContent>
             </Card>
-
-            {/* Upload Progress Cards */}
-            {images.length > 0 && (
-                <div className="mt-6 space-y-3">
-                    {images.map((imageFile) => (
-                        <Card key={imageFile.id} className="rounded-md shadow-none">
-                            <CardContent className="flex items-center gap-2 p-3">
-                                <div className="flex size-[32px] shrink-0 items-center justify-center rounded-md border border-border">
-                                    <ImageIcon className="size-4 text-muted-foreground" />
-                                </div>
-                                <div className="flex w-full flex-col gap-1.5">
-                                    <div className="-mt-2 flex w-full items-center justify-between gap-2.5">
-                                        <div className="flex items-center gap-2.5">
-                                            <span className="text-xs leading-none font-medium text-foreground">
-                                                {imageFile.file.name}
-                                            </span>
-                                            <span className="text-xs leading-none font-normal text-muted-foreground">
-                                                {formatBytes(imageFile.file.size)}
-                                            </span>
-                                            <Activity mode={imageFile.status === 'uploading' ? 'visible' : 'hidden'}>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Uploading... {Math.round(imageFile.progress)}%
-                                                </p>
-                                            </Activity>
-                                        </div>
-                                        <Button
-                                            onClick={() => removeImage(imageFile.id)}
-                                            variant="ghost"
-                                            size="icon"
-                                            className="size-6"
-                                            aria-label="Cancel upload"
-                                            title="Cancel upload"
-                                        >
-                                            <CircleX aria-hidden className="size-3.5" />
-                                        </Button>
-                                    </div>
-
-                                    <Progress
-                                        value={imageFile.progress}
-                                        className="h-1 transition-all duration-300 [&>div]:bg-foreground"
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
 
             {/* Error Messages */}
             {errors.length > 0 && (
