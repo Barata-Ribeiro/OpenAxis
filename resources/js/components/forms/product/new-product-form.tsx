@@ -231,6 +231,7 @@ export default function NewProductForm({ categories }: Readonly<{ categories: st
 
                     <SortableImageUpload
                         maxSize={5 * 1024 * 1024}
+                        maxFiles={3}
                         value={productImages}
                         onImagesChange={setProductImages}
                         onOrderChange={setProductImages}

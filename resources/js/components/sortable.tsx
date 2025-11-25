@@ -103,6 +103,12 @@ export default function SortableImageUpload({
 
             for (const file of Array.from(files)) {
                 const error = validateFile(file);
+
+                if (!error && images.length + newImages.length >= maxFiles) {
+                    newErrors.push(`Cannot add ${file.name}: maximum of ${maxFiles} files reached.`);
+                    continue;
+                }
+
                 if (error) {
                     newErrors.push(`${file.name}: ${error}`);
                     continue;
@@ -133,7 +139,7 @@ export default function SortableImageUpload({
                 setAllImages((prev) => [...prev, ...newSortableImages]);
             }
         },
-        [validateFile, images, onImagesChange, createSortableImage],
+        [validateFile, images, maxFiles, onImagesChange, createSortableImage],
     );
 
     const removeImage = useCallback(
@@ -334,9 +340,9 @@ export default function SortableImageUpload({
 
             {/* Error Messages */}
             {errors.length > 0 && (
-                <Alert variant="destructive" className="mt-5">
+                <Alert variant="destructive" className="mt-5 border-red-500 bg-red-50">
                     <TriangleAlert aria-hidden />
-                    <AlertTitle>File upload error(s)</AlertTitle>
+                    <AlertTitle>File(s) related error(s)</AlertTitle>
                     <AlertDescription>
                         <ul className="list-inside list-disc text-sm">
                             {errors.map((error) => (
