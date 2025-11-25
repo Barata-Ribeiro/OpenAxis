@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\product\ProductRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\ProductCategory;
 use App\Services\Product\ProductService;
+use Auth;
+use Exception;
 use Inertia\Inertia;
+use Log;
 
 class ProductController extends Controller
 {
@@ -39,5 +43,28 @@ class ProductController extends Controller
             'products' => $products,
             'categories' => ProductCategory::pluck('name'),
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('erp/products/create', [
+            'categories' => ProductCategory::pluck('name'),
+        ]);
+    }
+
+    public function store(ProductRequest $request)
+    {
+        $userId = Auth::id();
+        try {
+            Log::info('Product: Creation of new product.', ['action_user_id' => $userId]);
+
+            $this->productService->createProduct($request);
+
+            return to_route('erp.products.index')->with('success', 'Product created successfully.');
+        } catch (Exception $e) {
+            Log::error('Product: Failed to create product.', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->withInput()->with(['error' => 'Failed to create product.']);
+        }
     }
 }
