@@ -129,9 +129,9 @@ class Product extends Model implements Auditable, HasMedia
 
     public function getCoverImageAttribute()
     {
-        $media = $this->getMedia('products_images', ['is_cover' => true]);
+        $media = $this->getFirstMedia('products_images', ['is_cover' => true]);
 
-        return $media->isNotEmpty() ? $media->firstOrFail() : null;
+        return $media ? $media->getUrl('webp') : null;
     }
 
     public function registerMediaCollections(?Media $media = null): void
@@ -139,7 +139,13 @@ class Product extends Model implements Auditable, HasMedia
         $this->addMediaCollection('products_images')
             ->onlyKeepLatest(3)
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->withResponsiveImages();
+            ->registerMediaConversions(function () {
+                $this
+                    ->addMediaConversion('webp')
+                    ->format('webp')
+                    ->quality(100)
+                    ->performOnCollections('products_images');
+            });
     }
 
     public function category()
