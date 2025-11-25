@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Product;
 
+use App\Http\Requests\product\ProductRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ProductServiceInterface
@@ -22,4 +23,19 @@ interface ProductServiceInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated collection of Product models.
      */
     public function getPaginatedProducts(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Create a new product from the provided request.
+     *
+     * Implementations should validate the ProductRequest, map its data to a
+     * product entity/model, and persist the product to the underlying storage.
+     * This method does not return a value; any outcome or error should be
+     * communicated by throwing an exception or via other domain-specific mechanisms.
+     *
+     * @param  ProductRequest  $request  The request DTO containing product data (e.g. name, price, SKU, attributes).
+     *
+     * @throws \InvalidArgumentException If the provided request contains invalid or missing required data.
+     * @throws \RuntimeException If the product cannot be created or persisted due to a storage or domain error.
+     */
+    public function createProduct(ProductRequest $request): void;
 }

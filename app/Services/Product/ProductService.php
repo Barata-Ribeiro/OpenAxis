@@ -3,8 +3,10 @@
 namespace App\Services\Product;
 
 use App\Common\Helpers;
+use App\Http\Requests\product\ProductRequest;
 use App\Interfaces\Product\ProductServiceInterface;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -74,5 +76,44 @@ class ProductService implements ProductServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function createProduct(ProductRequest $request): void
+    {
+        $validatedData = $request->validated();
+
+        $images = $validatedData['images'] ?? [];
+        $coverImage = null;
+        $restOfImages = [];
+
+        if (! empty($images)) {
+            $coverImage = $images[0];
+
+            if (count($images) > 1) {
+                $restOfImages = array_values(array_slice($images, 1));
+            }
+        }
+
+        $categoryId = ProductCategory::whereName($validatedData['category'])->value('id');
+
+        // include product_category_id and remove non-fillable keys
+        $validatedData['product_category_id'] = $categoryId;
+        unset($validatedData['category']);
+
+        $newProduct = Product::create($validatedData);
+
+        $newProduct->addMedia($coverImage)
+            ->withCustomProperties(['is_cover' => true])
+            ->toMediaCollection('products_images');
+
+        if (! empty($restOfImages)) {
+
+            foreach ($restOfImages as $image) {
+                $newProduct->addMedia($image)
+                    ->withCustomProperties(['is_cover' => false])
+                    ->toMediaCollection('products_images');
+            }
+
+        }
     }
 }
