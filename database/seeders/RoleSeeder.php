@@ -64,7 +64,7 @@ class RoleSeeder extends Seeder
     {
         return [
             RoleEnum::VENDOR->value => [
-                'dashboard' => ['index', 'show'],
+                'dashboard' => ['show'],
                 'product' => ['index', 'show'],
                 'client' => ['index', 'show', 'create', 'edit'],
                 'sale' => ['index', 'show', 'create', 'edit'],
@@ -72,14 +72,14 @@ class RoleSeeder extends Seeder
                 'supply' => ['index', 'show'],
             ],
             RoleEnum::BUYER->value => [
-                'dashboard' => ['index', 'show'],
+                'dashboard' => ['show'],
                 'product' => ['index', 'show', 'create', 'edit'],
                 'order' => ['index', 'show', 'create', 'edit'],
                 'supplier' => ['index', 'show', 'create', 'edit'],
                 'supply' => ['index', 'show', 'create', 'edit'],
             ],
             RoleEnum::FINANCE->value => [
-                'dashboard' => ['index', 'show'],
+                'dashboard' => ['show'],
                 'finance' => ['index', 'show', 'create', 'edit'],
                 'sale' => ['index', 'show'],
                 'order' => ['index', 'show'],

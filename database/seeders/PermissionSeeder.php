@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
@@ -22,18 +23,18 @@ class PermissionSeeder extends Seeder
         ];
 
         $modules = [
-            ['name' => 'user', 'label' => ['singular' => 'user', 'plural' => 'users']],
-            ['name' => 'role', 'label' => ['singular' => 'role', 'plural' => 'roles']],
-            ['name' => 'permission', 'label' => ['singular' => 'permission', 'plural' => 'permissions']],
-            ['name' => 'dashboard', 'label' => ['singular' => 'dashboard', 'plural' => 'dashboards']],
-            ['name' => 'product', 'label' => ['singular' => 'product', 'plural' => 'products']],
-            ['name' => 'client', 'label' => ['singular' => 'client', 'plural' => 'clients']],
-            ['name' => 'order', 'label' => ['singular' => 'order', 'plural' => 'orders']],
-            ['name' => 'sale', 'label' => ['singular' => 'sale', 'plural' => 'sales']],
-            ['name' => 'vendor', 'label' => ['singular' => 'vendor', 'plural' => 'vendors']],
-            ['name' => 'supplier', 'label' => ['singular' => 'supplier', 'plural' => 'suppliers']],
-            ['name' => 'supply', 'label' => ['singular' => 'supply', 'plural' => 'supplies']],
-            ['name' => 'finance', 'label' => ['singular' => 'finance', 'plural' => 'finances']],
+            ['name' => 'user', 'label' => ['singular' => 'user', 'plural' => 'users'], 'actions' => ['all']],
+            ['name' => 'role', 'label' => ['singular' => 'role', 'plural' => 'roles'], 'actions' => ['all']],
+            ['name' => 'permission', 'label' => ['singular' => 'permission', 'plural' => 'permissions'], 'actions' => ['all']],
+            ['name' => 'dashboard', 'label' => ['singular' => 'dashboard', 'plural' => 'dashboards'], 'actions' => ['show']],
+            ['name' => 'product', 'label' => ['singular' => 'product', 'plural' => 'products'], 'actions' => ['all']],
+            ['name' => 'client', 'label' => ['singular' => 'client', 'plural' => 'clients'], 'actions' => ['all']],
+            ['name' => 'order', 'label' => ['singular' => 'order', 'plural' => 'orders'], 'actions' => ['all']],
+            ['name' => 'sale', 'label' => ['singular' => 'sale', 'plural' => 'sales'], 'actions' => ['all']],
+            ['name' => 'vendor', 'label' => ['singular' => 'vendor', 'plural' => 'vendors'], 'actions' => ['all']],
+            ['name' => 'supplier', 'label' => ['singular' => 'supplier', 'plural' => 'suppliers'], 'actions' => ['all']],
+            ['name' => 'supply', 'label' => ['singular' => 'supply', 'plural' => 'supplies'], 'actions' => ['all']],
+            ['name' => 'finance', 'label' => ['singular' => 'finance', 'plural' => 'finances'], 'actions' => ['all']],
         ];
 
         try {
@@ -41,10 +42,14 @@ class PermissionSeeder extends Seeder
 
             foreach ($modules as $module) {
                 foreach ($action as $act) {
-                    $label = sprintf($act['label'], $module['label']['singular']);
+                    if (! \in_array('all', $module['actions']) && ! \in_array($act['name'], $module['actions'])) {
+                        continue;
+                    }
+
+                    $label = \sprintf($act['label'], $module['label']['singular']);
 
                     if ($act['name'] === 'index') {
-                        $label = sprintf($act['label'], $module['label']['plural']);
+                        $label = \sprintf($act['label'], $module['label']['plural']);
                     }
 
                     $permissions[] = [
@@ -58,7 +63,7 @@ class PermissionSeeder extends Seeder
                 Permission::where(['name' => $perm['name'], 'title' => $perm['label']])
                     ->existsOr(fn () => Permission::create(['name' => $perm['name'], 'title' => $perm['label']]));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error seeding permissions!', ['error' => $e->getMessage()]);
         }
     }
