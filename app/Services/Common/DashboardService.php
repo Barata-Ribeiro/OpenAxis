@@ -23,11 +23,33 @@ class DashboardService implements DashboardServiceInterface
         $totalProfits = $this->getTotalProfits($year, $month);
 
         return [
-            'totalSales' => $totalSales,
-            'totalClients' => $totalClients,
-            'totalVendors' => $totalVendors,
-            'totalOrders' => $totalOrders,
-            'totalProfits' => $totalProfits,
+            'generalSummary' => [
+                'title' => 'General Summary',
+                'totalSales' => $totalSales,
+                'totalClients' => $totalClients,
+                'totalVendors' => $totalVendors,
+                'totalOrders' => $totalOrders,
+            ],
+            'financialSummary' => [
+                'title' => 'Financial Summary',
+                'totalProfits' => $totalProfits,
+            ],
+            'inventoryAndCostsSummary' => [
+                'title' => 'Inventory and Costs Summary',
+                // Future metrics can be added here
+            ],
+            'commissions' => [
+                'title' => 'Commissions',
+                // Future metrics can be added here
+            ],
+            'payables' => [
+                'title' => 'Payables',
+                // Future metrics can be added here
+            ],
+            'receivables' => [
+                'title' => 'Receivables',
+                // Future metrics can be added here
+            ],
         ];
     }
 
