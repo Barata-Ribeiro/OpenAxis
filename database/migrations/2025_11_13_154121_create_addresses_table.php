@@ -30,7 +30,6 @@ return new class extends Migration
             $table->string('country', 100)->default('USA');
             $table->boolean('is_primary')->default(false)->comment('Indicates if this is the primary address for the entity');
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['city', 'state', 'postal_code']);
 

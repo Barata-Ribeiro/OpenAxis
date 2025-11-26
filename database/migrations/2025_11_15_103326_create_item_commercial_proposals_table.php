@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('unit_price', 10, 2);
             $table->decimal('subtotal_price', 10, 2);
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['commercial_proposal_id', 'product_id'], 'idx_item_cp_prod');
         });

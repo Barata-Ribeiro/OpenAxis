@@ -28,7 +28,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['order_date', 'status']);
         });

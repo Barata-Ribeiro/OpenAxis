@@ -23,7 +23,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['proposal_date', 'status']);
             $table->index(['client_id', 'vendor_id']);

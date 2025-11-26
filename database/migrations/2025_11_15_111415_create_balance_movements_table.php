@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('destination_account_id')->nullable()->constrained('bank_accounts')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['bank_account_id', 'type']);
         });

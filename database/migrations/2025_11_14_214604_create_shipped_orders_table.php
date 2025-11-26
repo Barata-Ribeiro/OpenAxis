@@ -20,7 +20,6 @@ return new class extends Migration
             $table->enum('status', ['posted', 'in_transit', 'delivered', 'returned'])->default('posted');
             $table->text('notes')->nullable();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['shipped_date', 'status']);
         });

@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained('partners')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['order_date', 'status']);
         });

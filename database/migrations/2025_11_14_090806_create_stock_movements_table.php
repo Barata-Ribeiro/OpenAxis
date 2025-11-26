@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('reason', 100)->nullable();
             $table->string('reference', 50)->nullable();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['product_id', 'movement_type']);
         });

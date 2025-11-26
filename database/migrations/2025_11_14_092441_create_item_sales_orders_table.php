@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('unit_price', 10, 2)->default(0);
             $table->decimal('subtotal_price', 10, 2)->default(0);
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index(['sales_order_id', 'product_id']);
         });
