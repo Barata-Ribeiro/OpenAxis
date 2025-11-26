@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('payables', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 20)->unique();
             $table->string('description');
             $table->foreignId('supplier_id')->constrained('partners')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('vendor_id')->constrained('vendors')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
-            $table->date('issue_date');
+            $table->date('issue_date')->useCurrent();
             $table->date('due_date');
             $table->date('payment_date')->nullable();
-            $table->enum('status', ['open', 'paid', 'cancelled'])->default('open');
+            $table->enum('status', ['pending', 'paid', 'cancelled'])->default('pending');
             $table->enum('payment_method', ['bank_transfer', 'credit_card', 'cash', 'check']);
             $table->foreignId('bank_account_id')->constrained('bank_accounts')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('sales_order_id')->constrained('sales_orders')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('reference_number', 50)->nullable();
             $table->text('notes')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();

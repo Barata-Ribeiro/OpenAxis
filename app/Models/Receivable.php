@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
+ * @property string $code
  * @property string $description
  * @property int $client_id
  * @property numeric $amount
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property string $payment_method
  * @property int $bank_account_id
+ * @property int $sales_order_id
  * @property string|null $reference_number
  * @property string|null $notes
  * @property int $user_id
@@ -22,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\Partner $client
+ * @property-read \App\Models\SalesOrder $salesOrder
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable newQuery()
@@ -29,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereClientId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDueDate($value)
@@ -38,6 +42,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable wherePaymentMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereReceivedDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereSalesOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUserId($value)
@@ -46,6 +51,7 @@ use Illuminate\Database\Eloquent\Model;
 class Receivable extends Model
 {
     protected $fillable = [
+        'code',
         'description',
         'client_id',
         'amount',
@@ -55,6 +61,7 @@ class Receivable extends Model
         'status',
         'payment_method',
         'bank_account_id',
+        'sales_order_id',
         'reference_number',
         'notes',
         'user_id',
@@ -83,6 +90,11 @@ class Receivable extends Model
     public function bankAccount()
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
+    }
+
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 
     public function user()

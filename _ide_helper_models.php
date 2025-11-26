@@ -29,7 +29,6 @@ namespace App\Models{
  * @property int $is_primary Indicates if this is the primary address for the entity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read Model|\Eloquent $addressable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address newQuery()
@@ -40,7 +39,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereComplement($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereIsPrimary($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereLabel($value)
@@ -69,7 +67,6 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\BankAccount|null $destinationAccount
  * @property-read \App\Models\User $user
@@ -79,7 +76,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereDestinationAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereId($value)
@@ -101,12 +97,13 @@ namespace App\Models{
  * @property string $bank_name
  * @property string $bank_agency
  * @property string $bank_account_number
+ * @property string|null $pix_key Key for PIX transactions, if applicable.
+ * @property string|null $destination_name Name of the account holder for transfers.
  * @property numeric $initial_balance
  * @property numeric $current_balance
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount query()
@@ -115,18 +112,15 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereBankName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereCurrentBalance($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereDestinationName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereInitialBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount wherePixKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property string|null $pix_key Key for PIX transactions, if applicable.
- * @property string|null $destination_name Name of the account holder for transfers.
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereDestinationName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount wherePixKey($value)
  */
 	class BankAccount extends \Eloquent {}
 }
@@ -141,12 +135,16 @@ namespace App\Models{
  * @property string $client_type Type of client: individual or company. In Brazil would be Pessoa Física or Pessoa Jurídica.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
  * @property-read int|null $addresses_count
  * @property-read bool|null $addresses_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereClientType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereCreatedAt($value)
@@ -157,13 +155,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereUpdatedAt($value)
- * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
- * @property-read int|null $audits_count
- * @property-read bool|null $audits_exists
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Client onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client withoutTrashed()
+ * @mixin \Eloquent
  */
 	class Client extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }
@@ -182,7 +176,6 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
@@ -192,7 +185,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereProposalDate($value)
@@ -217,7 +209,6 @@ namespace App\Models{
  * @property numeric $subtotal_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\CommercialProposal $commercialProposal
  * @property-read \App\Models\Product $product
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal newModelQuery()
@@ -225,7 +216,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereCommercialProposalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereQuantity($value)
@@ -247,14 +237,12 @@ namespace App\Models{
  * @property numeric $subtotal_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\PurchaseOrder $purchaseOrder
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder wherePurchaseOrderId($value)
@@ -277,14 +265,12 @@ namespace App\Models{
  * @property numeric $subtotal_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\SalesOrder $salesOrder
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereQuantity($value)
@@ -308,12 +294,16 @@ namespace App\Models{
  * @property bool $is_active Indicates whether the supplier is currently active.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
  * @property-read int|null $addresses_count
  * @property-read bool|null $addresses_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereDeletedAt($value)
@@ -325,13 +315,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereUpdatedAt($value)
- * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
- * @property-read int|null $audits_count
- * @property-read bool|null $audits_exists
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withoutTrashed()
+ * @mixin \Eloquent
  */
 	class Partner extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }
@@ -353,7 +339,6 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
@@ -363,7 +348,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereId($value)
@@ -377,6 +361,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUserId($value)
  * @mixin \Eloquent
+ * @property string $code
+ * @property int $vendor_id
+ * @property int $sales_order_id
+ * @property-read \App\Models\SalesOrder $salesOrder
+ * @property-read \App\Models\Vendor $vendor
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereSalesOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereVendorId($value)
  */
 	class Payable extends \Eloquent {}
 }
@@ -401,7 +393,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
- * @property-read \App\Models\ProductCategory|null $category
+ * @property-read \App\Models\ProductCategory $category
  * @property-read mixed $cover_image
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
@@ -442,7 +434,6 @@ namespace App\Models{
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
@@ -452,18 +443,14 @@ namespace App\Models{
  * @method static \Database\Factories\ProductCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory withoutTrashed()
  * @mixin \Eloquent
  */
 	class ProductCategory extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
@@ -482,14 +469,12 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereForecastDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereNotes($value)
@@ -522,7 +507,6 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
@@ -533,7 +517,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereId($value)
@@ -546,6 +529,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUserId($value)
  * @mixin \Eloquent
+ * @property string $code
+ * @property int $sales_order_id
+ * @property-read \App\Models\SalesOrder $salesOrder
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereSalesOrderId($value)
  */
 	class Receivable extends \Eloquent {}
 }
@@ -569,7 +557,6 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newModelQuery()
@@ -577,7 +564,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDeliveryCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDeliveryDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDiscountCost($value)
@@ -609,14 +595,12 @@ namespace App\Models{
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\SalesOrder $salesOrder
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereCarrier($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereSalesOrdersId($value)
@@ -640,14 +624,12 @@ namespace App\Models{
  * @property string|null $reference
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereMovementType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereProductId($value)
@@ -734,10 +716,14 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereCreatedAt($value)
@@ -750,13 +736,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUserId($value)
- * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
- * @property-read int|null $audits_count
- * @property-read bool|null $audits_exists
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withoutTrashed()
+ * @mixin \Eloquent
  */
 	class Vendor extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }

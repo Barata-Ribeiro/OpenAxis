@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
+ * @property string $code
  * @property string $description
  * @property int $supplier_id
+ * @property int $vendor_id
  * @property numeric $amount
  * @property \Illuminate\Support\Carbon $issue_date
  * @property \Illuminate\Support\Carbon $due_date
@@ -15,19 +17,23 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property string $payment_method
  * @property int $bank_account_id
+ * @property int $sales_order_id
  * @property string|null $reference_number
  * @property string|null $notes
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankAccount $bankAccount
+ * @property-read \App\Models\SalesOrder $salesOrder
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\Vendor $vendor
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereBankAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDueDate($value)
@@ -37,10 +43,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable wherePaymentDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable wherePaymentMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereSalesOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereSupplierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereVendorId($value)
  * @mixin \Eloquent
  */
 class Payable extends Model
@@ -48,8 +56,10 @@ class Payable extends Model
     protected $table = 'payables';
 
     protected $fillable = [
+        'code',
         'description',
         'supplier_id',
+        'vendor_id',
         'amount',
         'issue_date',
         'due_date',
@@ -57,6 +67,7 @@ class Payable extends Model
         'status',
         'payment_method',
         'bank_account_id',
+        'sales_order_id',
         'reference_number',
         'notes',
         'user_id',
@@ -82,9 +93,19 @@ class Payable extends Model
         return $this->belongsTo(Partner::class, 'supplier_id');
     }
 
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id');
+    }
+
     public function bankAccount()
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
+    }
+
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 
     public function user()
