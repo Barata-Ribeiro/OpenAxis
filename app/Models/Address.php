@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $is_primary Indicates if this is the primary address for the entity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read Model|\Eloquent $addressable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address newQuery()
@@ -32,7 +31,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereComplement($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereIsPrimary($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereLabel($value)

@@ -16,14 +16,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereForecastDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereNotes($value)

@@ -123,6 +123,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $pix_key Key for PIX transactions, if applicable.
+ * @property string|null $destination_name Name of the account holder for transfers.
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereDestinationName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount wherePixKey($value)
  */
 	class BankAccount extends \Eloquent {}
 }
@@ -154,8 +158,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Client whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Client withoutTrashed()
  */
-	class Client extends \Eloquent {}
+	class Client extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }
 
 namespace App\Models{
@@ -316,8 +326,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withoutTrashed()
  */
-	class Partner extends \Eloquent {}
+	class Partner extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }
 
 namespace App\Models{
@@ -735,7 +751,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUserId($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withoutTrashed()
  */
-	class Vendor extends \Eloquent {}
+	class Vendor extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }
 

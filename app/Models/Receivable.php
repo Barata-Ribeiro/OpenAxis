@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
@@ -31,7 +30,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereId($value)

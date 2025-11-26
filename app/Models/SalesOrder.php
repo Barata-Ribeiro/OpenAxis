@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newModelQuery()
@@ -30,7 +29,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDeliveryCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDeliveryDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereDiscountCost($value)

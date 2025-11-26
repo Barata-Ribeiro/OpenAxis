@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
@@ -27,7 +26,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereProposalDate($value)

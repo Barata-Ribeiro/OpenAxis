@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\BankAccount|null $destinationAccount
  * @property-read \App\Models\User $user
@@ -26,7 +25,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereDestinationAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereId($value)

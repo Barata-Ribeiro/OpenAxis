@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property numeric $subtotal_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\CommercialProposal $commercialProposal
  * @property-read \App\Models\Product $product
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal newModelQuery()
@@ -21,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereCommercialProposalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereQuantity($value)

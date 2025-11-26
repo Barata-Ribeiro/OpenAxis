@@ -14,14 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\SalesOrder $salesOrder
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereCarrier($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShippedOrder whereSalesOrdersId($value)

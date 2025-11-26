@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @property int $id
@@ -14,12 +16,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $is_active Indicates whether the supplier is currently active.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
  * @property-read int|null $addresses_count
  * @property-read bool|null $addresses_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereDeletedAt($value)
@@ -31,10 +37,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withoutTrashed()
  * @mixin \Eloquent
  */
-class Partner extends Model
+class Partner extends Model implements Auditable
 {
+    /**
+     * @use SoftDeletes<\Illuminate\Database\Eloquent\SoftDeletes>
+     * @use \OwenIt\Auditing\Auditable
+     */
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
+
     protected $fillable = [
         'type',
         'name',

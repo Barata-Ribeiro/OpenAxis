@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * @property int $id
@@ -15,10 +17,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read bool|null $audits_exists
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereCreatedAt($value)
@@ -31,10 +37,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withoutTrashed()
  * @mixin \Eloquent
  */
-class Vendor extends Model
+class Vendor extends Model implements Auditable
 {
+    /**
+     * @use SoftDeletes<\Illuminate\Database\Eloquent\SoftDeletes>
+     * @use \OwenIt\Auditing\Auditable
+     */
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
+
     protected $fillable = [
         'first_name',
         'last_name',

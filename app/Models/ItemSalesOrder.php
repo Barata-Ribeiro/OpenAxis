@@ -13,14 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property numeric $subtotal_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\SalesOrder $salesOrder
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereQuantity($value)

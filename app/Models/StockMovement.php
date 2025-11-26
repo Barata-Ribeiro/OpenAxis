@@ -14,14 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $reference
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereMovementType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereProductId($value)
