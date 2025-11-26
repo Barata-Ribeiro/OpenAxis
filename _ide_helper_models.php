@@ -279,6 +279,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property numeric $commission_item
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCommissionItem($value)
  */
 	class ItemSalesOrder extends \Eloquent {}
 }
@@ -606,6 +608,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereVendorId($value)
  * @mixin \Eloquent
+ * @property numeric $total_commission Total commission for the sales order
+ * @property int|null $payment_condition_id
+ * @property-read \App\Models\PaymentCondition|null $paymentCondition
+ * @property-read \App\Models\Vendor $vendor
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder wherePaymentConditionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereTotalCommission($value)
  */
 	class SalesOrder extends \Eloquent {}
 }

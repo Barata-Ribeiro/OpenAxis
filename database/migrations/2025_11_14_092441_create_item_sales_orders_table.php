@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2)->default(0);
             $table->decimal('subtotal_price', 10, 2)->default(0);
+            $table->decimal('commission_item', 10, 2)->default(0);
             $table->timestamps();
 
             $table->index(['sales_order_id', 'product_id']);

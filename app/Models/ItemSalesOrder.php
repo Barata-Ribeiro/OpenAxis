@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $quantity
  * @property numeric $unit_price
  * @property numeric $subtotal_price
+ * @property numeric $commission_item
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCommissionItem($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereProductId($value)
@@ -36,6 +38,7 @@ class ItemSalesOrder extends Model
         'quantity',
         'unit_price',
         'subtotal_price',
+        'commission_item',
     ];
 
     /**
@@ -48,6 +51,7 @@ class ItemSalesOrder extends Model
         return [
             'unit_price' => 'decimal:2',
             'subtotal_price' => 'decimal:2',
+            'commission_item' => 'decimal:2',
         ];
     }
 

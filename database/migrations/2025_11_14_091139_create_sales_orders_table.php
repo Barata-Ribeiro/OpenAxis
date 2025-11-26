@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('discount_cost', 10, 2)->default(0)->comment('Discount applied to the sales order');
             $table->decimal('total_cost', 10, 2)->default(0)->comment('Total cost of the sales order');
             $table->decimal('product_value', 10, 2)->default(0)->comment('Total value of the products in the sales order');
+            $table->decimal('total_commission', 10, 2)->default(0)->comment('Total commission for the sales order');
             $table->enum('payment_method', ['cash', 'credit_card', 'debit_card', 'bank_transfer'])->default('cash');
             $table->text('notes')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
