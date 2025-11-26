@@ -11,12 +11,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $bank_name
  * @property string $bank_agency
  * @property string $bank_account_number
+ * @property string|null $pix_key Key for PIX transactions, if applicable.
+ * @property string|null $destination_name Name of the account holder for transfers.
  * @property numeric $initial_balance
  * @property numeric $current_balance
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount query()
@@ -25,11 +26,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereBankName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereCurrentBalance($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereDestinationName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereInitialBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount wherePixKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankAccount whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -42,6 +44,8 @@ class BankAccount extends Model
         'bank_name',
         'bank_agency',
         'bank_account_number',
+        'pix_key',
+        'destination_name',
         'initial_balance',
         'current_balance',
         'is_active',

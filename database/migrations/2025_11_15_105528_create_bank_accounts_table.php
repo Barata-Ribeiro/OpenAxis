@@ -22,11 +22,12 @@ return new class extends Migration
             $table->string('bank_name', 100);
             $table->string('bank_agency', 20);
             $table->string('bank_account_number', 30);
+            $table->string('pix_key')->nullable()->comment('Key for PIX transactions, if applicable.');
+            $table->string('destination_name')->nullable()->comment('Name of the account holder for transfers.');
             $table->decimal('initial_balance', 10, 2)->default(0);
             $table->decimal('current_balance', 10, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->softDeletes();
 
             $table->index('name');
             $table->index('bank_account_number');
