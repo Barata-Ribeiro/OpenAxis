@@ -394,6 +394,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 	class PaymentCondition extends \Eloquent {}
 }

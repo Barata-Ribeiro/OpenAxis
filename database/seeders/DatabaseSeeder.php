@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([PermissionSeeder::class, RoleSeeder::class, AdminSeeder::class]);
+        $this->call([PermissionSeeder::class, RoleSeeder::class, AdminSeeder::class, PaymentConditionSeeder::class]);
 
         if (App::environment('local', 'testing', 'staging')) {
             $this->call([UserSeeder::class, ProductCategorySeeder::class, ProductSeeder::class]);
