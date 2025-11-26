@@ -325,8 +325,10 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string $code
  * @property string $description
  * @property int $supplier_id
+ * @property int $vendor_id
  * @property numeric $amount
  * @property \Illuminate\Support\Carbon $issue_date
  * @property \Illuminate\Support\Carbon $due_date
@@ -334,19 +336,23 @@ namespace App\Models{
  * @property string $status
  * @property string $payment_method
  * @property int $bank_account_id
+ * @property int $sales_order_id
  * @property string|null $reference_number
  * @property string|null $notes
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankAccount $bankAccount
+ * @property-read \App\Models\SalesOrder $salesOrder
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\Vendor $vendor
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereBankAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereDueDate($value)
@@ -356,21 +362,40 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable wherePaymentDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable wherePaymentMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereSalesOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereSupplierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUserId($value)
- * @mixin \Eloquent
- * @property string $code
- * @property int $vendor_id
- * @property int $sales_order_id
- * @property-read \App\Models\SalesOrder $salesOrder
- * @property-read \App\Models\Vendor $vendor
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereSalesOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereVendorId($value)
+ * @mixin \Eloquent
  */
 	class Payable extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $code Unique code representing the payment condition.
+ * @property string $name Name of the payment condition.
+ * @property int $days_until_due Number of days until the payment is due.
+ * @property int $installments Number of installments for the payment condition.
+ * @property bool $is_active Indicates whether the payment condition is currently active.
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereDaysUntilDue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereInstallments($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentCondition whereUpdatedAt($value)
+ */
+	class PaymentCondition extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -493,6 +518,7 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string $code
  * @property string $description
  * @property int $client_id
  * @property numeric $amount
@@ -502,6 +528,7 @@ namespace App\Models{
  * @property string $status
  * @property string $payment_method
  * @property int $bank_account_id
+ * @property int $sales_order_id
  * @property string|null $reference_number
  * @property string|null $notes
  * @property int $user_id
@@ -509,6 +536,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\Partner $client
+ * @property-read \App\Models\SalesOrder $salesOrder
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable newQuery()
@@ -516,6 +544,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereBankAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereClientId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereDueDate($value)
@@ -525,15 +554,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable wherePaymentMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereReceivedDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereSalesOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUserId($value)
  * @mixin \Eloquent
- * @property string $code
- * @property int $sales_order_id
- * @property-read \App\Models\SalesOrder $salesOrder
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereSalesOrderId($value)
  */
 	class Receivable extends \Eloquent {}
 }
