@@ -203,6 +203,7 @@ class DashboardService implements DashboardServiceInterface
         $orders = SalesOrder::query()
             ->whereYear('order_date', $year)
             ->whereMonth('order_date', $month)
+            ->where('status', '!=', 'cancelled')
             ->get();
 
         $totalProfit = 0.0;
