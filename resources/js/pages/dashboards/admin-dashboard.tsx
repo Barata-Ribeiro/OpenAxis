@@ -1,15 +1,11 @@
-import InputError from '@/components/feedback/input-error';
+import DashboardMonthYearForm from '@/components/forms/dashboard-month-year-form';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
-import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { Activity } from 'react';
 
 interface StatusInfo {
     title: string;
@@ -50,37 +46,7 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
             <Head title="Dashboard" />
 
             <section className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* TODO: Extract form to a component for page readability */}
-                <Form
-                    {...dashboard.form()}
-                    method="GET"
-                    className="w-full max-w-64 place-self-end inert:pointer-events-none inert:grayscale-100"
-                    disableWhileProcessing
-                >
-                    {({ processing, errors }) => (
-                        <Field data-invalid={!!errors.yearMonth}>
-                            <InputGroup>
-                                <InputGroupInput id="yearMonth" name="yearMonth" type="month" />
-                                <InputGroupAddon align="block-start">
-                                    <FieldLabel htmlFor="yearMonth">Select Month & Year</FieldLabel>
-                                    <InputGroupButton
-                                        type="submit"
-                                        className="ml-auto"
-                                        size="sm"
-                                        variant="default"
-                                        disabled={processing}
-                                    >
-                                        <Activity mode={processing ? 'visible' : 'hidden'}>
-                                            <Spinner />
-                                        </Activity>
-                                        Filter
-                                    </InputGroupButton>
-                                </InputGroupAddon>
-                            </InputGroup>
-                            <InputError message={errors.yearMonth} />
-                        </Field>
-                    )}
-                </Form>
+                <DashboardMonthYearForm />
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {Object.entries(data).map(([key, info]) => {
