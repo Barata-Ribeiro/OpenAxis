@@ -40,6 +40,11 @@ class AppServiceProvider extends ServiceProvider
 			\App\Interfaces\Product\ProductServiceInterface::class,
 			\App\Services\Product\ProductService::class
 		);
+
+		$this->app->bind(
+			\App\Interfaces\Common\DashboardServiceInterface::class,
+			\App\Services\Common\DashboardService::class
+		);
     }
 
     /**
