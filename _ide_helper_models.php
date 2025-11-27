@@ -263,6 +263,7 @@ namespace App\Models{
  * @property int $quantity
  * @property numeric $unit_price
  * @property numeric $subtotal_price
+ * @property numeric $commission_item
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
@@ -270,6 +271,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCommissionItem($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereProductId($value)
@@ -279,8 +281,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property numeric $commission_item
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereCommissionItem($value)
  */
 	class ItemSalesOrder extends \Eloquent {}
 }
@@ -580,13 +580,17 @@ namespace App\Models{
  * @property numeric $discount_cost Discount applied to the sales order
  * @property numeric $total_cost Total cost of the sales order
  * @property numeric $product_value Total value of the products in the sales order
+ * @property numeric $total_commission Total commission for the sales order
  * @property string $payment_method
  * @property string|null $notes
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $payment_condition_id
  * @property-read \App\Models\Partner $client
+ * @property-read \App\Models\PaymentCondition|null $paymentCondition
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\Vendor $vendor
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder query()
@@ -599,21 +603,17 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereOrderDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereOrderNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder wherePaymentConditionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder wherePaymentMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereProductCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereProductValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereTotalCommission($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereTotalCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereVendorId($value)
  * @mixin \Eloquent
- * @property numeric $total_commission Total commission for the sales order
- * @property int|null $payment_condition_id
- * @property-read \App\Models\PaymentCondition|null $paymentCondition
- * @property-read \App\Models\Vendor $vendor
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder wherePaymentConditionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereTotalCommission($value)
  */
 	class SalesOrder extends \Eloquent {}
 }
