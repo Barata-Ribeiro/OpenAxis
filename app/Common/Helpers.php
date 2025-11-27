@@ -3,6 +3,7 @@
 namespace App\Common;
 
 use Asika\Agent\Agent;
+use Carbon\Carbon;
 
 class Helpers
 {
@@ -66,5 +67,48 @@ class Helpers
         $major = $version ? explode('.', $version)[0] : '';
 
         return trim($browser.($major ? " {$major}" : '')." / {$os}");
+    }
+
+    /**
+     * Normalize a "created/updated/deleted at" date range into a two-element array.
+     *
+     * Accepts either an array or a string representation of a date range and
+     * returns a normalized array containing the start and end values.
+     *
+     * Expected input forms:
+     *  - array: [start, end] where each element may be a date string or null
+     *  - string: a single date or a range (for example "YYYY-MM-DD - YYYY-MM-DD")
+     *
+     * Returned value:
+     *  - array with exactly two elements: [0 => ?string, 1 => ?string]
+     *    representing the start and end dates respectively. Unset or
+     *    unparseable values are normalized to null.
+     *
+     * @param  array|mixed|string  $inputRange  Date range input (array or string)
+     * @return array{0:?string,1:?string} Normalized two-element array [start, end]
+     *
+     * @throws \InvalidArgumentException If the input type or format is unsupported or cannot be parsed
+     */
+    public static function getDateRange(array|string|null $inputRange): array
+    {
+        if (! \is_array($inputRange) || \count($inputRange) !== 2) {
+            return [null, null];
+        }
+
+        $tz = config('app.timezone', 'UTC');
+        $startTs = (int) $inputRange[0];
+        $endTs = (int) $inputRange[1];
+
+        $start = Carbon::createFromTimestampMs($startTs, $tz)
+            ->startOfDay()
+            ->clone()
+            ->toDateTimeString();
+
+        $end = Carbon::createFromTimestampMs($endTs, $tz)
+            ->endOfDay()
+            ->clone()
+            ->toDateTimeString();
+
+        return [$start, $end];
     }
 }
