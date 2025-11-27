@@ -1,9 +1,11 @@
 import type { InertiaLinkProps } from '@inertiajs/react';
 import type { LucideIcon } from 'lucide-react';
+import type { Permission } from './application/role-permission';
 import type { UserWithRelations } from './application/user';
 
 export interface Auth {
     user: UserWithRelations;
+    permissions: Permission['name'][];
 }
 
 export interface BreadcrumbItem {
