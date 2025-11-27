@@ -7,7 +7,6 @@ use App\Http\Requests\product\ProductRequest;
 use App\Interfaces\Product\ProductServiceInterface;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -17,7 +16,7 @@ class ProductService implements ProductServiceInterface
 
     public function __construct()
     {
-        $this->isSqlDriver = in_array(DB::getDriverName(), ['mysql', 'pgsql']);
+        $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
     }
 
     public function getPaginatedProducts(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
@@ -34,24 +33,7 @@ class ProductService implements ProductServiceInterface
             $sortBy = str_replace('category_name', 'product_categories.name', $sortBy);
         }
 
-        $start = null;
-        $end = null;
-
-        if (! empty($createdAtRange) && count($createdAtRange) === 2) {
-            $tz = config('app.timezone', 'UTC');
-            $startTs = (int) $createdAtRange[0];
-            $endTs = (int) $createdAtRange[1];
-
-            $start = Carbon::createFromTimestampMs($startTs, $tz)
-                ->startOfDay()
-                ->clone()
-                ->toDateTimeString();
-
-            $end = Carbon::createFromTimestampMs($endTs, $tz)
-                ->endOfDay()
-                ->clone()
-                ->toDateTimeString();
-        }
+        [$start, $end] = Helpers::getDateRange($createdAtRange);
 
         return Product::query()
             ->select('products.*')
@@ -89,8 +71,8 @@ class ProductService implements ProductServiceInterface
         if (! empty($images)) {
             $coverImage = $images[0];
 
-            if (count($images) > 1) {
-                $restOfImages = array_values(array_slice($images, 1));
+            if (\count($images) > 1) {
+                $restOfImages = array_values(\array_slice($images, 1));
             }
         }
 

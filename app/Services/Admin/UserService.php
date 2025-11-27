@@ -2,11 +2,11 @@
 
 namespace App\Services\Admin;
 
+use App\Common\Helpers;
 use App\Http\Requests\Admin\EditUserRequest;
 use App\Interfaces\Admin\UserServiceInterface;
 use App\Mail\NewUserMail;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -18,24 +18,7 @@ class UserService implements UserServiceInterface
         $roles = $filters['roles'] ?? [];
         $createdAtRange = $filters['created_at'] ?? [];
 
-        $start = null;
-        $end = null;
-
-        if (! empty($createdAtRange) && count($createdAtRange) === 2) {
-            $tz = config('app.timezone', 'UTC');
-            $startTs = (int) $createdAtRange[0];
-            $endTs = (int) $createdAtRange[1];
-
-            $start = Carbon::createFromTimestampMs($startTs, $tz)
-                ->startOfDay()
-                ->clone()
-                ->toDateTimeString();
-
-            $end = Carbon::createFromTimestampMs($endTs, $tz)
-                ->endOfDay()
-                ->clone()
-                ->toDateTimeString();
-        }
+        [$start, $end] = Helpers::getDateRange($createdAtRange);
 
         $users = User::query()
             ->select(['id', 'name', 'email', 'created_at', 'updated_at', 'deleted_at'])
