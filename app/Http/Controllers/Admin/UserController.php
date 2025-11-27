@@ -74,10 +74,8 @@ class UserController extends Controller
         $userId = Auth::id();
         Log::info('User: Creating New User', ['action_user_id' => $userId]);
 
-        $validated = $request->validated();
-
         try {
-            $user = $this->userService->createUser($validated);
+            $user = $this->userService->createUser($request);
 
             return to_route('administrative.users.index')->with('success', $user->name." account's created successfully.");
         } catch (Exception $e) {

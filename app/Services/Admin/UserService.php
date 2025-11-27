@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Common\Helpers;
 use App\Http\Requests\Admin\EditUserRequest;
+use App\Http\Requests\Admin\UserAccountRequest;
 use App\Interfaces\Admin\UserServiceInterface;
 use App\Mail\NewUserMail;
 use App\Models\User;
@@ -44,9 +45,15 @@ class UserService implements UserServiceInterface
         return $users->paginate($perPage)->withQueryString();
     }
 
-    public function createUser($data): User
+    public function createUser(UserAccountRequest $request): User
     {
-        $user = User::create($data);
+        $validated = $request->validated();
+
+        $data = collect($validated)
+            ->except('role')
+            ->toArray();
+
+        $user = User::create($data)->assignRole($validated['role']);
 
         Mail::to($user->email)->send(new NewUserMail($user->name, $user->email, $data['password']));
 

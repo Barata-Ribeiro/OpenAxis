@@ -3,6 +3,7 @@
 namespace App\Interfaces\Admin;
 
 use App\Http\Requests\Admin\EditUserRequest;
+use App\Http\Requests\Admin\UserAccountRequest;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -26,12 +27,12 @@ interface UserServiceInterface
      * Creates a new User with the given attributes and sends a NewUserMail to the
      * new user's email address with the plaintext password from the input data.
      *
-     * @param  array  $data  Associative array of user attributes (must include 'email', 'name', and 'password').
+     * @param  UserAccountRequest  $request  The request containing user attributes.
      * @return \App\Models\User The created User instance.
      *
      * @throws \Throwable If user creation or email sending fails.
      */
-    public function createUser(array $data): User;
+    public function createUser(UserAccountRequest $request): User;
 
     /**
      * Update the given user using validated edit request data.
