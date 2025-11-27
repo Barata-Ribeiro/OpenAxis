@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use App\Interfaces\{{ class }}Interface;
+use {{ interfaceFqn }};
 
 class {{ class }} implements {{ class }}Interface
 {
