@@ -127,23 +127,20 @@ class Product extends Model implements Auditable, HasMedia
 
     public function getCoverImageAttribute()
     {
-        $media = $this->getFirstMedia('products_images', ['is_cover' => true]);
+        $media = $this->getFirstMedia('products_images');
 
-        return $media ? $media->getUrl('webp') : null;
+        return [
+            'src' => $media?->getUrl(),
+            'srcSet' => $media?->getSrcSet(),
+        ];
     }
 
     public function registerMediaCollections(?Media $media = null): void
     {
         $this->addMediaCollection('products_images')
             ->onlyKeepLatest(3)
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->registerMediaConversions(function () {
-                $this
-                    ->addMediaConversion('webp')
-                    ->format('webp')
-                    ->quality(100)
-                    ->performOnCollections('products_images');
-            });
+            ->withResponsiveImages()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
     }
 
     public function category()

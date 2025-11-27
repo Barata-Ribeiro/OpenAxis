@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Str;
 
 class ProductService implements ProductServiceInterface
 {
@@ -65,37 +66,22 @@ class ProductService implements ProductServiceInterface
         $validatedData = $request->validated();
 
         $images = $validatedData['images'] ?? [];
-        $coverImage = null;
-        $restOfImages = [];
-
-        if (! empty($images)) {
-            $coverImage = $images[0];
-
-            if (\count($images) > 1) {
-                $restOfImages = array_values(\array_slice($images, 1));
-            }
-        }
 
         $categoryId = ProductCategory::whereName($validatedData['category'])->value('id');
 
-        // include product_category_id and remove non-fillable keys
-        $validatedData['product_category_id'] = $categoryId;
-        unset($validatedData['category']);
+        $payload = collect($validatedData)
+            ->except(['images', 'category'])
+            ->put('product_category_id', $categoryId)
+            ->toArray();
 
-        $newProduct = Product::create($validatedData);
+        DB::transaction(function () use ($payload, $images) {
+            $product = Product::create($payload);
 
-        $newProduct->addMedia($coverImage)
-            ->withCustomProperties(['is_cover' => true])
-            ->toMediaCollection('products_images');
-
-        if (! empty($restOfImages)) {
-
-            foreach ($restOfImages as $image) {
-                $newProduct->addMedia($image)
-                    ->withCustomProperties(['is_cover' => false])
+            foreach ($images as $image) {
+                $product->addMedia($image)
+                    ->usingFileName(Str::uuid7().'_'.now()->timestamp.'.'.$image->getClientOriginalExtension())
                     ->toMediaCollection('products_images');
             }
-
-        }
+        });
     }
 }

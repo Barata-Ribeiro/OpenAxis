@@ -128,30 +128,19 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
     {
         $media = $this->getFirstMedia('avatar');
 
-        if ($media) {
-            return [
-                'original' => $media->getUrl(),
-                'webp' => $media->getUrl('webp'),
-            ];
-        }
-
-        return null;
+        return [
+            'src' => $media?->getUrl(),
+            'srcSet' => $media?->getSrcSet(),
+        ];
     }
 
     public function registerMediaCollections(?Media $media = null): void
     {
         $this
             ->addMediaCollection('avatar')
-            ->singleFile()
+            ->withResponsiveImages()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->registerMediaConversions(function () {
-                $this
-                    ->addMediaConversion('webp')
-                    ->format('webp')
-                    ->width(100)
-                    ->height(100)
-                    ->sharpen(10);
-            });
+            ->singleFile();
     }
 
     public function addresses()
