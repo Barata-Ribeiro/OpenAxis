@@ -8,9 +8,17 @@ use App\Models\ItemSalesOrder;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
 use Concurrency;
+use DB;
 
 class DashboardService implements DashboardServiceInterface
 {
+    private bool $isSqlDriver;
+
+    public function __construct()
+    {
+        $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
+    }
+
     public function getAdminDashboardData($yearMonth): array
     {
         $year = $yearMonth ? (int) explode('-', $yearMonth)[0] : now()->year;
@@ -62,7 +70,7 @@ class DashboardService implements DashboardServiceInterface
      */
     public function getTotalSales($year, $month): mixed
     {
-        [$currentMonth, $pastMonth] = Concurrency::run([
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => SalesOrder::query()
                 ->whereYear('order_date', $year)
                 ->whereMonth('order_date', $month)
@@ -93,7 +101,7 @@ class DashboardService implements DashboardServiceInterface
      */
     private function getTotalClients($year, $month): mixed
     {
-        [$currentMonth, $pastMonth] = Concurrency::run([
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => Client::query()
                 ->whereYear('created_at', $year)
                 ->whereMonth('created_at', $month)
@@ -122,7 +130,7 @@ class DashboardService implements DashboardServiceInterface
      */
     private function getTotalVendors($year, $month): mixed
     {
-        [$currentMonth, $pastMonth] = Concurrency::run([
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => Vendor::query()
                 ->whereYear('created_at', $year)
                 ->whereMonth('created_at', $month)
@@ -151,7 +159,7 @@ class DashboardService implements DashboardServiceInterface
      */
     private function getTotalOrders($year, $month): mixed
     {
-        [$currentMonth, $pastMonth] = Concurrency::run([
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => SalesOrder::query()
                 ->whereYear('order_date', $year)
                 ->whereMonth('order_date', $month)
@@ -183,7 +191,7 @@ class DashboardService implements DashboardServiceInterface
      */
     private function getTotalProfits($year, $month): mixed
     {
-        [$currentMonth, $pastMonth] = Concurrency::run([
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => $this->calculateProfitForPeriod($year, $month),
             fn () => $this->calculateProfitForPeriod($year, $month - 1),
         ]);
@@ -272,5 +280,25 @@ class DashboardService implements DashboardServiceInterface
     {
         // TODO: Implement user dashboard data retrieval
         return [];
+    }
+
+    private function runDashboardTasks(array $callbacks): array
+    {
+        if ($this->shouldBypassConcurrency()) {
+            $results = [];
+
+            foreach ($callbacks as $key => $callback) {
+                $results[$key] = $callback();
+            }
+
+            return $results;
+        }
+
+        return Concurrency::run($callbacks);
+    }
+
+    private function shouldBypassConcurrency(): bool
+    {
+        return app()->environment('testing') || $this->isSqlDriver === false;
     }
 }
