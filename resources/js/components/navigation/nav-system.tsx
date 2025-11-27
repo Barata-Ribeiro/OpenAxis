@@ -11,12 +11,36 @@ import administrative from '@/routes/administrative';
 import erp from '@/routes/erp';
 import { NavGroup } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { IdCardLanyardIcon, MailIcon, Package2Icon, TagsIcon, UsersIcon } from 'lucide-react';
+import { BookUserIcon, IdCardLanyardIcon, MailIcon, Package2Icon, TagsIcon, UsersIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
 export function NavSystem() {
     const page = usePage();
     const { can } = usePermission();
+
+    const erpGroup: NavGroup = {
+        title: 'Enterprise Resource Planning',
+        items: [
+            {
+                title: 'Products',
+                href: erp.products.index().url,
+                icon: Package2Icon,
+                canView: can('product.index'),
+            },
+            {
+                title: 'Categories',
+                href: erp.categories.index().url,
+                icon: TagsIcon,
+                canView: can('product.index'),
+            },
+            {
+                title: 'Clients',
+                href: erp.clients.index().url,
+                icon: BookUserIcon,
+                canView: can('client.index'),
+            },
+        ],
+    };
 
     const adminGroup: NavGroup = {
         title: 'Administrative',
@@ -44,24 +68,6 @@ export function NavSystem() {
                 href: administrative.mailable.newAccount().url,
                 icon: MailIcon,
                 canView: can('user.create'),
-            },
-        ],
-    };
-
-    const erpGroup: NavGroup = {
-        title: 'Enterprise Resource Planning',
-        items: [
-            {
-                title: 'Products',
-                href: erp.products.index().url,
-                icon: Package2Icon,
-                canView: can('product.index'),
-            },
-            {
-                title: 'Categories',
-                href: erp.categories.index().url,
-                icon: TagsIcon,
-                canView: can('product.index'),
             },
         ],
     };
