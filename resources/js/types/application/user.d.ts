@@ -1,14 +1,12 @@
-import { Address } from './address';
-import { Permission, Role } from './role-permission';
+import type { ImageSources } from '@/types/index';
+import type { Address } from './address';
+import type { Permission, Role } from './role-permission';
 
 export interface User {
     id: number;
     name: string;
     email: string;
-    avatar?: {
-        original: string;
-        webp: string;
-    };
+    avatar: ImageSources;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     two_factor_confirmed_at: string | null;

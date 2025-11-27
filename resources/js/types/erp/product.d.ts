@@ -1,10 +1,11 @@
-import { ProductCategory } from './product-category';
+import type { ImageSources } from '@/types/index';
+import type { ProductCategory } from './product-category';
 
 export interface Product {
     id: number;
     sku: string;
     name: string;
-    cover_image: string | null;
+    cover_image: ImageSources;
     description?: string;
     slug: string;
     cost_price: string;

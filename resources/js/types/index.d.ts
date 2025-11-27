@@ -1,6 +1,6 @@
-import { InertiaLinkProps } from '@inertiajs/react';
-import { LucideIcon } from 'lucide-react';
-import { UserWithRelations } from './application/user';
+import type { InertiaLinkProps } from '@inertiajs/react';
+import type { LucideIcon } from 'lucide-react';
+import type { UserWithRelations } from './application/user';
 
 export interface Auth {
     user: UserWithRelations;
@@ -86,3 +86,8 @@ export interface Option {
 }
 
 export type FilterVariant = DataTableConfig['filterVariants'][number];
+
+export interface ImageSources {
+    src: string | null;
+    srcSet: string | null;
+}

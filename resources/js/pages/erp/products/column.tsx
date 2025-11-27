@@ -18,12 +18,13 @@ export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWi
         accessorKey: 'cover_image',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Cover Image" />,
         cell: function Cell({ row }) {
-            const coverImageUrl = row.original.cover_image;
+            const cover_image = row.original.cover_image;
             const altText = `Miniature representation of ${row.original.name}`;
 
-            return coverImageUrl ? (
+            return cover_image.src && cover_image.srcSet ? (
                 <img
-                    src={coverImageUrl}
+                    src={cover_image.src}
+                    srcSet={cover_image.srcSet}
                     alt={altText}
                     className="aspect-square size-10 rounded-md object-cover"
                     width={40}
