@@ -52,9 +52,9 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                 <DashboardMonthYearForm />
 
                 <div className="grid gap-6">
-                    {Object.entries(data).map(([key, summary]) => {
+                    {Object.entries(data).map(([summaryKey, summary]) => {
                         return (
-                            <Card key={key} className="rounded-md bg-muted/50">
+                            <Card key={summaryKey} className="rounded-md bg-muted/50">
                                 <CardHeader>
                                     <CardTitle className="text-3xl">{summary.title}</CardTitle>
                                 </CardHeader>
@@ -62,8 +62,9 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                 <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                     {Object.entries(summary)
                                         .filter(([statusKey]) => statusKey !== 'title')
-                                        .map(([, status]) => {
+                                        .map(([statusKey, status]) => {
                                             const info = status as StatusInfo;
+                                            const cardKey = `${summaryKey}-${statusKey}`;
 
                                             const formattedCurrentValue = `${info.prefix ?? ''}${formatNumber(info.value)}${info.suffix ?? ''}`;
                                             const formattedDelta = `${info.positive ? '+' : '-'}${formatNumber(info.delta)}`;
@@ -78,7 +79,7 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                             const changeIndicatorType = info.positive ? 'success' : 'destructive';
 
                                             return (
-                                                <Card key={key} className="p-4">
+                                                <Card key={cardKey} className="p-4">
                                                     <CardHeader className="border-0">
                                                         <CardTitle className="text-2xl text-muted-foreground">
                                                             {info.title}
