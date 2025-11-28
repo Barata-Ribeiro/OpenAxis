@@ -3,9 +3,12 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\Management\ClientRequest;
 use App\Interfaces\Management\ClientServiceInterface;
 use App\Models\Client;
+use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 
 class ClientService implements ClientServiceInterface
 {
@@ -26,5 +29,21 @@ class ClientService implements ClientServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function createClient(ClientRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $clientData = Arr::only($validated, [
+            'name', 'email', 'identification', 'client_type',
+        ]);
+
+        $addressData = Arr::only($validated, [
+            'type', 'label', 'street', 'number', 'complement', 'neighborhood',
+            'city', 'state', 'postal_code', 'country', 'is_primary',
+        ]);
+
+        DB::transaction(fn () => Client::create($clientData)->addresses()->create($addressData));
     }
 }
