@@ -53,6 +53,30 @@ class AddressController extends Controller
         }
     }
 
+    public function update(AddressRequest $request, Address $address)
+    {
+        $data = $request->validated();
+
+        $addresses = Auth::user()->addresses();
+
+        try {
+            $isPrimary = isset($data['is_primary']) ? filter_var($data['is_primary'], FILTER_VALIDATE_BOOLEAN) : false;
+            $data['is_primary'] = $isPrimary ? 1 : 0;
+
+            if ($data['is_primary']) {
+                $addresses->update(['is_primary' => 0]);
+            }
+
+            $addresses->whereId($address->id)->update($data);
+
+            return to_route('profile.addresses')->with('success', 'Address updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Address: Failed to update address', ['action_user_id' => Auth::id(), 'error' => $e->getMessage()]);
+
+            return back()->withInput()->with('error', 'Failed to update address. Please try again.');
+        }
+    }
+
     /**
      * Set an address as primary for the user.
      */
