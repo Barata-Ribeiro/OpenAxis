@@ -13,6 +13,6 @@ export interface Client {
     deleted_at: string | null;
 }
 
-export interface ClientWithRelations {
+export interface ClientWithRelations extends Client {
     addresses: Address[];
 }
