@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\ClientRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\Management\ClientService;
+use Auth;
 use Inertia\Inertia;
+use Log;
 
 class ClientController extends Controller
 {
@@ -37,5 +40,30 @@ class ClientController extends Controller
         return Inertia::render('erp/clients/index', [
             'clients' => $clients,
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('erp/clients/create');
+    }
+
+    public function store(ClientRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Client: Creation of new a new client.', ['action_user_id' => $userId]);
+
+            $this->clientService->createClient($request);
+
+            return to_route('erp.clients.index')->with('success', 'Client created successfully.');
+        } catch (\Exception $e) {
+            Log::error('Client: Error creating new client.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'Error creating client.');
+        }
     }
 }
