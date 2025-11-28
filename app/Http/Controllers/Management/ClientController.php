@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\ClientRequest;
+use App\Http\Requests\Management\UpdateClientRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\Client;
 use App\Services\Management\ClientService;
 use Auth;
 use Inertia\Inertia;
@@ -64,6 +66,34 @@ class ClientController extends Controller
             ]);
 
             return back()->withInput()->with('error', 'Error creating client.');
+        }
+    }
+
+    public function edit(Client $client)
+    {
+        return Inertia::render('erp/clients/edit', [
+            'client' => $client,
+        ]);
+    }
+
+    public function update(UpdateClientRequest $request, Client $client)
+    {
+        $userId = Auth::id();
+        $data = $request->validated();
+
+        try {
+            Log::info('Client: Updating client.', ['action_user_id' => $userId]);
+
+            $client->update($data);
+
+            return to_route('erp.clients.index')->with('success', 'Client updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Client: Error updating client.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'Error updating client.');
         }
     }
 }
