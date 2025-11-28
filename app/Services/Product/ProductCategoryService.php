@@ -27,21 +27,13 @@ class ProductCategoryService implements ProductCategoryServiceInterface
     {
         $validated = $request->validated();
 
-        ProductCategory::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'is_active' => $validated['is_active'],
-        ]);
+        ProductCategory::create($validated);
     }
 
     public function updateCategory(UpdateProductCategoryRequest $request, ProductCategory $category): void
     {
         $validated = $request->validated();
 
-        $category->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'is_active' => $validated['is_active'],
-        ]);
+        $category->update($validated);
     }
 }
