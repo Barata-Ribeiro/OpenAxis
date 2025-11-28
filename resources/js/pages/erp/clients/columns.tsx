@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { usePermission } from '@/hooks/use-permission';
+import { normalizeString } from '@/lib/utils';
 import erp from '@/routes/erp';
 import type { Client } from '@/types/erp/client';
 import { ClientType, clientTypeLabel } from '@/types/erp/erp-enums';
@@ -58,7 +59,7 @@ export const columns: Array<ColumnDef<Client>> = [
         cell: function Cell({ row }) {
             const rawClientType = row.original.client_type;
 
-            return <Badge variant="secondary">{rawClientType}</Badge>;
+            return <Badge variant="secondary">{normalizeString(rawClientType)}</Badge>;
         },
         meta: {
             label: 'Types',
