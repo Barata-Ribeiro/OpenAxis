@@ -39,10 +39,16 @@ export const columns: Array<ColumnDef<UserWithRelations>> = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         cell: function Cell({ row }) {
             const getInitials = useInitials();
+
             return (
                 <div className="inline-flex items-center gap-x-2">
                     <Avatar className="size-6 overflow-hidden rounded-full">
-                        <AvatarImage src={row.original.avatar?.webp} alt={row.original.name} className="object-cover" />
+                        <AvatarImage
+                            src={row.original.avatar.src ?? ''}
+                            srcSet={row.original.avatar.srcSet ?? ''}
+                            alt={row.original.name}
+                            className="object-cover"
+                        />
                         <AvatarFallback className="rounded-lg bg-neutral-200 text-xs text-black select-none dark:bg-neutral-700 dark:text-white">
                             {getInitials(row.original.name)}
                         </AvatarFallback>
