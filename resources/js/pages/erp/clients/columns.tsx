@@ -1,4 +1,5 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,8 @@ import { ClientType, clientTypeLabel } from '@/types/erp/erp-enums';
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CalendarIcon, CircleDashed, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
+import { CalendarIcon, CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
+import { useState } from 'react';
 
 export const columns: Array<ColumnDef<Client>> = [
     {
@@ -104,52 +106,74 @@ export const columns: Array<ColumnDef<Client>> = [
     {
         id: 'actions',
         cell: function Cell({ row }) {
+            const [open, setOpen] = useState(false);
             const { can } = usePermission();
+
             const nameToCopy = row.original.name;
             const emailToCopy = row.original.email;
             const idToCopy = row.original.identification;
 
             return (
-                <DropdownMenu modal={false}>
-                    {' '}
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Open menu"
-                            variant="ghost"
-                            className="flex size-8 p-0 data-[state=open]:bg-muted"
-                        >
-                            <Ellipsis aria-hidden size={16} />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem asChild>
-                                <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <DropdownMenuCopyButton content={emailToCopy}>Copy Email</DropdownMenuCopyButton>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <DropdownMenuCopyButton content={idToCopy}>Copy Identification</DropdownMenuCopyButton>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem disabled={!can('client.show')} asChild>
-                                <Link className="block w-full" href={erp.clients.show(row.original.id)} as="button">
-                                    <EyeIcon aria-hidden size={14} /> View
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem disabled={!can('client.edit')} asChild>
-                                <Link className="block w-full" href={erp.clients.edit(row.original.id)} as="button">
-                                    <EditIcon aria-hidden size={14} /> Edit
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu modal={false}>
+                        {' '}
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Open menu"
+                                variant="ghost"
+                                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                            >
+                                <Ellipsis aria-hidden size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={emailToCopy}>Copy Email</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={idToCopy}>
+                                        Copy Identification
+                                    </DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem disabled={!can('client.show')} asChild>
+                                    <Link className="block w-full" href={erp.clients.show(row.original.id)} as="button">
+                                        <EyeIcon aria-hidden size={14} /> View
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem disabled={!can('client.edit')} asChild>
+                                    <Link className="block w-full" href={erp.clients.edit(row.original.id)} as="button">
+                                        <EditIcon aria-hidden size={14} /> Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    disabled={!can('client.destroy')}
+                                    onSelect={() => setOpen(true)}
+                                >
+                                    <DeleteIcon aria-hidden size={14} /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ActionConfirmationDialog
+                        open={open}
+                        setOpen={setOpen}
+                        title="Confirm Deletion"
+                        description={`Are you sure you want to soft delete client "${row.original.name}"? This action can be undone later.`}
+                        method="delete"
+                        route={erp.clients.destroy(row.original.id)}
+                    />
+                </>
             );
         },
         size: 40,
