@@ -3502,7 +3502,9 @@ namespace PHPSTORM_META {
 'erp.categories.create','erp.categories.store','erp.categories.edit','erp.categories.update','erp.categories.destroy',
 'erp.products.index','erp.products.create','erp.products.store','erp.products.edit','erp.products.update',
 'erp.products.destroy','erp.clients.index','erp.clients.create','erp.clients.store','erp.clients.edit',
-'erp.clients.update','erp.clients.show','erp.clients.destroy','storage.local',);
+'erp.clients.update','erp.clients.show','erp.clients.destroy','erp.clients.force-destroy','erp.payment-conditions.index',
+'erp.payment-conditions.create','erp.payment-conditions.store','erp.payment-conditions.edit','erp.payment-conditions.update','erp.payment-conditions.destroy',
+'storage.local',);
         registerArgumentsSet('views', 
 'app','emails.new_account','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line',
 'laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method',
