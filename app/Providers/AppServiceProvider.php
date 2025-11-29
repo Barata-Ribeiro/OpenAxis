@@ -50,6 +50,11 @@ class AppServiceProvider extends ServiceProvider
 			\App\Interfaces\Management\ClientServiceInterface::class,
 			\App\Services\Management\ClientService::class
 		);
+
+		$this->app->bind(
+			\App\Interfaces\Management\PaymentConditionServiceInterface::class,
+			\App\Services\Management\PaymentConditionService::class
+		);
     }
 
     /**

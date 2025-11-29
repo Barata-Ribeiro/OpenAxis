@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
+use App\Services\Management\PaymentConditionService;
 use Inertia\Inertia;
 
 class PaymentConditionController extends Controller
 {
+    public function __construct(private PaymentConditionService $paymentConditionService) {}
+
     public function index(QueryRequest $request)
     {
         $validated = $request->validated();
@@ -23,8 +26,16 @@ class PaymentConditionController extends Controller
             $sortBy = 'id';
         }
 
+        $paymentConditions = $this->paymentConditionService->getPaginatedPaymentConditions(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
+
         return Inertia::render('erp/payment-conditions/index', [
-            // 'paymentConditions' => $paymentConditions,
+            'paymentConditions' => $paymentConditions,
         ]);
     }
 }
