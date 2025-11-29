@@ -42,5 +42,6 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         Route::get('/{client}', [ClientController::class, 'show'])->name('erp.clients.show')->middleware('permission:client.show');
 
         Route::delete('/{client}', [ClientController::class, 'destroy'])->name('erp.clients.destroy')->middleware('permission:client.destroy');
+        Route::delete('/{client}/force', [ClientController::class, 'forceDestroy'])->name('erp.clients.force-destroy')->middleware('permission:client.destroy');
     });
 });

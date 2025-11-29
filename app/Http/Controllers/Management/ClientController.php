@@ -9,6 +9,7 @@ use App\Http\Requests\QueryRequest;
 use App\Models\Client;
 use App\Services\Management\ClientService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -59,7 +60,7 @@ class ClientController extends Controller
             $this->clientService->createClient($request);
 
             return to_route('erp.clients.index')->with('success', 'Client created successfully.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Client: Error creating new client.', [
                 'action_user_id' => $userId,
                 'error_message' => $e->getMessage(),
@@ -87,13 +88,53 @@ class ClientController extends Controller
             $client->update($data);
 
             return to_route('erp.clients.index')->with('success', 'Client updated successfully.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Client: Error updating client.', [
                 'action_user_id' => $userId,
                 'error_message' => $e->getMessage(),
             ]);
 
             return back()->withInput()->with('error', 'Error updating client.');
+        }
+    }
+
+    public function destroy(Client $client)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Client: Deleting client.', ['action_user_id' => $userId]);
+
+            $client->delete();
+
+            return to_route('erp.clients.index')->with('success', 'Client deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Client: Error deleting client.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Error deleting client.');
+        }
+    }
+
+    public function forceDestroy(Client $client)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Client: Permanently deleting client.', ['action_user_id' => $userId]);
+
+            $client->forceDelete();
+
+            return to_route('erp.clients.index')->with('success', 'Client permanently deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Client: Error permanently deleting client.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An unknown error occurred while permanently deleting the client.');
         }
     }
 }
