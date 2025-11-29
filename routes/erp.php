@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Management\ClientController;
+use App\Http\Controllers\Management\PaymentConditionController;
 use App\Http\Controllers\Product\ProductCategoryController;
 use App\Http\Controllers\Product\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -43,5 +44,17 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
 
         Route::delete('/{client}', [ClientController::class, 'destroy'])->name('erp.clients.destroy')->middleware('permission:client.destroy');
         Route::delete('/{client}/force', [ClientController::class, 'forceDestroy'])->name('erp.clients.force-destroy')->middleware('permission:client.destroy');
+    });
+
+    Route::prefix('payment-conditions')->group(function () {
+        Route::get('/', [PaymentConditionController::class, 'index'])->name('erp.payment-conditions.index')->middleware('permission:finance.index');
+
+        Route::get('/create', [PaymentConditionController::class, 'create'])->name('erp.payment-conditions.create')->middleware('permission:finance.create');
+        Route::post('/', [PaymentConditionController::class, 'store'])->name('erp.payment-conditions.store')->middleware('permission:finance.create');
+
+        Route::get('/{paymentCondition}/edit', [PaymentConditionController::class, 'edit'])->name('erp.payment-conditions.edit')->middleware('permission:finance.edit');
+        Route::patch('/{paymentCondition}', [PaymentConditionController::class, 'update'])->name('erp.payment-conditions.update')->middleware('permission:finance.edit');
+
+        Route::delete('/{paymentCondition}', [PaymentConditionController::class, 'destroy'])->name('erp.payment-conditions.destroy')->middleware('permission:finance.destroy');
     });
 });
