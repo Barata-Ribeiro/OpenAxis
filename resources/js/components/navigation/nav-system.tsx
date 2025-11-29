@@ -11,7 +11,15 @@ import administrative from '@/routes/administrative';
 import erp from '@/routes/erp';
 import { NavGroup } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookUserIcon, IdCardLanyardIcon, MailIcon, Package2Icon, TagsIcon, UsersIcon } from 'lucide-react';
+import {
+    BookUserIcon,
+    IdCardLanyardIcon,
+    MailIcon,
+    Package2Icon,
+    PercentIcon,
+    TagsIcon,
+    UsersIcon,
+} from 'lucide-react';
 import { Fragment } from 'react';
 
 export function NavSystem() {
@@ -38,6 +46,12 @@ export function NavSystem() {
                 href: erp.clients.index().url,
                 icon: BookUserIcon,
                 canView: can('client.index'),
+            },
+            {
+                title: 'Payment Conditions',
+                href: erp.paymentConditions.index().url,
+                icon: PercentIcon,
+                canView: can('finance.index'),
             },
         ],
     };
