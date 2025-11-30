@@ -237,7 +237,9 @@ export default function ClientShow({ client }: Readonly<ClientShowProps>) {
                                     <div>
                                         <dt className="text-muted-foreground">Client Type</dt>
                                         <dd>
-                                            <Badge variant="secondary" className='select-none'>{clientTypeLabel(client.client_type)}</Badge>
+                                            <Badge variant="secondary" className="select-none">
+                                                {clientTypeLabel(client.client_type)}
+                                            </Badge>
                                         </dd>
                                     </div>
 
