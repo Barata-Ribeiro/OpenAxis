@@ -11,6 +11,8 @@ import { Link, router, usePage } from '@inertiajs/react';
 import type { Column, ColumnFiltersState, Updater, VisibilityState } from '@tanstack/react-table';
 import { ClipboardPlusIcon } from 'lucide-react';
 import { type CSSProperties, useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react';
+import { ButtonGroup } from '../ui/button-group';
+import DataTableExportData from './data-table-export-data';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
@@ -19,6 +21,7 @@ interface DataTableProps<TData, TValue> {
     data: PaginationMeta<TData[]>['data'];
     pagination: Omit<PaginationMeta<TData[]>, 'data'>;
     createRoute?: RouteDefinition<'get'>;
+    exportables?: Partial<Record<'csvRoute' | 'pdfRoute', RouteDefinition<'get'>>>;
 }
 
 type FilterValue = string | string[] | null;
@@ -57,6 +60,7 @@ export function DataTable<TData, TValue>({
     data,
     pagination,
     createRoute,
+    exportables,
 }: Readonly<DataTableProps<TData, TValue>>) {
     const page = usePage();
     const isMounted = useIsMounted();
@@ -247,20 +251,27 @@ export function DataTable<TData, TValue>({
         <Card className="mx-auto w-full flex-col space-y-4">
             <CardHeader className="flex flex-wrap items-center justify-between gap-4">
                 <DataTableToolbar table={table} path={path} />
-                {createRoute && (
-                    <Button asChild>
-                        <Link
-                            href={createRoute}
-                            aria-label="Create new record of this type"
-                            title="Create new record of this type"
-                            prefetch
-                            as="button"
-                        >
-                            <ClipboardPlusIcon aria-hidden size={16} />
-                            Create
-                        </Link>
-                    </Button>
-                )}
+
+                <ButtonGroup>
+                    {createRoute && (
+                        <Button asChild>
+                            <Link
+                                href={createRoute}
+                                aria-label="Create new record of this type"
+                                title="Create new record of this type"
+                                prefetch
+                                as="button"
+                            >
+                                <ClipboardPlusIcon aria-hidden size={16} />
+                                Create
+                            </Link>
+                        </Button>
+                    )}
+
+                    {exportables && (exportables.csvRoute || exportables.pdfRoute) && (
+                        <DataTableExportData csv={exportables.csvRoute} pdf={exportables.pdfRoute} />
+                    )}
+                </ButtonGroup>
             </CardHeader>
 
             <CardContent className="border-y py-4">
