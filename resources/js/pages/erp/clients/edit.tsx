@@ -12,7 +12,8 @@ export default function EditClientPage({ client }: Readonly<{ client: Client }>)
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Clients', href: erp.clients.index().url },
-        { title: `#${client.name}`, href: erp.clients.edit(client.id).url },
+        { title: `#${client.name}`, href: erp.clients.show(client.id).url },
+        { title: `Editing #${client.name}`, href: erp.clients.edit(client.id).url },
     ];
 
     return (
