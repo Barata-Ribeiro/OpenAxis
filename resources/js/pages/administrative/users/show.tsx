@@ -185,18 +185,18 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
                                 <CardTitle>Account Information</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <dl className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
-                                        <p className="text-sm font-medium text-muted-foreground">Name</p>
-                                        <p className="mt-1 text-base">{user.name}</p>
+                                        <dt className="text-sm font-medium text-muted-foreground">Name</dt>
+                                        <dd className="mt-1 text-base">{user.name}</dd>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-muted-foreground">Email</p>
-                                        <p className="mt-1 text-base">{user.email}</p>
+                                        <dt className="text-sm font-medium text-muted-foreground">Email</dt>
+                                        <dd className="mt-1 text-base">{user.email}</dd>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-muted-foreground">Email Verified</p>
-                                        <p className="mt-1 text-base">
+                                        <dt className="text-sm font-medium text-muted-foreground">Email Verified</dt>
+                                        <dd className="mt-1 text-base">
                                             {user.email_verified_at ? (
                                                 <Badge
                                                     variant="outline"
@@ -212,13 +212,13 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
                                                     Not Verified
                                                 </Badge>
                                             )}
-                                        </p>
+                                        </dd>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-muted-foreground">
+                                        <dt className="text-sm font-medium text-muted-foreground">
                                             Two-Factor Authentication
-                                        </p>
-                                        <p className="mt-1 text-base">
+                                        </dt>
+                                        <dd className="mt-1 text-base">
                                             {user.two_factor_confirmed_at ? (
                                                 <Badge
                                                     variant="outline"
@@ -234,9 +234,9 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
                                                     Disabled
                                                 </Badge>
                                             )}
-                                        </p>
+                                        </dd>
                                     </div>
-                                </div>
+                                </dl>
                             </CardContent>
                         </Card>
 
@@ -286,36 +286,36 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
                                                         <Badge variant="secondary">Primary</Badge>
                                                     </Activity>
                                                 </div>
-                                                <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                                                <dl className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
                                                     <div>
-                                                        <p className="text-muted-foreground">Street</p>
-                                                        <p>
+                                                        <dt className="text-muted-foreground">Street</dt>
+                                                        <dd>
                                                             {address.street}, {address.number}
-                                                        </p>
+                                                        </dd>
                                                     </div>
                                                     <div>
-                                                        <p className="text-muted-foreground">Complement</p>
-                                                        <p>{address.complement}</p>
+                                                        <dt className="text-muted-foreground">Complement</dt>
+                                                        <dd>{address.complement}</dd>
                                                     </div>
                                                     <div>
-                                                        <p className="text-muted-foreground">Neighborhood</p>
-                                                        <p>{address.neighborhood}</p>
+                                                        <dt className="text-muted-foreground">Neighborhood</dt>
+                                                        <dd>{address.neighborhood}</dd>
                                                     </div>
                                                     <div>
-                                                        <p className="text-muted-foreground">City</p>
-                                                        <p>
+                                                        <dt className="text-muted-foreground">City</dt>
+                                                        <dd>
                                                             {address.city}, {address.state}
-                                                        </p>
+                                                        </dd>
                                                     </div>
                                                     <div>
-                                                        <p className="text-muted-foreground">Postal Code</p>
-                                                        <p>{address.postal_code}</p>
+                                                        <dt className="text-muted-foreground">Postal Code</dt>
+                                                        <dd>{address.postal_code}</dd>
                                                     </div>
                                                     <div>
-                                                        <p className="text-muted-foreground">Country</p>
-                                                        <p>{address.country}</p>
+                                                        <dt className="text-muted-foreground">Country</dt>
+                                                        <dd>{address.country}</dd>
                                                     </div>
-                                                </div>
+                                                </dl>
                                             </div>
                                         </div>
                                     ))
