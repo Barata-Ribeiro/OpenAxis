@@ -21,6 +21,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
+ * @property-read string $full_name
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
@@ -58,6 +59,13 @@ class Vendor extends Model implements Auditable
         'is_active',
         'user_id',
     ];
+
+    protected $appends = ['full_name'];
+
+    public function getFullNameAttribute(): string
+    {
+        return ucwords("{$this->first_name} {$this->last_name}");
+    }
 
     /**
      * Get the attributes that should be cast.
