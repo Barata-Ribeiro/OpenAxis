@@ -775,6 +775,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withoutTrashed()
  * @mixin \Eloquent
+ * @property-read string $full_name
  */
 	class Vendor extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }
