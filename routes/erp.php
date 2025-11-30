@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Management\ClientController;
 use App\Http\Controllers\Management\PaymentConditionController;
+use App\Http\Controllers\Management\VendorController;
 use App\Http\Controllers\Product\ProductCategoryController;
 use App\Http\Controllers\Product\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,21 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
 
         Route::delete('/{client}', [ClientController::class, 'destroy'])->name('erp.clients.destroy')->middleware('permission:client.destroy');
         Route::delete('/{client}/force', [ClientController::class, 'forceDestroy'])->name('erp.clients.force-destroy')->middleware('permission:client.destroy');
+    });
+
+    Route::prefix('vendors')->group(function () {
+        Route::get('/', [VendorController::class, 'index'])->name('erp.vendors.index')->middleware('permission:vendor.index');
+
+        Route::get('/create', [VendorController::class, 'create'])->name('erp.vendors.create')->middleware('permission:vendor.create');
+        Route::post('/', [VendorController::class, 'store'])->name('erp.vendors.store')->middleware('permission:vendor.create');
+
+        Route::get('/{vendor}/edit', [VendorController::class, 'edit'])->name('erp.vendors.edit')->middleware('permission:vendor.edit');
+        Route::patch('/{vendor}', [VendorController::class, 'update'])->name('erp.vendors.update')->middleware('permission:vendor.edit');
+
+        Route::delete('/{vendor}', [VendorController::class, 'destroy'])->name('erp.vendors.destroy')->middleware('permission:vendor.destroy');
+        Route::delete('/{vendor}/force', [VendorController::class, 'forceDestroy'])->name('erp.vendors.force-destroy')->middleware('permission:vendor.destroy');
+
+        Route::get('/{vendor}', [VendorController::class, 'show'])->name('erp.vendors.show')->middleware('permission:vendor.show');
     });
 
     Route::prefix('payment-conditions')->group(function () {
