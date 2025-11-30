@@ -54,19 +54,19 @@
         <div class="container">
             <h1>New account created</h1>
 
-            <p>Hi {{ $name }},</p>
+            <p>Hi {!! $name !!},</p>
 
             <p>An account has been created for you on our system.</p>
 
             <span class="credentials">
-                Email: {{ $email }}<br>
-                Password: <strong>{{ $password }}</strong>
+                Email: {!! $email !!}<br>
+                Password: <strong>{!! $password !!}</strong>
             </span>
 
             <p>Please log in and change your password as soon as possible.</p>
 
             <p>Thanks,<br>
-                {{ $appName }}</p>
+                {!! $appName !!}</p>
         </div>
     </body>
 
