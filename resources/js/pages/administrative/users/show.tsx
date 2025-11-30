@@ -71,14 +71,19 @@ export default function UserShow({ user }: Readonly<UserShowProps>) {
 
                         <div className="flex flex-wrap items-center-safe gap-2">
                             <Avatar className="size-28 overflow-hidden rounded-full">
-                                <AvatarImage src={user.avatar?.original} alt={user.name} className="object-cover" />
+                                <AvatarImage
+                                    src={user.avatar.src ?? ''}
+                                    srcSet={user.avatar.srcSet ?? ''}
+                                    alt={user.name}
+                                    className="object-cover"
+                                />
                                 <AvatarFallback className="rounded-lg bg-neutral-200 text-4xl text-black dark:bg-neutral-700 dark:text-white">
                                     {getInitials(user.name)}
                                 </AvatarFallback>
                             </Avatar>
 
                             <div className="flex flex-col gap-4">
-                                <div className="-items-center flex flex-wrap gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                     <h1 className="text-text-balance text-3xl font-bold">{user.name}</h1>
 
                                     {user.roles.length > 0 && (
