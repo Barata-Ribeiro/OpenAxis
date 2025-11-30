@@ -40,13 +40,26 @@ class ClientController extends Controller
             $filters
         );
 
+        Log::info('Client: Accessed client list.', ['action_user_id' => Auth::id()]);
+
         return Inertia::render('erp/clients/index', [
             'clients' => $clients,
         ]);
     }
 
+    public function show(Client $client)
+    {
+        Log::info('Client: Viewing client details.', ['client_id' => $client->id, 'action_user_id' => Auth::id()]);
+
+        return Inertia::render('erp/clients/show', [
+            'client' => $client->load('addresses'),
+        ]);
+    }
+
     public function create()
     {
+        Log::info('Client: Accessing client creation form.', ['action_user_id' => Auth::id()]);
+
         return Inertia::render('erp/clients/create');
     }
 
@@ -72,6 +85,8 @@ class ClientController extends Controller
 
     public function edit(Client $client)
     {
+        Log::info('Client: Accessing client edit form.', ['client_id' => $client->id, 'action_user_id' => Auth::id()]);
+
         return Inertia::render('erp/clients/edit', [
             'client' => $client,
         ]);
