@@ -756,7 +756,9 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
+ * @property-read string $full_name
  * @property-read \App\Models\User $user
+ * @method static \Database\Factories\VendorFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor onlyTrashed()
@@ -775,7 +777,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withoutTrashed()
  * @mixin \Eloquent
- * @property-read string $full_name
  */
 	class Vendor extends \Eloquent implements \OwenIt\Auditing\Contracts\Auditable {}
 }

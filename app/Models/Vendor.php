@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -23,6 +24,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read bool|null $audits_exists
  * @property-read string $full_name
  * @property-read \App\Models\User $user
+ * @method static \Database\Factories\VendorFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor onlyTrashed()
@@ -45,10 +47,11 @@ use OwenIt\Auditing\Contracts\Auditable;
 class Vendor extends Model implements Auditable
 {
     /**
+     * @use HasFactory<\Database\Factories\VendorFactory>
      * @use SoftDeletes<\Illuminate\Database\Eloquent\SoftDeletes>
      * @use \OwenIt\Auditing\Auditable
      */
-    use \OwenIt\Auditing\Auditable, SoftDeletes;
+    use HasFactory, \OwenIt\Auditing\Auditable, SoftDeletes;
 
     protected $fillable = [
         'first_name',
