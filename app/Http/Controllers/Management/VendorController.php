@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Services\Management\VendorService;
 
 class VendorController extends Controller
 {
-    //
+    public function __construct(private VendorService $vendorService) {}
 }
