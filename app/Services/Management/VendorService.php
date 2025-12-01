@@ -15,15 +15,26 @@ class VendorService implements VendorServiceInterface
 
         [$start, $end] = Helpers::getDateRange($createdAtRange);
 
-        return Vendor::query()
-            ->with(['user', 'user.media'])
+        $query = Vendor::query()
+            ->with([
+                'user' => fn ($q) => $q->select('id', 'name', 'email'),
+                'user.media',
+            ])
             ->when($search, fn ($q, $search) => $q->whereLike('first_name', "%$search%")
                 ->orWhereLike('last_name', "%$search%")->orWhereLike('phone_number', "%$search%")
                 ->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('name', "%$search%")->orWhereLike('email', "%$search%")))
             ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
-            ->withTrashed()
-            ->orderBy($sortBy, $sortDir)
-            ->paginate($perPage)
-            ->withQueryString();
+            ->withTrashed();
+
+        if (str_starts_with($sortBy, 'user.')) {
+            $relatedField = str_replace('user.', '', $sortBy);
+            $query->join('users', 'vendors.user_id', '=', 'users.id')
+                ->orderBy("users.{$relatedField}", $sortDir)
+                ->select('vendors.*');
+        } else {
+            $query->orderBy($sortBy, $sortDir);
+        }
+
+        return $query->paginate($perPage)->withQueryString();
     }
 }
