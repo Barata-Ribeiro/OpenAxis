@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([PermissionSeeder::class, RoleSeeder::class, AdminSeeder::class, PaymentConditionSeeder::class]);
 
         if (App::environment('local', 'testing', 'staging')) {
-            $this->call([UserSeeder::class, ProductCategorySeeder::class, ProductSeeder::class, ClientSeeder::class]);
+            $this->call([UserSeeder::class, ProductCategorySeeder::class, ProductSeeder::class, ClientSeeder::class, VendorSeeder::class]);
         }
     }
 }
