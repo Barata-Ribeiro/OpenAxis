@@ -67,7 +67,7 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                             const cardKey = `${summaryKey}-${statusKey}`;
 
                                             const formattedCurrentValue = `${info.prefix ?? ''}${formatNumber(info.value)}${info.suffix ?? ''}`;
-                                            const formattedDelta = `${info.positive ? '+' : '-'}${formatNumber(info.delta)}`;
+                                            const formattedDelta = `${info.positive ? '+' : ''}${formatNumber(info.delta)}`;
                                             const formattedLastMonth = `${info.prefix ?? ''}${formatNumber(info.lastMonth)}${info.suffix ?? ''}`;
 
                                             const valueChangeIndicator = info.positive ? (
