@@ -1,10 +1,26 @@
+import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import { normalizeString } from '@/lib/utils';
+import erp from '@/routes/erp';
 import { VendorWithRelations } from '@/types/erp/vendor';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CalendarIcon, CircleDashed, XIcon } from 'lucide-react';
+import { CalendarIcon, CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
+import { useState } from 'react';
 
 export const columns: Array<ColumnDef<VendorWithRelations>> = [
     {
@@ -50,7 +66,7 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
         cell: ({ row }) => `${row.original.commission_rate}%`,
         enableSorting: true,
     },
-        {
+    {
         accessorKey: 'is_active',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
         cell: function Cell({ row }) {
@@ -103,5 +119,74 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
                 <XIcon size={14} aria-label="Not deleted" className="text-muted-foreground" />
             ),
         enableSorting: true,
+    },
+    {
+        id: 'actions',
+        cell: function Cell({ row }) {
+            const [open, setOpen] = useState(false);
+            const { can } = usePermission();
+
+            const nameToCopy = row.original.full_name;
+            const emailToCopy = row.original.user.email;
+
+            return (
+                <>
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Open menu"
+                                variant="ghost"
+                                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                            >
+                                <Ellipsis aria-hidden size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={nameToCopy}>Copy Full Name</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={emailToCopy}>Copy Email</DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem disabled={!can('vendor.show')} asChild>
+                                    <Link className="block w-full" href={erp.vendors.show(row.original.id)} as="button">
+                                        <EyeIcon aria-hidden size={14} /> View
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem disabled={!can('vendor.edit')} asChild>
+                                    <Link className="block w-full" href={erp.vendors.edit(row.original.id)} as="button">
+                                        <EditIcon aria-hidden size={14} /> Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    disabled={!can('vendor.destroy')}
+                                    onSelect={() => setOpen(true)}
+                                >
+                                    <DeleteIcon aria-hidden size={14} /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ActionConfirmationDialog
+                        open={open}
+                        setOpen={setOpen}
+                        title="Confirm Deletion"
+                        description={`Are you sure you want to soft delete vendor "${row.original.full_name}"? This action can be undone later.`}
+                        method="delete"
+                        route={erp.vendors.destroy(row.original.id)}
+                    />
+                </>
+            );
+        },
+        size: 40,
+        enableHiding: false,
     },
 ];
