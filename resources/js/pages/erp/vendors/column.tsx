@@ -1,8 +1,10 @@
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import { Badge } from '@/components/ui/badge';
+import { normalizeString } from '@/lib/utils';
 import { VendorWithRelations } from '@/types/erp/vendor';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CalendarIcon, XIcon } from 'lucide-react';
+import { CalendarIcon, CircleDashed, XIcon } from 'lucide-react';
 
 export const columns: Array<ColumnDef<VendorWithRelations>> = [
     {
@@ -13,16 +15,23 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
         size: 40,
     },
     {
-        id: 'user.first_name',
-        accessorKey: 'full_name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Full Name" />,
-        cell: ({ row }) => row.original.full_name,
+        id: 'first_name',
+        accessorKey: 'first_name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="First Name" />,
+        cell: ({ row }) => row.original.first_name,
         enableSorting: true,
-        enableHiding: false,
+    },
+
+    {
+        id: 'last_name',
+        accessorKey: 'last_name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Last Name" />,
+        cell: ({ row }) => row.original.last_name,
+        enableSorting: true,
     },
     {
         id: 'user.email',
-        accessorKey: 'email',
+        accessorKey: 'user.email',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
         cell: ({ row }) => (
             <a
@@ -30,7 +39,7 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
                 aria-label={`Send email to ${row.original.user.email}`}
                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
             >
-                {row.getValue('email')}
+                {row.original.user.email}
             </a>
         ),
         enableSorting: true,
@@ -40,6 +49,32 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Commission Rate" />,
         cell: ({ row }) => `${row.original.commission_rate}%`,
         enableSorting: true,
+    },
+        {
+        accessorKey: 'is_active',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: function Cell({ row }) {
+            const isActive = row.original.is_active;
+            const statusLabel = isActive ? 'Active' : 'Inactive';
+            const statusVariant = isActive ? 'secondary' : 'destructive';
+
+            return (
+                <Badge variant={statusVariant} className="select-none">
+                    {statusLabel}
+                </Badge>
+            );
+        },
+        meta: {
+            label: 'Active Status',
+            variant: 'select',
+            options: ['active', 'inactive'].map((status) => ({
+                label: normalizeString(status),
+                value: status === 'active' ? 'true' : 'false',
+            })),
+            icon: CircleDashed,
+        },
+        enableSorting: true,
+        enableColumnFilter: true,
     },
     {
         accessorKey: 'created_at',
