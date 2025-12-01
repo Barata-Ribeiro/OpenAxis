@@ -51,22 +51,27 @@
     </head>
 
     <body>
+        @php
+            $sanitize = function ($value) {
+                return str_replace('&#039;', "'", e($value));
+            };
+        @endphp
         <div class="container">
             <h1>New account created</h1>
 
-            <p>Hi {!! $name !!},</p>
+            <p>Hi {!! $sanitize($name) !!},</p>
 
             <p>An account has been created for you on our system.</p>
 
             <span class="credentials">
-                Email: {!! $email !!}<br>
-                Password: <strong>{!! $password !!}</strong>
+                Email: {!! $sanitize($email) !!}<br>
+                Password: <strong>{!! $sanitize($password) !!}</strong>
             </span>
 
             <p>Please log in and change your password as soon as possible.</p>
 
             <p>Thanks,<br>
-                {!! $appName !!}</p>
+                {!! $sanitize($appName) !!}</p>
         </div>
     </body>
 
