@@ -77,4 +77,13 @@ class VendorController extends Controller
             return back()->withInput()->with('error', 'Error creating vendor.');
         }
     }
+
+    public function show(Vendor $vendor)
+    {
+        $vendor->load('user', 'user.roles', 'user.addresses', 'user.media');
+
+        return Inertia::render('erp/vendors/show', [
+            'vendor' => $vendor,
+        ]);
+    }
 }
