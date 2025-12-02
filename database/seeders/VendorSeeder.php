@@ -21,5 +21,8 @@ class VendorSeeder extends Seeder
                 ->state(['user_id' => $userId])
                 ->create();
         }
+
+        // Create additional users with vendor role but no vendor record yet
+        User::factory()->count(10)->create()->each(fn ($u) => $u->assignRole(RoleEnum::VENDOR->value));
     }
 }
