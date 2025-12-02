@@ -2,6 +2,8 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\VendorRequest;
+use App\Models\Vendor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface VendorServiceInterface
@@ -20,4 +22,17 @@ interface VendorServiceInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated collection of vendors.
      */
     public function getPaginatedVendors(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Create a new Vendor from the provided request data.
+     *
+     * Uses the validated values from the VendorRequest to create and persist a new
+     * Vendor entity, then returns the saved Vendor instance.
+     *
+     * @param  VendorRequest  $request  Validated request containing vendor attributes.
+     * @return Vendor The newly created and persisted Vendor entity.
+     *
+     * @throws \Exception If the vendor cannot be created or persistence fails.
+     */
+    public function createVendor(VendorRequest $request): Vendor;
 }

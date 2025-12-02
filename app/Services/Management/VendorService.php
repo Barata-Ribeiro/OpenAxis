@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\Management\VendorRequest;
 use App\Interfaces\Management\VendorServiceInterface;
 use App\Models\Vendor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -38,5 +39,12 @@ class VendorService implements VendorServiceInterface
         }
 
         return $query->paginate($perPage)->withQueryString();
+    }
+
+    public function createVendor(VendorRequest $request): Vendor
+    {
+        $validated = $request->validated();
+
+        return Vendor::create($validated);
     }
 }

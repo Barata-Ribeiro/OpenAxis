@@ -9,7 +9,10 @@ use App\Http\Requests\QueryRequest;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Services\Management\VendorService;
+use Auth;
+use Exception;
 use Inertia\Inertia;
+use Log;
 
 class VendorController extends Controller
 {
@@ -57,6 +60,21 @@ class VendorController extends Controller
 
     public function store(VendorRequest $request)
     {
-        dd($request->validated());
+        $userId = Auth::id();
+
+        try {
+            Log::info('Vendor: Creation of a new vendor.', ['action_user_id' => $userId]);
+
+            $vendor = $this->vendorService->createVendor($request);
+
+            return to_route('erp.vendors.index')->with('success', "$vendor->full_name's vendor profile created successfully.");
+        } catch (Exception $e) {
+            Log::error('Vendor: Error creating vendor.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'Error creating vendor.');
+        }
     }
 }
