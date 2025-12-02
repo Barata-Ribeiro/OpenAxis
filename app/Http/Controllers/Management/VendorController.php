@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Management;
 
+use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
+use App\Models\User;
+use App\Models\Vendor;
 use App\Services\Management\VendorService;
 use Inertia\Inertia;
 
@@ -36,6 +39,18 @@ class VendorController extends Controller
 
         return Inertia::render('erp/vendors/index', [
             'vendors' => $vendors,
+        ]);
+    }
+
+    public function create()
+    {
+        $usersWithVendorRole = User::select(['id', 'name'])
+            ->whereHas('roles', fn ($q) => $q->where('name', RoleEnum::VENDOR->value))
+            ->whereNotIn('id', Vendor::pluck('user_id'))
+            ->get();
+
+        return Inertia::render('erp/vendors/create', [
+            'users' => Inertia::defer(fn () => $usersWithVendorRole),
         ]);
     }
 }
