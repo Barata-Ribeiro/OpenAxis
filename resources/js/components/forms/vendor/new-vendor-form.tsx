@@ -35,6 +35,7 @@ export default function NewVendorForm({ users }: { users: Array<User> }) {
             transform={(data) => ({
                 ...data,
                 date_of_birth: dateOfBirth?.toISOString().split('T')[0] ?? null,
+                user_id: value,
             })}
         >
             {({ processing, resetAndClearErrors, errors }) => (
@@ -156,12 +157,15 @@ export default function NewVendorForm({ users }: { users: Array<User> }) {
                                                               return (
                                                                   <CommandItem
                                                                       key={user.id}
-                                                                      value={user.id.toString()}
+                                                                      value={user.name}
                                                                       onSelect={(currentValue) => {
-                                                                          const numValue = Number(currentValue);
-                                                                          const selectedUserId =
-                                                                              numValue === value ? null : numValue;
-
+                                                                          const selectedUser =
+                                                                              users.find(
+                                                                                  (u) => u.name === currentValue,
+                                                                              ) ?? null;
+                                                                          const selectedUserId = selectedUser
+                                                                              ? selectedUser.id
+                                                                              : null;
                                                                           setValue(selectedUserId);
                                                                           setOpen(false);
                                                                       }}
@@ -203,13 +207,7 @@ export default function NewVendorForm({ users }: { users: Array<User> }) {
 
                         <Field data-invalid={!!errors.is_active}>
                             <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="is_active"
-                                    name="is_active"
-                                    required
-                                    aria-required
-                                    aria-invalid={!!errors.is_active}
-                                />
+                                <Checkbox id="is_active" name="is_active" aria-invalid={!!errors.is_active} />
                                 <FieldLabel htmlFor="is_active">Set as active</FieldLabel>
                             </div>
                             <InputError message={errors.is_active} />
@@ -236,7 +234,11 @@ export default function NewVendorForm({ users }: { users: Array<User> }) {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => resetAndClearErrors()}
+                                onClick={() => {
+                                    resetAndClearErrors();
+                                    setDateOfBirth(undefined);
+                                    setValue(null);
+                                }}
                                 disabled={processing}
                             >
                                 Reset
