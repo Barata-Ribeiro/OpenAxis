@@ -24,11 +24,17 @@ class DashboardService implements DashboardServiceInterface
         $year = $yearMonth ? (int) explode('-', $yearMonth)[0] : now()->year;
         $month = $yearMonth ? (int) explode('-', $yearMonth)[1] : now()->month;
 
-        $totalSales = $this->getTotalSales($year, $month);
-        $totalClients = $this->getTotalClients($year, $month);
-        $totalVendors = $this->getTotalVendors($year, $month);
-        $totalOrders = $this->getTotalOrders($year, $month);
-        $totalProfits = $this->getTotalProfits($year, $month);
+        [$totalSales,
+            $totalClients,
+            $totalVendors,
+            $totalOrders,
+            $totalProfits] = $this->runDashboardTasks([
+                fn () => $this->getTotalSales($year, $month),
+                fn () => $this->getTotalClients($year, $month),
+                fn () => $this->getTotalVendors($year, $month),
+                fn () => $this->getTotalOrders($year, $month),
+                fn () => $this->getTotalProfits($year, $month),
+            ]);
 
         return [
             'generalSummary' => [
@@ -226,9 +232,6 @@ class DashboardService implements DashboardServiceInterface
      */
     private function calculateProfitForPeriod($year, $month): float
     {
-        if ($month <= 0 || $month > 12) {
-            return 0.0;
-        }
 
         $orders = SalesOrder::query()
             ->whereYear('order_date', $year)
@@ -243,7 +246,7 @@ class DashboardService implements DashboardServiceInterface
 
             if ($productCost === null) {
                 $calculatedProductCost = ItemSalesOrder::query()
-                    ->join('products', 'item_sales_orders.product_id', '=', 'products.id')
+                    ->leftJoin('products', 'item_sales_orders.product_id', '=', 'products.id')
                     ->where('item_sales_orders.sales_order_id', $order->id)
                     ->selectRaw('COALESCE(SUM(products.cost_price * item_sales_orders.quantity), 0) as total_cost')
                     ->value('total_cost');
@@ -256,7 +259,7 @@ class DashboardService implements DashboardServiceInterface
                 if ($order->product_cost !== null && (float) $order->product_cost > 0) {
                     // Use item-based commission OR 5% fallback of order total
                     $calculatedCommission = ItemSalesOrder::query()
-                        ->join('products', 'item_sales_orders.product_id', '=', 'products.id')
+                        ->leftJoin('products', 'item_sales_orders.product_id', '=', 'products.id')
                         ->where('item_sales_orders.sales_order_id', $order->id)
                         ->selectRaw('COALESCE(SUM(products.comission * item_sales_orders.quantity), 0) as total_commission')
                         ->value('total_commission');
