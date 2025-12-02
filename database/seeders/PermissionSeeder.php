@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
+use DB;
 use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionSeeder extends Seeder
 {
@@ -14,6 +15,8 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
         $action = [
             ['name' => 'index', 'label' => 'List %s'],
             ['name' => 'show', 'label' => 'View %s'],
@@ -54,15 +57,17 @@ class PermissionSeeder extends Seeder
 
                     $permissions[] = [
                         'name' => $module['name'].'.'.$act['name'],
-                        'label' => $label,
+                        'title' => $label,
+                        'guard_name' => config('auth.defaults.guard', 'web'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
             }
 
-            foreach ($permissions as $perm) {
-                Permission::where(['name' => $perm['name'], 'title' => $perm['label']])
-                    ->existsOr(fn () => Permission::create(['name' => $perm['name'], 'title' => $perm['label']]));
-            }
+            DB::table('permissions')->insertOrIgnore($permissions);
+
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
         } catch (Exception $e) {
             Log::error('Error seeding permissions!', ['error' => $e->getMessage()]);
         }

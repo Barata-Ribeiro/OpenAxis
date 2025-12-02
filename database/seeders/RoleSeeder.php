@@ -28,8 +28,8 @@ class RoleSeeder extends Seeder
                 $rolePermissions = [];
                 foreach ($mods as $module => $actions) {
                     foreach ($actions as $action) {
-                        $permissionName = $module.'.'.$action;
-                        if (in_array($permissionName, $allPermissions)) {
+                        $permissionName = "$module.$action";
+                        if (\in_array($permissionName, $allPermissions)) {
                             $rolePermissions[] = $permissionName;
                         } else {
                             Log::warning("Permission '$permissionName' does not exist and cannot be assigned to role '$roleName'.");
