@@ -1,4 +1,4 @@
-import { User } from '../application/user';
+import { User, UserWithRelations } from '../application/user';
 
 export interface Vendor {
     id: number;
@@ -16,5 +16,5 @@ export interface Vendor {
 }
 
 export interface VendorWithRelations extends Vendor {
-    user: User;
+    user: User | UserWithRelations;
 }
