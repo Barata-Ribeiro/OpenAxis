@@ -3,6 +3,7 @@
 use App\Http\Controllers\Management\ClientController;
 use App\Http\Controllers\Management\PaymentConditionController;
 use App\Http\Controllers\Management\SalesOrderController;
+use App\Http\Controllers\Management\SupplierController;
 use App\Http\Controllers\Management\VendorController;
 use App\Http\Controllers\Product\ProductCategoryController;
 use App\Http\Controllers\Product\ProductController;
@@ -95,6 +96,22 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('show', 'permission:vendor.show')
         ->middlewareFor(['edit', 'update'], 'permission:vendor.edit')
         ->middlewareFor('destroy', 'permission:vendor.destroy');
+
+    Route::resource('suppliers', SupplierController::class)
+        ->names([
+            'index' => 'erp.suppliers.index',
+            'create' => 'erp.suppliers.create',
+            'store' => 'erp.suppliers.store',
+            'show' => 'erp.suppliers.show',
+            'edit' => 'erp.suppliers.edit',
+            'update' => 'erp.suppliers.update',
+            'destroy' => 'erp.suppliers.destroy',
+        ])
+        ->middlewareFor('index', 'permission:supplier.index')
+        ->middlewareFor(['create', 'store'], 'permission:supplier.create')
+        ->middlewareFor('show', 'permission:supplier.show')
+        ->middlewareFor(['edit', 'update'], 'permission:supplier.edit')
+        ->middlewareFor('destroy', 'permission:supplier.destroy');
 
     Route::resource('payment-conditions', PaymentConditionController::class)
         ->except('show')
