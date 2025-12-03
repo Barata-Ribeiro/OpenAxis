@@ -19,6 +19,12 @@ class DashboardService implements DashboardServiceInterface
         $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
     }
 
+    public function getUserDashboardData(): array
+    {
+        // TODO: Implement user dashboard data retrieval
+        return [];
+    }
+
     public function getAdminDashboardData($yearMonth): array
     {
         $year = $yearMonth ? (int) explode('-', $yearMonth)[0] : now()->year;
@@ -28,12 +34,14 @@ class DashboardService implements DashboardServiceInterface
             $totalClients,
             $totalVendors,
             $totalOrders,
-            $totalProfits] = $this->runDashboardTasks([
+            $totalProfits,
+            $totalCompletedBilling] = $this->runDashboardTasks([
                 fn () => $this->getTotalSales($year, $month),
                 fn () => $this->getTotalClients($year, $month),
                 fn () => $this->getTotalVendors($year, $month),
                 fn () => $this->getTotalOrders($year, $month),
                 fn () => $this->getTotalProfits($year, $month),
+                fn () => $this->getTotalCompletedBilling($year, $month),
             ]);
 
         return [
@@ -47,6 +55,7 @@ class DashboardService implements DashboardServiceInterface
             'financialSummary' => [
                 'title' => 'Financial Summary',
                 'totalProfits' => $totalProfits,
+                'totalCompletedBilling' => $totalCompletedBilling,
             ],
             'inventoryAndCostsSummary' => [
                 'title' => 'Inventory and Costs Summary',
@@ -213,6 +222,34 @@ class DashboardService implements DashboardServiceInterface
         ];
     }
 
+    private function getTotalCompletedBilling($year, $month): mixed
+    {
+        $possibleStatuses = ['delivered', 'completed', 'fulfilled'];
+
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
+            fn () => SalesOrder::query()
+                ->whereYear('order_date', $year)
+                ->whereMonth('order_date', $month)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('total_cost'),
+            fn () => SalesOrder::query()
+                ->whereYear('order_date', $year)
+                ->whereMonth('order_date', $month - 1)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('total_cost'),
+        ]);
+
+        return [
+            'title' => 'Total Completed Billing',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonth,
+            'positive' => $currentMonth >= $pastMonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
     /**
      * Calculate the net profit for a specific year and month.
      *
@@ -233,10 +270,12 @@ class DashboardService implements DashboardServiceInterface
     private function calculateProfitForPeriod($year, $month): float
     {
 
+        $possibleStatuses = ['canceled', 'cancelled'];
+
         $orders = SalesOrder::query()
             ->whereYear('order_date', $year)
             ->whereMonth('order_date', $month)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', $possibleStatuses)
             ->get();
 
         $totalProfit = 0.0;
@@ -277,12 +316,6 @@ class DashboardService implements DashboardServiceInterface
         }
 
         return $totalProfit;
-    }
-
-    public function getUserDashboardData(): array
-    {
-        // TODO: Implement user dashboard data retrieval
-        return [];
     }
 
     private function runDashboardTasks(array $callbacks): array
