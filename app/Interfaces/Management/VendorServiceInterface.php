@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\UpdateVendorRequest;
 use App\Http\Requests\Management\VendorRequest;
 use App\Models\Vendor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -35,4 +36,14 @@ interface VendorServiceInterface
      * @throws \Exception If the vendor cannot be created or persistence fails.
      */
     public function createVendor(VendorRequest $request): Vendor;
+
+    /**
+     * Update the given vendor using validated input from the request.
+     *
+     * @param  UpdateVendorRequest  $request  The validated request containing vendor update data.
+     * @param  Vendor  $vendor  The vendor model instance to update.
+     *
+     * @throws \Throwable If the update cannot be completed for any other reason.
+     */
+    public function updateVendor(UpdateVendorRequest $request, Vendor $vendor): void;
 }

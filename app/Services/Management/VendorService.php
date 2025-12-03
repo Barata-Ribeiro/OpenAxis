@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\Management\UpdateVendorRequest;
 use App\Http\Requests\Management\VendorRequest;
 use App\Interfaces\Management\VendorServiceInterface;
 use App\Models\Vendor;
@@ -46,5 +47,12 @@ class VendorService implements VendorServiceInterface
         $validated = $request->validated();
 
         return Vendor::create($validated);
+    }
+
+    public function updateVendor(UpdateVendorRequest $request, Vendor $vendor): void
+    {
+        $validated = $request->validated();
+
+        $vendor->update($validated);
     }
 }

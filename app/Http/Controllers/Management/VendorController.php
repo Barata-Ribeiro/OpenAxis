@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Management;
 
 use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\UpdateVendorRequest;
 use App\Http\Requests\Management\VendorRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\User;
@@ -85,5 +86,33 @@ class VendorController extends Controller
         return Inertia::render('erp/vendors/show', [
             'vendor' => $vendor,
         ]);
+    }
+
+    public function edit(Vendor $vendor)
+    {
+        return Inertia::render('erp/vendors/edit', [
+            'vendor' => $vendor,
+        ]);
+    }
+
+    public function update(UpdateVendorRequest $request, Vendor $vendor)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Vendor: Updating vendor.', ['action_user_id' => $userId, 'vendor_id' => $vendor->id]);
+
+            $this->vendorService->updateVendor($request, $vendor);
+
+            return to_route('erp.vendors.index')->with('success', "$vendor->full_name's vendor profile updated successfully.");
+        } catch (Exception $e) {
+            Log::error('Vendor: Error updating vendor.', [
+                'action_user_id' => $userId,
+                'vendor_id' => $vendor->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'Error updating vendor.');
+        }
     }
 }
