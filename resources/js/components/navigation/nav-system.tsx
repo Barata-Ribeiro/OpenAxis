@@ -13,6 +13,7 @@ import { NavGroup } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
     BookUserIcon,
+    FactoryIcon,
     FileUserIcon,
     IdCardLanyardIcon,
     MailIcon,
@@ -60,6 +61,12 @@ export function NavSystem() {
                 href: erp.vendors.index().url,
                 icon: FileUserIcon,
                 canView: can('vendor.index'),
+            },
+            {
+                title: 'Suppliers',
+                href: erp.suppliers.index().url,
+                icon: FactoryIcon,
+                canView: can('supplier.index'),
             },
             {
                 title: 'Payment Conditions',
