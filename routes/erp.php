@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Management\ClientController;
 use App\Http\Controllers\Management\PaymentConditionController;
+use App\Http\Controllers\Management\SalesOrderController;
 use App\Http\Controllers\Management\VendorController;
 use App\Http\Controllers\Product\ProductCategoryController;
 use App\Http\Controllers\Product\ProductController;
@@ -45,6 +46,18 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
 
         Route::delete('/{client}', [ClientController::class, 'destroy'])->name('erp.clients.destroy')->middleware('permission:client.destroy');
         Route::delete('/{client}/force', [ClientController::class, 'forceDestroy'])->name('erp.clients.force-destroy')->middleware('permission:client.destroy');
+    });
+
+    Route::prefix('sales-orders')->group(function () {
+        Route::get('/', [SalesOrderController::class, 'index'])->name('erp.sales-orders.index')->middleware('permission:sale.index');
+
+        Route::get('/create', [SalesOrderController::class, 'create'])->name('erp.sales-orders.create')->middleware('permission:sale.create');
+        Route::post('/', [SalesOrderController::class, 'store'])->name('erp.sales-orders.store')->middleware('permission:sale.create');
+
+        Route::get('/{salesOrder}/edit', [SalesOrderController::class, 'edit'])->name('erp.sales-orders.edit')->middleware('permission:sale.edit');
+        Route::patch('/{salesOrder}', [SalesOrderController::class, 'update'])->name('erp.sales-orders.update')->middleware('permission:sale.edit');
+
+        Route::delete('/{salesOrder}', [SalesOrderController::class, 'destroy'])->name('erp.sales-orders.destroy')->middleware('permission:sale.destroy');
     });
 
     Route::prefix('vendors')->group(function () {
