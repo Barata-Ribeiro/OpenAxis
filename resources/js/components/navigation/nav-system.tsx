@@ -18,6 +18,7 @@ import {
     MailIcon,
     Package2Icon,
     PercentIcon,
+    ShoppingCartIcon,
     TagsIcon,
     UsersIcon,
 } from 'lucide-react';
@@ -47,6 +48,12 @@ export function NavSystem() {
                 href: erp.clients.index().url,
                 icon: BookUserIcon,
                 canView: can('client.index'),
+            },
+            {
+                title: 'Sales',
+                href: erp.salesOrders.index().url,
+                icon: ShoppingCartIcon,
+                canView: can('sale.index'),
             },
             {
                 title: 'Vendors',
