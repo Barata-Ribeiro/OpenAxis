@@ -6,24 +6,30 @@ use App\Mail\NewUserMail;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('administrative')->group(function () {
-    Route::prefix('roles')->group(function () {
-        Route::get('/', [RoleController::class, 'index'])->name('administrative.roles.index')->middleware('permission:role.index');
-    });
+    Route::resource('roles', RoleController::class)
+        ->only('index')
+        ->names(['index' => 'administrative.roles.index'])
+        ->middlewareFor('index', 'permission:role.index');
 
-    Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('administrative.users.index')->middleware('permission:user.index');
+    Route::delete('users/{user}/force', [UserController::class, 'forceDestroy'])
+        ->name('administrative.users.force-destroy')
+        ->middleware('permission:user.destroy');
 
-        Route::get('/create', [UserController::class, 'create'])->name('administrative.users.create')->middleware('permission:user.create');
-        Route::post('/', [UserController::class, 'store'])->name('administrative.users.store')->middleware('permission:user.create');
-
-        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('administrative.users.edit')->middleware('permission:user.edit');
-        Route::patch('/{user}', [UserController::class, 'update'])->name('administrative.users.update')->middleware('permission:user.edit');
-
-        Route::delete('/{user}', [UserController::class, 'destroy'])->name('administrative.users.destroy')->middleware('permission:user.destroy');
-        Route::delete('/{user}/force', [UserController::class, 'forceDestroy'])->name('administrative.users.force-destroy')->middleware('permission:user.destroy');
-
-        Route::get('/{user}', [UserController::class, 'show'])->name('administrative.users.show')->middleware('permission:user.show');
-    });
+    Route::resource('users', UserController::class)
+        ->names([
+            'index' => 'administrative.users.index',
+            'create' => 'administrative.users.create',
+            'store' => 'administrative.users.store',
+            'show' => 'administrative.users.show',
+            'edit' => 'administrative.users.edit',
+            'update' => 'administrative.users.update',
+            'destroy' => 'administrative.users.destroy',
+        ])
+        ->middlewareFor('index', 'permission:user.index')
+        ->middlewareFor(['create', 'store'], 'permission:user.create')
+        ->middlewareFor('show', 'permission:user.show')
+        ->middlewareFor(['edit', 'update'], 'permission:user.edit')
+        ->middlewareFor('destroy', 'permission:user.destroy');
 
     Route::prefix('mailable')->group(function () {
         Route::get('/new-account', function () {
