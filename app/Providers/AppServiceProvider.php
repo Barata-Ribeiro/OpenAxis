@@ -65,6 +65,11 @@ class AppServiceProvider extends ServiceProvider
 			\App\Interfaces\Management\SalesOrderServiceInterface::class,
 			\App\Services\Management\SalesOrderService::class
 		);
+
+		$this->app->bind(
+			\App\Interfaces\Management\SupplierServiceInterface::class,
+			\App\Services\Management\SupplierService::class
+		);
     }
 
     /**
