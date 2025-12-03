@@ -17,6 +17,23 @@ export function roleLabel(role: RoleNames): string {
     return ROLE_LABELS[role] ?? role;
 }
 
+// Partner
+export enum PartnerTypes {
+    CLIENT = 'client',
+    SUPPLIER = 'supplier',
+    BOTH = 'both',
+}
+
+export const PARTNER_TYPE_LABELS: Record<PartnerTypes, string> = {
+    [PartnerTypes.CLIENT]: 'Client',
+    [PartnerTypes.SUPPLIER]: 'Supplier',
+    [PartnerTypes.BOTH]: 'Supplier and Client',
+};
+
+export function partnerTypeLabel(type: PartnerTypes): string {
+    return PARTNER_TYPE_LABELS[type] ?? type;
+}
+
 // Address
 export enum AddressTypes {
     BILLING = 'billing',
