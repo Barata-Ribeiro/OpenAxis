@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Management;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Services\Management\SalesOrderService;
+use Inertia\Inertia;
 
 class SalesOrderController extends Controller
 {
@@ -24,5 +25,17 @@ class SalesOrderController extends Controller
         if (! \in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
+
+        $sales = $this->salesOrderService->getPaginatedSalesOrders(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
+
+        return Inertia::render('erp/sales/index', [
+            'sales' => $sales,
+        ]);
     }
 }
