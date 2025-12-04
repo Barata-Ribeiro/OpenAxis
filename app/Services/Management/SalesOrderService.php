@@ -27,6 +27,7 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->select('sales_orders.*')
             ->with('user:id,name,email')
             ->select('partners.name as client_name', 'vendors.name as vendor_name', 'payment_conditions.terms as payment_terms')
+            ->when($vendorId, fn ($q, $vId) => $q->whereIn('sales_orders.vendor_id', $vId))
             ->when($search, fn ($query, $search) => $query->whereLike('sales_orders.order_number', "%$search%")
                 ->orWhereLike('sales_orders.notes', "%$search%")->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('name', "%$search%")
                 ->orWhereLike('email', "%$search%"))->orWhereLike('partners.name', "%$search%")->orWhereLike('vendors.name', "%$search%")
