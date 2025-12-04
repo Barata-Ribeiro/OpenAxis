@@ -36,7 +36,8 @@ class DashboardService implements DashboardServiceInterface
             $totalOrders,
             $totalProfits,
             $totalCompletedBilling,
-            $totalCompletedProfits] = $this->runDashboardTasks([
+            $totalCompletedProfits,
+            $totalPendingProfits] = $this->runDashboardTasks([
                 fn () => $this->getTotalSales($year, $month),
                 fn () => $this->getTotalClients($year, $month),
                 fn () => $this->getTotalVendors($year, $month),
@@ -44,6 +45,7 @@ class DashboardService implements DashboardServiceInterface
                 fn () => $this->getTotalProfits($year, $month),
                 fn () => $this->getTotalCompletedBilling($year, $month),
                 fn () => $this->getTotalCompletedProfits($year, $month),
+                fn () => $this->getTotalPendingProfits($year, $month),
             ]);
 
         return [
@@ -62,7 +64,7 @@ class DashboardService implements DashboardServiceInterface
             ],
             'inventoryAndCostsSummary' => [
                 'title' => 'Inventory and Costs Summary',
-                // Future metrics can be added here
+                'totalPendingProfits' => $totalPendingProfits,
             ],
             'commissions' => [
                 'title' => 'Commissions',
@@ -302,6 +304,36 @@ class DashboardService implements DashboardServiceInterface
 
         return [
             'title' => 'Total Completed Profits',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonth,
+            'positive' => $currentMonth >= $pastMonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
+     * Get the total pending profits for a given year and optional month.
+     *
+     * If $month is provided (1–12) the function returns the profit for that month in the specified year.
+     * If $month is null, the function returns the total pending profit for the entire year.
+     *
+     * @param  int|string  $year  Year to compute profits for (e.g. 2025). Integer or numeric string accepted.
+     * @param  int|string|null  $month  Month number (1–12) or null to compute the yearly total.
+     * @return mixed Numeric total pending profit (float|int) or null if no data is available.
+     */
+    public function getTotalPendingProfits($year, $month): mixed
+    {
+        $possibleStatuses = ['pending', 'processing', 'on-hold', 'awaiting-payment'];
+
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
+            fn () => $this->calculateProfitForPeriod($year, $month, $possibleStatuses),
+            fn () => $this->calculateProfitForPeriod($year, $month - 1, $possibleStatuses),
+        ]);
+
+        return [
+            'title' => 'Total Pending Profits',
             'value' => $currentMonth,
             'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
             'lastMonth' => $pastMonth,
