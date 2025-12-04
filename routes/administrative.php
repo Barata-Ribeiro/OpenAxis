@@ -7,9 +7,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('administrative')->group(function () {
     Route::resource('roles', RoleController::class)
-        ->only('index')
-        ->names(['index' => 'administrative.roles.index'])
-        ->middlewareFor('index', 'permission:role.index');
+        ->names([
+            'index' => 'administrative.roles.index',
+            'create' => 'administrative.roles.create',
+            'store' => 'administrative.roles.store',
+            'show' => 'administrative.roles.show',
+            'edit' => 'administrative.roles.edit',
+            'update' => 'administrative.roles.update',
+            'destroy' => 'administrative.roles.destroy',
+        ])
+        ->middlewareFor('index', 'permission:role.index')
+        ->middlewareFor(['create', 'store'], 'permission:role.create')
+        ->middlewareFor('show', 'permission:role.show')
+        ->middlewareFor(['edit', 'update'], 'permission:role.edit')
+        ->middlewareFor('destroy', 'permission:role.destroy');
 
     Route::delete('users/{user}/force', [UserController::class, 'forceDestroy'])
         ->name('administrative.users.force-destroy')
