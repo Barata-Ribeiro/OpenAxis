@@ -35,13 +35,15 @@ class DashboardService implements DashboardServiceInterface
             $totalVendors,
             $totalOrders,
             $totalProfits,
-            $totalCompletedBilling] = $this->runDashboardTasks([
+            $totalCompletedBilling,
+            $totalCompletedProfits] = $this->runDashboardTasks([
                 fn () => $this->getTotalSales($year, $month),
                 fn () => $this->getTotalClients($year, $month),
                 fn () => $this->getTotalVendors($year, $month),
                 fn () => $this->getTotalOrders($year, $month),
                 fn () => $this->getTotalProfits($year, $month),
                 fn () => $this->getTotalCompletedBilling($year, $month),
+                fn () => $this->getTotalCompletedProfits($year, $month),
             ]);
 
         return [
@@ -56,6 +58,7 @@ class DashboardService implements DashboardServiceInterface
                 'title' => 'Financial Summary',
                 'totalProfits' => $totalProfits,
                 'totalCompletedBilling' => $totalCompletedBilling,
+                'totalCompletedProfits' => $totalCompletedProfits,
             ],
             'inventoryAndCostsSummary' => [
                 'title' => 'Inventory and Costs Summary',
@@ -206,9 +209,11 @@ class DashboardService implements DashboardServiceInterface
      */
     private function getTotalProfits($year, $month): mixed
     {
+        $possibleStatuses = ['canceled', 'cancelled'];
+
         [$currentMonth, $pastMonth] = $this->runDashboardTasks([
-            fn () => $this->calculateProfitForPeriod($year, $month),
-            fn () => $this->calculateProfitForPeriod($year, $month - 1),
+            fn () => $this->calculateProfitForPeriod($year, $month, $possibleStatuses),
+            fn () => $this->calculateProfitForPeriod($year, $month - 1, $possibleStatuses),
         ]);
 
         return [
@@ -250,6 +255,26 @@ class DashboardService implements DashboardServiceInterface
         ];
     }
 
+    public function getTotalCompletedProfits($year, $month): mixed
+    {
+        $possibleStatuses = ['delivered', 'completed', 'fulfilled'];
+
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
+            fn () => $this->calculateProfitForPeriod($year, $month, $possibleStatuses),
+            fn () => $this->calculateProfitForPeriod($year, $month - 1, $possibleStatuses),
+        ]);
+
+        return [
+            'title' => 'Total Completed Profits',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonth,
+            'positive' => $currentMonth >= $pastMonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
     /**
      * Calculate the net profit for a specific year and month.
      *
@@ -267,15 +292,12 @@ class DashboardService implements DashboardServiceInterface
      *
      * @internal Private helper used by the dashboard service to build period summaries.
      */
-    private function calculateProfitForPeriod($year, $month): float
+    private function calculateProfitForPeriod($year, $month, $statuses): float
     {
-
-        $possibleStatuses = ['canceled', 'cancelled'];
-
         $orders = SalesOrder::query()
             ->whereYear('order_date', $year)
             ->whereMonth('order_date', $month)
-            ->whereIn('status', $possibleStatuses)
+            ->whereIn('status', $statuses)
             ->get();
 
         $totalProfit = 0.0;
@@ -285,7 +307,7 @@ class DashboardService implements DashboardServiceInterface
 
             if ($productCost === null) {
                 $calculatedProductCost = ItemSalesOrder::query()
-                    ->leftJoin('products', 'item_sales_orders.product_id', '=', 'products.id')
+                    ->join('products', 'item_sales_orders.product_id', '=', 'products.id')
                     ->where('item_sales_orders.sales_order_id', $order->id)
                     ->selectRaw('COALESCE(SUM(products.cost_price * item_sales_orders.quantity), 0) as total_cost')
                     ->value('total_cost');
@@ -298,7 +320,7 @@ class DashboardService implements DashboardServiceInterface
                 if ($order->product_cost !== null && (float) $order->product_cost > 0) {
                     // Use item-based commission OR 5% fallback of order total
                     $calculatedCommission = ItemSalesOrder::query()
-                        ->leftJoin('products', 'item_sales_orders.product_id', '=', 'products.id')
+                        ->join('products', 'item_sales_orders.product_id', '=', 'products.id')
                         ->where('item_sales_orders.sales_order_id', $order->id)
                         ->selectRaw('COALESCE(SUM(products.comission * item_sales_orders.quantity), 0) as total_commission')
                         ->value('total_commission');
