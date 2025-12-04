@@ -1,20 +1,26 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import { normalizeString } from '@/lib/utils';
+import administrative from '@/routes/administrative';
 import { RoleNames } from '@/types/application/enums';
 import { Role } from '@/types/application/role-permission';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Ellipsis, InfinityIcon } from 'lucide-react';
+import { DeleteIcon, Ellipsis, InfinityIcon } from 'lucide-react';
+import { useState } from 'react';
 
 export const columns: Array<ColumnDef<Role>> = [
     {
@@ -87,30 +93,61 @@ export const columns: Array<ColumnDef<Role>> = [
     {
         id: 'actions',
         cell: function Cell({ row }) {
+            const { can } = usePermission();
+            const [open, setOpen] = useState(false);
+
             const nameToCopy = normalizeString(row.original.name);
             const guardNameToCopy = normalizeString(row.original.guard_name ?? 'No Guard Name');
 
+            const deleteRoute = administrative.roles.destroy(row.original.id);
+            const canDeleteRole =
+                can('role.destroy') && Object.values(RoleNames).every((role) => role !== row.original.name);
+
             return (
-                <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Open menu"
-                            variant="ghost"
-                            className="flex size-8 p-0 data-[state=open]:bg-muted"
-                        >
-                            <Ellipsis aria-hidden size={16} />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <DropdownMenuCopyButton content={guardNameToCopy}>Copy Guard Name</DropdownMenuCopyButton>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Open menu"
+                                variant="ghost"
+                                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                            >
+                                <Ellipsis aria-hidden size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={guardNameToCopy}>
+                                    Copy Guard Name
+                                </DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    onSelect={() => setOpen(true)}
+                                    disabled={!canDeleteRole}
+                                >
+                                    <DeleteIcon aria-hidden size={14} /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ActionConfirmationDialog
+                        open={open}
+                        setOpen={setOpen}
+                        title="Confirm Deletion"
+                        description={`Are you sure you want to delete the role "${row.original.name}"? This action cannot be undone later.`}
+                        method="delete"
+                        route={deleteRoute}
+                    />
+                </>
             );
         },
         size: 40,
