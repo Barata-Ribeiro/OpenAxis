@@ -3,8 +3,11 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\Management\SupplierRequest;
 use App\Interfaces\Management\SupplierServiceInterface;
 use App\Models\Partner;
+use Arr;
+use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class SupplierService implements SupplierServiceInterface
@@ -18,7 +21,7 @@ class SupplierService implements SupplierServiceInterface
         $is_active = $filters['is_active'][0] ?? null;
 
         return Partner::query()
-            ->whereType('supplier')
+            ->whereIn('type', ['supplier', 'both'])
             ->when($search, fn ($query, $search) => $query->whereLike('name', "%$search%")
                 ->orWhereLike('email', "%$search%")->orWhereLike('phone_number', "%$search%")
                 ->orWhereLike('identification', "%$search%"))
@@ -28,5 +31,26 @@ class SupplierService implements SupplierServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function createSupplier(SupplierRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $supplierData = Arr::only($validated, [
+            'name', 'email', 'identification', 'is_active', 'phone_number', 'supplier_type',
+        ]);
+
+        if (\array_key_exists('supplier_type', $supplierData)) {
+            $supplierData['type'] = $supplierData['supplier_type'];
+            unset($supplierData['supplier_type']);
+        }
+
+        $addressData = Arr::only($validated, [
+            'type', 'label', 'street', 'number', 'complement', 'neighborhood',
+            'city', 'state', 'postal_code', 'country', 'is_primary',
+        ]);
+
+        DB::transaction(fn () => Partner::create($supplierData)->addresses()->create($addressData));
     }
 }

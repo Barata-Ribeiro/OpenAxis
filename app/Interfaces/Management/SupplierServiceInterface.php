@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\SupplierRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface SupplierServiceInterface
@@ -20,4 +21,19 @@ interface SupplierServiceInterface
      * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of suppliers.
      */
     public function getPaginatedSuppliers(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Create a new supplier from the provided request data.
+     *
+     * Implementations should validate the given SupplierRequest, map it to the domain entity
+     * or data model, and persist the supplier. This operation is expected to be atomic and
+     * ensure data integrity. Implementations may also trigger domain events or
+     * notifications as part of supplier creation.
+     *
+     * @param  SupplierRequest  $request  Request DTO containing supplier attributes required for creation.
+     *
+     * @throws \InvalidArgumentException When the supplied data is invalid.
+     * @throws \RuntimeException When persistence fails or an unexpected error occurs.
+     */
+    public function createSupplier(SupplierRequest $request): void;
 }
