@@ -2,7 +2,9 @@
 
 namespace App\Interfaces\Admin;
 
+use App\Http\Requests\Admin\RoleRequest;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Spatie\Permission\Models\Role;
 
 interface RoleServiceInterface
 {
@@ -16,4 +18,6 @@ interface RoleServiceInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated collection of roles matching the provided criteria.
      */
     public function getPaginatedRoles(?int $perPage, ?string $search, ?string $sortBy, ?string $sortDir): LengthAwarePaginator;
+
+    public function createRole(RoleRequest $request): Role;
 }
