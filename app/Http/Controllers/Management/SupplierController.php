@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\SupplierRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\Management\SupplierService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -41,5 +43,32 @@ class SupplierController extends Controller
         return Inertia::render('erp/suppliers/index', [
             'suppliers' => $suppliers,
         ]);
+    }
+
+    public function create()
+    {
+        Log::info('Supplier: Accessed supplier creation page.', ['action_user_id' => Auth::id()]);
+
+        return Inertia::render('erp/suppliers/create');
+    }
+
+    public function store(SupplierRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Supplier: Store method called.', ['action_user_id' => $userId]);
+
+            $this->supplierService->createSupplier($request);
+
+            return to_route('erp.suppliers.index')->with('success', 'Supplier created successfully.');
+        } catch (Exception $e) {
+            Log::error('Supplier: Error occurred while storing supplier.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'An error occurred while creating the supplier. Please try again.');
+        }
     }
 }
