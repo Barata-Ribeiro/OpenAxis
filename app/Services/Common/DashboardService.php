@@ -227,6 +227,32 @@ class DashboardService implements DashboardServiceInterface
         ];
     }
 
+    /**
+     * Calculate the total completed billing for a specific month and year.
+     *
+     * Retrieves and aggregates billings that are considered "completed" within the
+     * provided year and month. The aggregation logic may return a single numeric
+     * total (sum of amounts) or a more complex structure (e.g., totals per currency
+     * or per client) depending on the implementation.
+     *
+     * @param  int|string  $year  Year to filter billings (e.g., 2024). Accepts integer or numeric string.
+     * @param  int|string  $month  Month to filter billings (1-12 or '01'-'12'). Accepts integer or numeric string.
+     * @return int|float|array|mixed
+     *                               The aggregated total for completed billings. Common return shapes:
+     *                               - int|float: the summed billing amount.
+     *                               - array: breakdowns by currency/client/other dimensions.
+     *                               - mixed: other shapes used by the underlying data layer.
+     *
+     * @throws \InvalidArgumentException If $year or $month are not valid or parsable.
+     * @throws \RuntimeException If the data source query or aggregation fails.
+     *
+     * Notes:
+     * - The method is private and intended for internal dashboard/reporting use.
+     * - Inputs are expected to be normalized (e.g., month in 1-12); callers should
+     *   validate or normalize inputs if necessary.
+     * - If no completed billings exist for the period, implementations typically
+     *   return 0, 0.0, or an empty array depending on the return shape.
+     */
     private function getTotalCompletedBilling($year, $month): mixed
     {
         $possibleStatuses = ['delivered', 'completed', 'fulfilled'];
@@ -255,6 +281,16 @@ class DashboardService implements DashboardServiceInterface
         ];
     }
 
+    /**
+     * Get the total completed profits for a given year and optional month.
+     *
+     * If $month is provided (1–12) the function returns the profit for that month in the specified year.
+     * If $month is null, the function returns the total completed profit for the entire year.
+     *
+     * @param  int|string  $year  Year to compute profits for (e.g. 2025). Integer or numeric string accepted.
+     * @param  int|string|null  $month  Month number (1–12) or null to compute the yearly total.
+     * @return mixed Numeric total completed profit (float|int) or null if no data is available.
+     */
     public function getTotalCompletedProfits($year, $month): mixed
     {
         $possibleStatuses = ['delivered', 'completed', 'fulfilled'];
@@ -340,6 +376,32 @@ class DashboardService implements DashboardServiceInterface
         return $totalProfit;
     }
 
+    /**
+     * Execute a set of dashboard-related tasks provided as callables and collect their results.
+     *
+     * This internal method iterates over the provided array of callbacks, invokes each one,
+     * and returns an array containing the results in the same order (or keyed by the same
+     * keys for associative arrays) as the input.
+     *
+     * Notes:
+     * - Each item in $callbacks must be a callable (closure, function name or [object, method]).
+     * - If $callbacks is an associative array, returned results preserve the same keys.
+     * - If $callbacks is empty, an empty array is returned.
+     * - Callbacks may perform side effects (database queries, cache updates, HTTP calls, etc.).
+     *
+     * @param  callable[]|array<string,callable>  $callbacks  Array of callables to execute.
+     * @return array The results returned by each callback, keyed the same way as $callbacks.
+     *
+     * @throws \InvalidArgumentException If any element of $callbacks is not callable.
+     * @throws \Throwable Any exception thrown by a callback will propagate to the caller
+     *                    unless the method implementation explicitly catches and handles it.
+     *
+     * Usage example:
+     * $results = $this->runDashboardTasks([
+     *     'stats' => function () { return $this->getStats(); },
+     *     function () { return $this->getRecentActivities(); },
+     * ]);
+     */
     private function runDashboardTasks(array $callbacks): array
     {
         if ($this->shouldBypassConcurrency()) {
@@ -355,6 +417,25 @@ class DashboardService implements DashboardServiceInterface
         return Concurrency::run($callbacks);
     }
 
+    /**
+     * Determine whether dashboard concurrency protections should be bypassed.
+     *
+     * This predicate is used internally to decide if concurrency controls (locks, rate
+     * limits or similar mechanisms protecting dashboard operations) should be skipped.
+     * The decision is typically based on runtime context such as environment, application
+     * configuration, request flags, or user/role permissions.
+     *
+     * Implementations usually return true for cases like:
+     *  - running in console or test environments,
+     *  - a global configuration flag that disables concurrency checks,
+     *  - a specific "force" or "bypass" parameter present in the current request/context,
+     *  - an elevated user or service account that is allowed to bypass protections.
+     *
+     * No state is modified by this method; it only returns a boolean predicate used by callers
+     * to conditionally bypass concurrency handling.
+     *
+     * @return bool True when concurrency handling should be bypassed, false otherwise.
+     */
     private function shouldBypassConcurrency(): bool
     {
         return app()->environment('testing') || $this->isSqlDriver === false;
