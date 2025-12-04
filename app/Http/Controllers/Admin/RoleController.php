@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RoleRequest;
 use App\Http\Requests\QueryRequest;
@@ -11,6 +12,7 @@ use Exception;
 use Inertia\Inertia;
 use Log;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -61,6 +63,26 @@ class RoleController extends Controller
             Log::error('Role: Error creating new role', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
 
             return redirect()->back()->withInput()->with('error', 'An error occurred while creating the role.');
+        }
+    }
+
+    public function destroy(Role $role)
+    {
+        $userId = Auth::id();
+        Log::info('Role: Deleting role', ['action_user_id' => $userId, 'role_id' => $role->id, 'role_name' => $role->name]);
+
+        try {
+            if (RoleEnum::tryFrom((string) $role->name) !== null) {
+                return redirect()->back()->with('error', 'Cannot delete a protected role.');
+            }
+
+            $role->deleteOrFail();
+
+            return to_route('administrative.roles.index')->with('success', "Role '$role->name' deleted successfully.");
+        } catch (Exception $e) {
+            Log::error('Role: Error deleting role', ['action_user_id' => $userId, 'role_id' => $role->id, 'error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'An error occurred while deleting the role.');
         }
     }
 }
