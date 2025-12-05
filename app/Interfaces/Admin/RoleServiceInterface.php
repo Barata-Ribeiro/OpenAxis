@@ -19,5 +19,28 @@ interface RoleServiceInterface
      */
     public function getPaginatedRoles(?int $perPage, ?string $search, ?string $sortBy, ?string $sortDir): LengthAwarePaginator;
 
+    /**
+     * Create a new role.
+     *
+     * Creates and persists a new Role using the validated data from the provided RoleRequest.
+     *
+     * @param  RoleRequest  $request  Validated request containing attributes required to create the role.
+     * @return Role The newly created Role instance.
+     *
+     * @throws \Throwable If the role could not be created (database or validation errors).
+     */
     public function createRole(RoleRequest $request): Role;
+
+    /**
+     * Update an existing role.
+     *
+     * Updates the given Role with validated data from the provided RoleRequest and returns the updated instance.
+     *
+     * @param  RoleRequest  $request  Validated request containing attributes to update.
+     * @param  Role  $role  The Role instance to update.
+     * @return Role The updated Role instance.
+     *
+     * @throws \Throwable If the role could not be updated (database or validation errors).
+     */
+    public function updateRole(RoleRequest $request, Role $role): Role;
 }

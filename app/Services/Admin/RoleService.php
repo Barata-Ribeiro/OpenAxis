@@ -33,4 +33,19 @@ class RoleService implements RoleServiceInterface
 
         return DB::transaction(fn () => Role::create($roleData)->syncPermissions($permissions));
     }
+
+    public function updateRole(RoleRequest $request, Role $role): Role
+    {
+        $validated = $request->validated();
+
+        $roleData = Arr::only($validated, ['name']);
+        $permissions = Arr::get($validated, 'permissions', []);
+
+        return DB::transaction(function () use ($role, $roleData, $permissions) {
+            $role->update($roleData);
+            $role->syncPermissions($permissions);
+
+            return $role;
+        });
+    }
 }
