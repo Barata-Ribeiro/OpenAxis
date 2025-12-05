@@ -17,9 +17,10 @@ import { normalizeString } from '@/lib/utils';
 import administrative from '@/routes/administrative';
 import { RoleNames } from '@/types/application/enums';
 import { Role } from '@/types/application/role-permission';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { DeleteIcon, Ellipsis, InfinityIcon } from 'lucide-react';
+import { DeleteIcon, EditIcon, Ellipsis, InfinityIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export const columns: Array<ColumnDef<Role>> = [
@@ -99,9 +100,11 @@ export const columns: Array<ColumnDef<Role>> = [
             const nameToCopy = normalizeString(row.original.name);
             const guardNameToCopy = normalizeString(row.original.guard_name ?? 'No Guard Name');
 
+            const editRoute = administrative.roles.edit(row.original.id);
             const deleteRoute = administrative.roles.destroy(row.original.id);
-            const canDeleteRole =
-                can('role.destroy') && Object.values(RoleNames).every((role) => role !== row.original.name);
+
+            const isProtectedRole = Object.values(RoleNames).every((role) => role !== row.original.name);
+            const isSuperAdminRole = row.original.name === RoleNames.SUPER_ADMIN;
 
             return (
                 <>
@@ -128,10 +131,15 @@ export const columns: Array<ColumnDef<Role>> = [
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuGroup>
+                                <DropdownMenuItem disabled={!can('role.edit') || isSuperAdminRole} asChild>
+                                    <Link className="block w-full" href={editRoute} as="button">
+                                        <EditIcon aria-hidden size={14} /> Edit
+                                    </Link>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                     variant="destructive"
                                     onSelect={() => setOpen(true)}
-                                    disabled={!canDeleteRole}
+                                    disabled={!isProtectedRole || !can('role.destroy')}
                                 >
                                     <DeleteIcon aria-hidden size={14} /> Delete
                                 </DropdownMenuItem>
