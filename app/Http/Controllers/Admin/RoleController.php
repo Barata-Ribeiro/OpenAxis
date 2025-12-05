@@ -66,6 +66,38 @@ class RoleController extends Controller
         }
     }
 
+    public function edit(Role $role)
+    {
+        if ($role->name === RoleEnum::SUPER_ADMIN->value) {
+            return redirect()->back()->with('error', 'The Super Admin role cannot be edited through this interface.');
+        }
+
+        Log::info('Role: Accessing role edit form', ['action_user_id' => Auth::id(), 'role_id' => $role->id]);
+
+        $permissions = Permission::all(['id', 'title', 'name']);
+
+        return Inertia::render('administrative/roles/edit', [
+            'role' => $role->load('permissions:id,name,title'),
+            'permissions' => Inertia::defer(fn () => $permissions),
+        ]);
+    }
+
+    public function update(RoleRequest $request, Role $role)
+    {
+        $userId = Auth::id();
+        Log::info('Role: Updating role', ['action_user_id' => $userId, 'role_id' => $role->id, 'role_name' => $role->name]);
+
+        try {
+            $updatedRole = $this->roleService->updateRole($request, $role);
+
+            return to_route('administrative.roles.index')->with('success', "Role '$updatedRole->name' updated successfully.");
+        } catch (Exception $e) {
+            Log::error('Role: Error updating role', ['action_user_id' => $userId, 'role_id' => $role->id, 'error' => $e->getMessage()]);
+
+            return redirect()->back()->withInput()->with('error', 'An error occurred while updating the role.');
+        }
+    }
+
     public function destroy(Role $role)
     {
         $userId = Auth::id();
