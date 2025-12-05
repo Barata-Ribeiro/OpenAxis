@@ -9,7 +9,8 @@ import { usePermission } from '@/hooks/use-permission';
 import { resolveUrl } from '@/lib/utils';
 import administrative from '@/routes/administrative';
 import erp from '@/routes/erp';
-import { NavGroup } from '@/types';
+import { NavGroup, SharedData } from '@/types';
+import { RoleNames } from '@/types/application/enums';
 import { Link, usePage } from '@inertiajs/react';
 import {
     BookUserIcon,
@@ -21,13 +22,16 @@ import {
     PercentIcon,
     ShoppingCartIcon,
     TagsIcon,
+    TelescopeIcon,
     UsersIcon,
 } from 'lucide-react';
 import { Fragment } from 'react';
 
 export function NavSystem() {
-    const page = usePage();
+    const page = usePage<SharedData>();
     const { can } = usePermission();
+
+    const isSuperAdmin = page.props.auth.user.roles?.some((role) => role.name === RoleNames.SUPER_ADMIN) ?? false;
 
     const erpGroup: NavGroup = {
         title: 'Enterprise Resource Planning',
@@ -91,6 +95,12 @@ export function NavSystem() {
                 href: administrative.roles.index().url,
                 icon: IdCardLanyardIcon,
                 canView: can('role.index'),
+            },
+            {
+                title: 'Telescope',
+                href: '/telescope',
+                icon: TelescopeIcon,
+                canView: isSuperAdmin,
             },
         ],
     };
