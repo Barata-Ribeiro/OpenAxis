@@ -52,3 +52,22 @@ export const ADDRESS_TYPE_LABELS: Record<AddressTypes, string> = {
 export function addressTypeLabel(type: AddressTypes): string {
     return ADDRESS_TYPE_LABELS[type] ?? type;
 }
+
+// Purchase Order Status
+export enum PurchaseOrderStatus {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    RECEIVED = 'received',
+    CANCELED = 'canceled',
+}
+
+export const PURCHASE_ORDER_STATUS_LABELS: Record<PurchaseOrderStatus, string> = {
+    [PurchaseOrderStatus.PENDING]: 'Pending',
+    [PurchaseOrderStatus.APPROVED]: 'Approved',
+    [PurchaseOrderStatus.RECEIVED]: 'Received',
+    [PurchaseOrderStatus.CANCELED]: 'Canceled',
+};
+
+export function purchaseOrderStatusLabel(status: PurchaseOrderStatus): string {
+    return PURCHASE_ORDER_STATUS_LABELS[status] ?? status;
+}
