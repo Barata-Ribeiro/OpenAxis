@@ -23,6 +23,7 @@ import {
     ShoppingCartIcon,
     TagsIcon,
     TelescopeIcon,
+    TruckIcon,
     UsersIcon,
 } from 'lucide-react';
 import { Fragment } from 'react';
@@ -65,6 +66,12 @@ export function NavSystem() {
                 href: erp.vendors.index().url,
                 icon: FileUserIcon,
                 canView: can('vendor.index'),
+            },
+            {
+                title: 'Purchases',
+                href: erp.purchaseOrders.index().url,
+                icon: TruckIcon,
+                canView: can('order.index'),
             },
             {
                 title: 'Suppliers',
