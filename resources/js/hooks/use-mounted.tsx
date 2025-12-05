@@ -8,7 +8,9 @@ import { useEffect, useRef } from 'react';
  * The returned function is stable across renders and reads an internal ref that is set
  * to true on mount and false on unmount.
  *
- * Example:
+ * @returns {boolean} A function that returns `true` if the component is currently mounted, otherwise false.
+ *
+ * @example
  * const isMounted = useIsMounted();
  * useEffect(() => {
  *   let cancelled = false;
@@ -20,8 +22,6 @@ import { useEffect, useRef } from 'react';
  *   }
  *   load();
  * }, []);
- *
- * @returns A function that returns true if the component is currently mounted, otherwise false.
  */
 export function useIsMounted(): () => boolean {
     const isMountedRef = useRef<boolean>(false);
