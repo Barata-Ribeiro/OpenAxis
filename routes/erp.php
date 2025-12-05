@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Management\ClientController;
 use App\Http\Controllers\Management\PaymentConditionController;
+use App\Http\Controllers\Management\PurchaseOrderController;
 use App\Http\Controllers\Management\SalesOrderController;
 use App\Http\Controllers\Management\SupplierController;
 use App\Http\Controllers\Management\VendorController;
@@ -60,6 +61,22 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('show', 'permission:client.show')
         ->middlewareFor(['edit', 'update'], 'permission:client.edit')
         ->middlewareFor('destroy', 'permission:client.destroy');
+
+    Route::resource('purchase-orders', PurchaseOrderController::class)
+        ->except('show')
+        ->parameters(['purchase-orders' => 'purchaseOrder'])
+        ->names([
+            'index' => 'erp.purchase-orders.index',
+            'create' => 'erp.purchase-orders.create',
+            'store' => 'erp.purchase-orders.store',
+            'edit' => 'erp.purchase-orders.edit',
+            'update' => 'erp.purchase-orders.update',
+            'destroy' => 'erp.purchase-orders.destroy',
+        ])
+        ->middlewareFor('index', 'permission:order.index')
+        ->middlewareFor(['create', 'store'], 'permission:order.create')
+        ->middlewareFor(['edit', 'update'], 'permission:order.edit')
+        ->middlewareFor('destroy', 'permission:order.destroy');
 
     Route::resource('sales-orders', SalesOrderController::class)
         ->except('show')
