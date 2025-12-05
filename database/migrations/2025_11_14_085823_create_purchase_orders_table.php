@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('order_number', 20)->unique();
             $table->date('order_date')->default(now());
             $table->date('forecast_date')->nullable();
-            $table->enum('status', ['pending', 'approved', 'received', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'received', 'canceled'])->default('pending');
             $table->decimal('total_cost', 10, 2)->default(0)->comment('Total cost of the purchase order');
             $table->text('notes')->nullable();
             $table->foreignId('supplier_id')->constrained('partners')->cascadeOnUpdate()->cascadeOnDelete();
