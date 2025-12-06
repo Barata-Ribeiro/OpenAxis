@@ -4,7 +4,6 @@ namespace App\Services\Common;
 
 use App\Interfaces\Common\DashboardServiceInterface;
 use App\Models\Client;
-use App\Models\ItemSalesOrder;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
 use Concurrency;
@@ -369,40 +368,31 @@ class DashboardService implements DashboardServiceInterface
             ->get();
 
         $totalProfit = 0.0;
+
         foreach ($orders as $order) {
-            $orderTotal = (float) $order->total_cost;
-            $productCost = $order->product_cost !== null ? (float) $order->product_cost : null;
-
-            if ($productCost === null) {
-                $calculatedProductCost = ItemSalesOrder::query()
-                    ->join('products', 'item_sales_orders.product_id', '=', 'products.id')
-                    ->where('item_sales_orders.sales_order_id', $order->id)
-                    ->selectRaw('COALESCE(SUM(products.cost_price * item_sales_orders.quantity), 0) as total_cost')
-                    ->value('total_cost');
-
-                $productCost = $calculatedProductCost > 0 ? (float) $calculatedProductCost : $orderTotal * 0.6;
+            // Sum revenue from items; if empty, fall back to order product_value
+            $itemsRevenue = $order->salesOrderItems->sum('subtotal_price');
+            if ($itemsRevenue == 0.0 && $order->product_value !== null) {
+                $itemsRevenue = (float) $order->product_value;
             }
 
-            $commission = 0.0;
-            if (! empty($order->vendor_id)) {
-                if ($order->product_cost !== null && (float) $order->product_cost > 0) {
-                    // Use item-based commission OR 5% fallback of order total
-                    $calculatedCommission = ItemSalesOrder::query()
-                        ->join('products', 'item_sales_orders.product_id', '=', 'products.id')
-                        ->where('item_sales_orders.sales_order_id', $order->id)
-                        ->selectRaw('COALESCE(SUM(products.comission * item_sales_orders.quantity), 0) as total_commission')
-                        ->value('total_commission');
-
-                    $commission = $calculatedCommission > 0
-                        ? (float) $calculatedCommission
-                        : $orderTotal * 0.05;
-                } else {
-                    $commission = $orderTotal * 0.05;
-                }
+            // Sum commission from items; if empty, fall back to order total_commission
+            $itemsCommission = $order->salesOrderItems->sum('commission_item');
+            if ($itemsCommission == 0.0 && $order->total_commission !== null) {
+                $itemsCommission = (float) $order->total_commission;
             }
 
-            $profit = $orderTotal - $productCost - $commission;
-            $totalProfit += $profit;
+            $productCost = (float) $order->product_cost;
+            $deliveryCost = (float) $order->delivery_cost;
+            $discountCost = (float) $order->discount_cost;
+
+            $orderProfit = $itemsRevenue
+                - $productCost
+                - $deliveryCost
+                - $discountCost
+                - $itemsCommission;
+
+            $totalProfit += $orderProfit;
         }
 
         return $totalProfit;
