@@ -19,7 +19,7 @@ class VendorFactory extends Factory
         return [
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
-            'date_of_birth' => $this->faker->date(),
+            'date_of_birth' => $this->faker->date('Y-m-d', '-18 years'),
             'phone_number' => $this->faker->phoneNumber(),
             'commission_rate' => $this->faker->randomFloat(2, 0, 60),
             'is_active' => $this->faker->boolean(),
