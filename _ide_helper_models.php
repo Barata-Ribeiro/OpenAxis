@@ -305,6 +305,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
+ * @method static \Database\Factories\PartnerFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner onlyTrashed()
@@ -499,6 +500,9 @@ namespace App\Models{
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ItemPurchaseOrder> $purchaseOrderItems
+ * @property-read int|null $purchase_order_items_count
+ * @property-read bool|null $purchase_order_items_exists
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
@@ -591,6 +595,9 @@ namespace App\Models{
  * @property int|null $payment_condition_id
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\PaymentCondition|null $paymentCondition
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ItemSalesOrder> $salesOrderItems
+ * @property-read int|null $sales_order_items_count
+ * @property-read bool|null $sales_order_items_exists
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newModelQuery()

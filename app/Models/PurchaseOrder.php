@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ItemPurchaseOrder> $purchaseOrderItems
+ * @property-read int|null $purchase_order_items_count
+ * @property-read bool|null $purchase_order_items_exists
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
@@ -69,5 +72,10 @@ class PurchaseOrder extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function purchaseOrderItems()
+    {
+        return $this->hasMany(ItemPurchaseOrder::class);
     }
 }

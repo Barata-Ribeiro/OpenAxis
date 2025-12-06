@@ -26,6 +26,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $payment_condition_id
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\PaymentCondition|null $paymentCondition
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ItemSalesOrder> $salesOrderItems
+ * @property-read int|null $sales_order_items_count
+ * @property-read bool|null $sales_order_items_exists
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newModelQuery()
@@ -110,5 +113,10 @@ class SalesOrder extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function salesOrderItems()
+    {
+        return $this->hasMany(ItemSalesOrder::class);
     }
 }
