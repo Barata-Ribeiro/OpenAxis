@@ -23,6 +23,7 @@ class VendorSeeder extends Seeder
             ->state(fn () => ['user_id' => $userIds[array_rand($userIds)]])
             ->make()
             ->makeHidden('full_name')
+            ->map(fn ($u) => $u->getAttributes())
             ->toArray();
 
         $vendors = array_map(function ($vendor) {
@@ -31,11 +32,9 @@ class VendorSeeder extends Seeder
             return $vendor;
         }, $vendors);
 
-        // Create additional users with vendor role but no vendor record yet
         $users = User::factory()
             ->count(5)
             ->make()
-            ->each(fn ($u) => $u->assignRole(RoleEnum::VENDOR->value))
             ->makeHidden('avatar')
             ->map(fn ($u) => $u->getAttributes())
             ->toArray();
@@ -44,5 +43,9 @@ class VendorSeeder extends Seeder
             Vendor::insert($vendors);
             User::insert($users);
         });
+
+        User::whereIn('email', array_column($users, 'email'))
+            ->get()
+            ->each(fn ($u) => $u->assignRole(RoleEnum::VENDOR->value));
     }
 }

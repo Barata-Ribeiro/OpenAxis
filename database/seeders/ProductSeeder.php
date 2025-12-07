@@ -12,6 +12,6 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        Product::insert(Product::factory()->count(50)->make()->makeHidden('cover_image')->toArray());
+        Product::insert(Product::factory()->count(50)->make()->makeHidden('cover_image')->map(fn ($u) => $u->getAttributes())->toArray());
     }
 }
