@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\ProductCategory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Str;
 
@@ -37,7 +38,7 @@ class ProductFactory extends Factory
             'sku' => $sku,
             'name' => $name,
             'description' => $this->faker->sentences(5, true),
-            'slug' => Str::slug($name.'-'.$sku),
+            'slug' => Str::slug("$name-$sku"),
             'cost_price' => $costPrice,
             'selling_price' => $sellingPrice,
             'current_stock' => $this->faker->numberBetween(0, 100),
@@ -45,6 +46,8 @@ class ProductFactory extends Factory
             'comission' => $commission,
             'is_active' => $this->faker->boolean(80),
             'product_category_id' => ProductCategory::inRandomOrder()->first()->id,
+            'created_at' => Carbon::parse(now()),
+            'updated_at' => Carbon::parse(now()),
         ];
     }
 }

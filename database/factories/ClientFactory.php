@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,6 +27,8 @@ class ClientFactory extends Factory
             'phone_number' => $this->faker->optional()->e164PhoneNumber(),
             'identification' => $isIndividual ? $this->faker->unique()->numerify('###########') : $this->faker->unique()->numerify('##############'),
             'client_type' => $type,
+            'created_at' => Carbon::parse(now()),
+            'updated_at' => Carbon::parse(now()),
         ];
     }
 }

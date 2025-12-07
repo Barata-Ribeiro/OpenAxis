@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,6 +24,8 @@ class VendorFactory extends Factory
             'phone_number' => $this->faker->phoneNumber(),
             'commission_rate' => $this->faker->randomFloat(2, 0, 60),
             'is_active' => $this->faker->boolean(),
+            'created_at' => Carbon::parse(now()),
+            'updated_at' => Carbon::parse(now()),
         ];
     }
 }

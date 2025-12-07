@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +28,8 @@ class PartnerFactory extends Factory
             'phone_number' => $this->faker->e164PhoneNumber(),
             'identification' => $isSupplierOrBoth ? $this->faker->unique()->numerify('##.###.###/####-##') : $this->faker->unique()->numerify('###.###.###-##'),
             'is_active' => $this->faker->boolean(90),
+            'created_at' => Carbon::parse(now()),
+            'updated_at' => Carbon::parse(now()),
         ];
     }
 }

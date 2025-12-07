@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -29,6 +30,8 @@ class AddressFactory extends Factory
             'postal_code' => $this->faker->postcode(),
             'country' => 'USA',
             'is_primary' => true,
+            'created_at' => Carbon::parse(now()),
+            'updated_at' => Carbon::parse(now()),
         ];
     }
 }
