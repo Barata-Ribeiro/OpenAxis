@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Management;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\SupplierRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\Partner;
 use App\Services\Management\SupplierService;
 use Auth;
 use Exception;
@@ -69,6 +70,46 @@ class SupplierController extends Controller
             ]);
 
             return back()->withInput()->with('error', 'An error occurred while creating the supplier. Please try again.');
+        }
+    }
+
+    public function edit(Partner $supplier)
+    {
+        if ($supplier->type === 'client') {
+            return to_route('erp.suppliers.index')->with('error', 'The specified partner is not a supplier.');
+        }
+
+        Log::info('Supplier: Accessed supplier edit page.', [
+            'action_user_id' => Auth::id(),
+            'supplier_id' => $supplier->id,
+        ]);
+
+        return Inertia::render('erp/suppliers/edit', [
+            'supplier' => $supplier->load('addresses'),
+        ]);
+    }
+
+    public function update(SupplierRequest $request, Partner $supplier)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Supplier: Update method called.', [
+                'action_user_id' => $userId,
+                'supplier_id' => $supplier->id,
+            ]);
+
+            $this->supplierService->updateSupplier($request, $supplier);
+
+            return to_route('erp.suppliers.index')->with('success', 'Supplier updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Supplier: Error occurred while updating supplier.', [
+                'action_user_id' => $userId,
+                'supplier_id' => $supplier->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'An error occurred while updating the supplier. Please try again.');
         }
     }
 }
