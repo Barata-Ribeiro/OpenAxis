@@ -53,4 +53,28 @@ class SupplierService implements SupplierServiceInterface
 
         DB::transaction(fn () => Partner::create($supplierData)->addresses()->create($addressData));
     }
+
+    public function updateSupplier(SupplierRequest $request, Partner $supplier): void
+    {
+        $validated = $request->validated();
+
+        $supplierData = Arr::only($validated, [
+            'name', 'email', 'identification', 'is_active', 'phone_number', 'supplier_type',
+        ]);
+
+        if (\array_key_exists('supplier_type', $supplierData)) {
+            $supplierData['type'] = $supplierData['supplier_type'];
+            unset($supplierData['supplier_type']);
+        }
+
+        $addressData = Arr::only($validated, [
+            'type', 'label', 'street', 'number', 'complement', 'neighborhood',
+            'city', 'state', 'postal_code', 'country', 'is_primary',
+        ]);
+
+        DB::transaction(function () use ($supplier, $supplierData, $addressData) {
+            $supplier->update($supplierData);
+            $supplier->addresses()->update($addressData);
+        });
+    }
 }

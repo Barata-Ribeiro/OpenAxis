@@ -3,6 +3,7 @@
 namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\SupplierRequest;
+use App\Models\Partner;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface SupplierServiceInterface
@@ -36,4 +37,14 @@ interface SupplierServiceInterface
      * @throws \RuntimeException When persistence fails or an unexpected error occurs.
      */
     public function createSupplier(SupplierRequest $request): void;
+
+    /**
+     * Update the given supplier using validated input from the request.
+     *
+     * @param  SupplierRequest  $request  The validated request containing supplier update data.
+     * @param  Partner  $supplier  The supplier model instance to update.
+     *
+     * @throws \Throwable If the update cannot be completed for any other reason.
+     */
+    public function updateSupplier(SupplierRequest $request, Partner $supplier): void;
 }
