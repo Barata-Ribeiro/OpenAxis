@@ -42,7 +42,9 @@ class RoleSeeder extends Seeder
                 $roles[$roleName] = $rolePermissions;
             }
 
-            Role::firstOrCreate(['name' => RoleEnum::SUPER_ADMIN->value, 'guard_name' => $guard]);
+            foreach ([RoleEnum::SUPER_ADMIN->value, 'user'] as $roleName) {
+                Role::firstOrCreate(['name' => $roleName, 'guard_name' => $guard]);
+            }
 
             foreach ($roles as $roleName => $permissions) {
                 Role::firstOrCreate(['name' => $roleName, 'guard_name' => $guard])
@@ -83,6 +85,9 @@ class RoleSeeder extends Seeder
                 'finance' => ['index', 'show', 'create', 'edit'],
                 'sale' => ['index', 'show'],
                 'order' => ['index', 'show'],
+            ],
+            'user' => [
+                'dashboard' => ['show'],
             ],
         ];
     }
