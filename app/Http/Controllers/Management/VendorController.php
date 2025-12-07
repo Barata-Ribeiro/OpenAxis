@@ -50,8 +50,8 @@ class VendorController extends Controller
     public function create()
     {
         $usersWithVendorRole = User::select(['id', 'name'])
-            ->whereHas('roles', fn ($q) => $q->where('name', RoleEnum::VENDOR->value))
-            ->whereNotIn('id', Vendor::pluck('user_id'))
+            ->role(RoleEnum::VENDOR->value)
+            ->whereNotIn('id', Vendor::pluck('user_id')->toArray())
             ->get();
 
         return Inertia::render('erp/vendors/create', [
