@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read bool|null $purchase_order_items_exists
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder query()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereTotalCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class PurchaseOrder extends Model

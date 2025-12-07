@@ -24,6 +24,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
+ *
  * @method static \Database\Factories\PartnerFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner newQuery()
@@ -41,6 +42,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Partner withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Partner extends Model implements Auditable

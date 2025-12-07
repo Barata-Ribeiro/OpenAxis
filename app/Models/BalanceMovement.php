@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\BankAccount $bankAccount
  * @property-read \App\Models\BankAccount|null $destinationAccount
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement query()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BalanceMovement whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class BalanceMovement extends Model

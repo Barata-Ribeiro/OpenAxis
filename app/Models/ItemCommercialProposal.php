@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\CommercialProposal $commercialProposal
  * @property-read \App\Models\Product $product
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereSubtotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemCommercialProposal whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ItemCommercialProposal extends Model

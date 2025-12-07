@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\SalesOrder $salesOrder
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder query()
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereSubtotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemSalesOrder whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ItemSalesOrder extends Model

@@ -16,65 +16,65 @@ class AppServiceProvider extends ServiceProvider
     {
         //
 
-		$this->app->bind(
-			\App\Interfaces\Admin\UserServiceInterface::class,
-			\App\Services\Admin\UserService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Admin\UserServiceInterface::class,
+            \App\Services\Admin\UserService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Settings\SessionServiceInterface::class,
-			\App\Services\Settings\SessionService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Settings\SessionServiceInterface::class,
+            \App\Services\Settings\SessionService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Admin\RoleServiceInterface::class,
-			\App\Services\Admin\RoleService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Admin\RoleServiceInterface::class,
+            \App\Services\Admin\RoleService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Product\ProductCategoryServiceInterface::class,
-			\App\Services\Product\ProductCategoryService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Product\ProductCategoryServiceInterface::class,
+            \App\Services\Product\ProductCategoryService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Product\ProductServiceInterface::class,
-			\App\Services\Product\ProductService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Product\ProductServiceInterface::class,
+            \App\Services\Product\ProductService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Common\DashboardServiceInterface::class,
-			\App\Services\Common\DashboardService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Common\DashboardServiceInterface::class,
+            \App\Services\Common\DashboardService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Management\ClientServiceInterface::class,
-			\App\Services\Management\ClientService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Management\ClientServiceInterface::class,
+            \App\Services\Management\ClientService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Management\PaymentConditionServiceInterface::class,
-			\App\Services\Management\PaymentConditionService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Management\PaymentConditionServiceInterface::class,
+            \App\Services\Management\PaymentConditionService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Management\VendorServiceInterface::class,
-			\App\Services\Management\VendorService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Management\VendorServiceInterface::class,
+            \App\Services\Management\VendorService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Management\SalesOrderServiceInterface::class,
-			\App\Services\Management\SalesOrderService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Management\SalesOrderServiceInterface::class,
+            \App\Services\Management\SalesOrderService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Management\SupplierServiceInterface::class,
-			\App\Services\Management\SupplierService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Management\SupplierServiceInterface::class,
+            \App\Services\Management\SupplierService::class
+        );
 
-		$this->app->bind(
-			\App\Interfaces\Management\PurchaseOrderServiceInterface::class,
-			\App\Services\Management\PurchaseOrderService::class
-		);
+        $this->app->bind(
+            \App\Interfaces\Management\PurchaseOrderServiceInterface::class,
+            \App\Services\Management\PurchaseOrderService::class
+        );
     }
 
     /**

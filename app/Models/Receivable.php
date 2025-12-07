@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\SalesOrder $salesOrder
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable query()
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receivable whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Receivable extends Model

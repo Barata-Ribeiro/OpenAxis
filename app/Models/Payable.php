@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable query()
@@ -49,6 +50,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable whereVendorId($value)
+ *
  * @mixin \Eloquent
  */
 class Payable extends Model

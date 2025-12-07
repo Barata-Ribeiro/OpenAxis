@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\PurchaseOrder $purchaseOrder
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereSubtotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ItemPurchaseOrder whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ItemPurchaseOrder extends Model

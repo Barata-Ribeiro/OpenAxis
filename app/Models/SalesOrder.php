@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read bool|null $sales_order_items_exists
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder query()
@@ -53,6 +54,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SalesOrder whereVendorId($value)
+ *
  * @mixin \Eloquent
  */
 class SalesOrder extends Model

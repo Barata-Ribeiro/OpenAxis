@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Partner $client
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal query()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereValidUntil($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CommercialProposal whereVendorId($value)
+ *
  * @mixin \Eloquent
  */
 class CommercialProposal extends Model

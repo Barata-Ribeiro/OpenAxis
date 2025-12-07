@@ -24,6 +24,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read bool|null $audits_exists
  * @property-read string $full_name
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\VendorFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newQuery()
@@ -42,6 +43,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Vendor extends Model implements Auditable
