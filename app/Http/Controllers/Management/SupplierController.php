@@ -128,4 +128,52 @@ class SupplierController extends Controller
             return back()->withInput()->with('error', 'An error occurred while updating the supplier. Please try again.');
         }
     }
+
+    public function destroy(Partner $supplier)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Supplier: Destroy method called.', [
+                'action_user_id' => $userId,
+                'supplier_id' => $supplier->id,
+            ]);
+
+            $supplier->delete();
+
+            return to_route('erp.suppliers.index')->with('success', 'Supplier deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Supplier: Error occurred while deleting supplier.', [
+                'action_user_id' => $userId,
+                'supplier_id' => $supplier->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An error occurred while deleting the supplier. Please try again.');
+        }
+    }
+
+    public function forceDestroy(Partner $supplier)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Supplier: Force destroy method called.', [
+                'action_user_id' => $userId,
+                'supplier_id' => $supplier->id,
+            ]);
+
+            $supplier->forceDelete();
+
+            return to_route('erp.suppliers.index')->with('success', 'Supplier permanently deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Supplier: Error occurred while permanently deleting supplier.', [
+                'action_user_id' => $userId,
+                'supplier_id' => $supplier->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An error occurred while permanently deleting the supplier. Please try again.');
+        }
+    }
 }
