@@ -14,7 +14,6 @@ export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWi
         enableHiding: false,
     },
     {
-        id: 'cover_image',
         accessorKey: 'cover_image',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Cover Image" />,
         cell: function Cell({ row }) {
@@ -45,7 +44,6 @@ export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWi
         enableSorting: true,
     },
     {
-        id: 'category_name',
         accessorKey: 'category.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
         meta: {

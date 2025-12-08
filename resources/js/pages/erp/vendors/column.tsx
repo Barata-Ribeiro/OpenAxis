@@ -31,7 +31,6 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
         size: 40,
     },
     {
-        id: 'first_name',
         accessorKey: 'first_name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="First Name" />,
         cell: ({ row }) => row.original.first_name,
@@ -39,14 +38,12 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
     },
 
     {
-        id: 'last_name',
         accessorKey: 'last_name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Last Name" />,
         cell: ({ row }) => row.original.last_name,
         enableSorting: true,
     },
     {
-        id: 'user.email',
         accessorKey: 'user.email',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
         cell: ({ row }) => (

@@ -14,7 +14,6 @@ export const columns: Array<ColumnDef<PurchaseOrderWithRelations>> = [
         size: 40,
     },
     {
-        id: 'partners.name',
         accessorKey: 'supplier.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Supplier" />,
         enableSorting: true,
@@ -31,7 +30,6 @@ export const columns: Array<ColumnDef<PurchaseOrderWithRelations>> = [
         enableSorting: true,
     },
     {
-        id: 'user.name',
         accessorKey: 'user.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Purchaser" />,
         enableSorting: true,
