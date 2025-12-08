@@ -73,6 +73,22 @@ class SupplierController extends Controller
         }
     }
 
+    public function show(Partner $supplier)
+    {
+        if ($supplier->type === 'client') {
+            return to_route('erp.suppliers.index')->with('error', 'The specified partner is not a supplier.');
+        }
+
+        Log::info('Supplier: Accessed supplier details page.', [
+            'action_user_id' => Auth::id(),
+            'supplier_id' => $supplier->id,
+        ]);
+
+        return Inertia::render('erp/suppliers/show', [
+            'supplier' => $supplier->load('addresses'),
+        ]);
+    }
+
     public function edit(Partner $supplier)
     {
         if ($supplier->type === 'client') {
