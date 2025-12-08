@@ -9,8 +9,9 @@ enum RoleEnum: string
     case SUPER_ADMIN = 'super-admin';
     case VENDOR = 'vendor';
     case BUYER = 'buyer';
-
     case FINANCE = 'finance';
+
+    case USER = 'user';
 
     /**
      * Get a human-readable label for this enum case.
@@ -28,6 +29,7 @@ enum RoleEnum: string
             self::VENDOR => 'Vendors',
             self::BUYER => 'Buyers',
             self::FINANCE => 'Finance Team',
+            self::USER => 'Users',
         };
     }
 }

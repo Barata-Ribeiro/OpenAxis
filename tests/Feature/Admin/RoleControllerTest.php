@@ -30,7 +30,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page->component($componentName)
-                ->has('roles.data', 4) // Default per_page is 10
+                ->has('roles.data', 5) // Default per_page is 10
                 ->where('roles.data.0.id', $user->id)
             );
     });
@@ -56,7 +56,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page->component($componentName)
-                ->has('roles.data', 4)
+                ->has('roles.data', 5)
                 ->where('roles.data.0.name', Role::orderBy('name', 'desc')->first()->name)
             );
     });
@@ -87,7 +87,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page->component($componentName)
-                ->has('roles.data', 4)
+                ->has('roles.data', 5)
                 ->where('roles.data.0.id', Role::orderBy('id', 'asc')->first()->id)
             );
     });
