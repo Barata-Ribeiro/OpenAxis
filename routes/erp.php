@@ -114,6 +114,10 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor(['edit', 'update'], 'permission:vendor.edit')
         ->middlewareFor('destroy', 'permission:vendor.destroy');
 
+    Route::delete('suppliers/{supplier}/force', [SupplierController::class, 'forceDestroy'])
+        ->name('erp.suppliers.force-destroy')
+        ->middleware('permission:supplier.destroy');
+
     Route::resource('suppliers', SupplierController::class)
         ->names([
             'index' => 'erp.suppliers.index',
