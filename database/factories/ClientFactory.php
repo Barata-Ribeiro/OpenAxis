@@ -17,15 +17,15 @@ class ClientFactory extends Factory
      */
     public function definition(): array
     {
-        $type = $this->faker->randomElement(['individual', 'company']);
+        $type = fake()->randomElement(['individual', 'company']);
 
         $isIndividual = $type === 'individual';
 
         return [
-            'name' => $isIndividual ? $this->faker->name() : $this->faker->company(),
-            'email' => $isIndividual ? $this->faker->unique()->safeEmail() : $this->faker->unique()->companyEmail(),
-            'phone_number' => $this->faker->optional()->e164PhoneNumber(),
-            'identification' => $isIndividual ? $this->faker->unique()->numerify('###########') : $this->faker->unique()->numerify('##############'),
+            'name' => $isIndividual ? fake()->unique()->name() : fake()->unique()->company(),
+            'email' => $isIndividual ? fake()->unique()->safeEmail() : fake()->unique()->companyEmail(),
+            'phone_number' => fake()->optional()->e164PhoneNumber(),
+            'identification' => $isIndividual ? fake()->unique()->numerify('###########') : fake()->unique()->numerify('##############'),
             'client_type' => $type,
             'created_at' => Carbon::parse(now()),
             'updated_at' => Carbon::parse(now()),

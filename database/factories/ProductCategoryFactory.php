@@ -19,7 +19,7 @@ class ProductCategoryFactory extends Factory
     {
 
         return [
-            'description' => $this->faker->sentence(),
+            'description' => fake()->sentence(),
             'created_at' => Carbon::parse(now()),
             'updated_at' => Carbon::parse(now()),
         ];

@@ -18,12 +18,12 @@ class VendorFactory extends Factory
     public function definition(): array
     {
         return [
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'date_of_birth' => $this->faker->date('Y-m-d', '-18 years'),
-            'phone_number' => $this->faker->phoneNumber(),
-            'commission_rate' => $this->faker->randomFloat(2, 0, 60),
-            'is_active' => $this->faker->boolean(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'date_of_birth' => fake()->date('Y-m-d', '-18 years'),
+            'phone_number' => fake()->phoneNumber(),
+            'commission_rate' => fake()->randomFloat(2, 0, 60),
+            'is_active' => fake()->boolean(),
             'created_at' => Carbon::parse(now()),
             'updated_at' => Carbon::parse(now()),
         ];

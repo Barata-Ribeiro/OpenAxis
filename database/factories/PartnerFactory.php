@@ -18,16 +18,16 @@ class PartnerFactory extends Factory
     public function definition(): array
     {
         $partnerTypes = ['client', 'supplier', 'both'];
-        $type = $this->faker->randomElement($partnerTypes);
+        $type = fake()->randomElement($partnerTypes);
         $isSupplierOrBoth = \in_array($type, ['supplier', 'both']);
 
         return [
-            'name' => $isSupplierOrBoth ? $this->faker->company() : $this->faker->name(),
+            'name' => $isSupplierOrBoth ? fake()->unique()->company() : fake()->unique()->name(),
             'type' => $type,
-            'email' => $isSupplierOrBoth ? $this->faker->unique()->companyEmail() : $this->faker->unique()->safeEmail(),
-            'phone_number' => $this->faker->e164PhoneNumber(),
-            'identification' => $isSupplierOrBoth ? $this->faker->unique()->numerify('##.###.###/####-##') : $this->faker->unique()->numerify('###.###.###-##'),
-            'is_active' => $this->faker->boolean(90),
+            'email' => $isSupplierOrBoth ? fake()->unique()->companyEmail() : fake()->unique()->safeEmail(),
+            'phone_number' => fake()->unique()->e164PhoneNumber(),
+            'identification' => $isSupplierOrBoth ? fake()->unique()->numerify('##.###.###/####-##') : fake()->unique()->numerify('###.###.###-##'),
+            'is_active' => fake()->boolean(90),
             'created_at' => Carbon::parse(now()),
             'updated_at' => Carbon::parse(now()),
         ];
