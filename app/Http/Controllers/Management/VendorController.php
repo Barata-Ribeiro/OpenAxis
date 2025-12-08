@@ -29,7 +29,7 @@ class VendorController extends Controller
         $search = trim($validated['search'] ?? '');
         $filters = $validated['filters'] ?? [];
 
-        $allowedSorts = ['id', 'first_name', 'last_name', 'user.email', 'commission_rate', 'is_active', 'created_at', 'updated_at'];
+        $allowedSorts = ['id', 'first_name', 'last_name', 'user_email', 'commission_rate', 'is_active', 'created_at', 'updated_at'];
         if (! \in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
