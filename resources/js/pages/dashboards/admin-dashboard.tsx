@@ -1,6 +1,7 @@
 import DashboardMonthYearForm from '@/components/forms/dashboard-month-year-form';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CountingNumber } from '@/components/ui/counting-number';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -66,7 +67,6 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                             const info = status as StatusInfo;
                                             const cardKey = `${summaryKey}-${statusKey}`;
 
-                                            const formattedCurrentValue = `${info.prefix ?? ''}${formatNumber(info.value)}${info.suffix ?? ''}`;
                                             const formattedDelta = `${info.positive ? '+' : ''}${formatNumber(info.delta)}`;
                                             const formattedLastMonth = `${info.prefix ?? ''}${formatNumber(info.lastMonth)}${info.suffix ?? ''}`;
 
@@ -88,9 +88,15 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
 
                                                     <CardContent className="space-y-2.5">
                                                         <div className="flex items-center gap-2.5">
-                                                            <span className="text-2xl font-medium tracking-tight text-foreground">
-                                                                {formattedCurrentValue}
-                                                            </span>
+                                                            <CountingNumber
+                                                                from={0}
+                                                                to={info.value}
+                                                                duration={2}
+                                                                className="text-2xl font-medium tracking-tight text-foreground"
+                                                                format={(value) =>
+                                                                    `${info.prefix ?? ''}${formatNumber(Math.round(value))}${info.suffix ?? ''}`
+                                                                }
+                                                            />
                                                             <Badge
                                                                 className="select-none"
                                                                 variant={changeIndicatorType}
