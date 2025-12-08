@@ -115,4 +115,46 @@ class VendorController extends Controller
             return back()->withInput()->with('error', 'Error updating vendor.');
         }
     }
+
+    public function destroy(Vendor $vendor)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Vendor: Deleting vendor.', ['action_user_id' => $userId, 'vendor_id' => $vendor->id]);
+
+            $vendor->delete();
+
+            return to_route('erp.vendors.index')->with('success', "$vendor->full_name's vendor profile deleted successfully.");
+        } catch (Exception $e) {
+            Log::error('Vendor: Error deleting vendor.', [
+                'action_user_id' => $userId,
+                'vendor_id' => $vendor->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Error deleting vendor.');
+        }
+    }
+
+    public function forceDestroy(Vendor $vendor)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Vendor: Force deleting vendor.', ['action_user_id' => $userId, 'vendor_id' => $vendor->id]);
+
+            $vendor->forceDelete();
+
+            return to_route('erp.vendors.index')->with('success', "$vendor->full_name's vendor profile permanently deleted successfully.");
+        } catch (Exception $e) {
+            Log::error('Vendor: Error force deleting vendor.', [
+                'action_user_id' => $userId,
+                'vendor_id' => $vendor->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Error permanently deleting vendor.');
+        }
+    }
 }
