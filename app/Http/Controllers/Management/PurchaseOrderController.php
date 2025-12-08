@@ -23,7 +23,7 @@ class PurchaseOrderController extends Controller
         $search = trim($validated['search'] ?? '');
         $filters = $validated['filters'] ?? [];
 
-        $allowedSorts = ['id']; // Todo: define allowed sorts later
+        $allowedSorts = ['id', 'supplier_name', 'total_cost', 'status', 'user_name', 'created_at', 'updated_at'];
         if (! \in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
