@@ -90,6 +90,7 @@ export interface Option {
 export type FilterVariant = DataTableConfig['filterVariants'][number];
 
 export interface ImageSources {
+    id: (string | number) | null;
     src: string | null;
     srcSet: string | null;
 }
