@@ -1,10 +1,24 @@
+import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import { formatCurrency, normalizeString } from '@/lib/utils';
+import erp from '@/routes/erp';
 import { ProductWithRelations } from '@/types/erp/product';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns/format';
-import { CalendarIcon, CircleDashed } from 'lucide-react';
+import { CalendarIcon, CircleDashed, EditIcon, Ellipsis, EyeIcon } from 'lucide-react';
 
 export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWithRelations>> => [
     {
@@ -133,5 +147,55 @@ export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWi
         header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
         cell: ({ row }) => format(row.original.updated_at, 'PPpp'),
         enableSorting: true,
+    },
+    {
+        id: 'actions',
+        cell: function Cell({ row }) {
+            const { can } = usePermission();
+
+            const skuToCopy = row.original.sku;
+            const nameToCopy = row.original.name;
+
+            return (
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            aria-label="Open menu"
+                            variant="ghost"
+                            className="flex size-8 p-0 data-[state=open]:bg-muted"
+                        >
+                            <Ellipsis aria-hidden size={16} />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={skuToCopy}>Copy SKU</DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem disabled={!can('product.show')} asChild>
+                                <Link className="block w-full" href={erp.products.show(row.original.slug)} as="button">
+                                    <EyeIcon aria-hidden size={14} /> View
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled={!can('product.edit')} asChild>
+                                <Link className="block w-full" href={erp.products.edit(row.original.slug)} as="button">
+                                    <EditIcon aria-hidden size={14} /> Edit
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+        size: 40,
+        enableHiding: false,
     },
 ];
