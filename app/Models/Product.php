@@ -32,6 +32,7 @@ use Str;
  * @property-read bool|null $audits_exists
  * @property-read \App\Models\ProductCategory $category
  * @property-read mixed $cover_image
+ * @property-read mixed $images
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
@@ -132,6 +133,7 @@ class Product extends Model implements Auditable, HasMedia
         $media = $this->getFirstMedia('products_images');
 
         return [
+            'id' => $media?->getKey(),
             'src' => $media?->getUrl(),
             'srcSet' => $media?->getSrcSet(),
         ];
@@ -140,8 +142,9 @@ class Product extends Model implements Auditable, HasMedia
     public function getImagesAttribute()
     {
         return $this->getMedia('products_images')
-            ->filter(fn (Media $m) => $m->id !== ($this->getFirstMedia('products_images')->id ?? null))
+            ->filter(fn (Media $m) => $m->getKey() !== ($this->getFirstMedia('products_images')->getKey() ?? null))
             ->map(fn (Media $m) => [
+                'id' => $m->getKey(),
                 'src' => $m->getUrl(),
                 'srcSet' => $m->getSrcSet(),
             ])->values();

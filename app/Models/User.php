@@ -78,7 +78,7 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
     /**
      * @use HasFactory<\Database\Factories\UserFactory>
      * @use HasRoles<\Spatie\Permission\Traits\HasRoles>
-     * @use InteractsWithMedia<\Spatie\MediaLibrary\InteractsWithMedia>
+     * @use InteractsWithMedia
      * @use Notifiable<\Illuminate\Notifications\Notifiable>
      * @use \OwenIt\Auditing\Auditable<\OwenIt\Auditing\Contracts\Auditable>
      * @use SoftDeletes<\Illuminate\Database\Eloquent\SoftDeletes>
@@ -131,6 +131,7 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
         $media = $this->getFirstMedia('avatar');
 
         return [
+            'id' => $media?->getKey(),
             'src' => $media?->getUrl(),
             'srcSet' => $media?->getSrcSet(),
         ];
