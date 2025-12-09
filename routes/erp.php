@@ -28,17 +28,18 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('destroy', 'permission:product.destroy');
 
     Route::resource('products', ProductController::class)
-        ->except('show')
         ->names([
             'index' => 'erp.products.index',
             'create' => 'erp.products.create',
             'store' => 'erp.products.store',
+            'show' => 'erp.products.show',
             'edit' => 'erp.products.edit',
             'update' => 'erp.products.update',
             'destroy' => 'erp.products.destroy',
         ])
         ->middlewareFor('index', 'permission:product.index')
         ->middlewareFor(['create', 'store'], 'permission:product.create')
+        ->middlewareFor('show', 'permission:product.show')
         ->middlewareFor(['edit', 'update'], 'permission:product.edit')
         ->middlewareFor('destroy', 'permission:product.destroy');
 
