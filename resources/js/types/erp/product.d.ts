@@ -6,6 +6,7 @@ export interface Product {
     sku: string;
     name: string;
     cover_image: ImageSources;
+    images?: ImageSources[];
     description?: string;
     slug: string;
     cost_price: string;
