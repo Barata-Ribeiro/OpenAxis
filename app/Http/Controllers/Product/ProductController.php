@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\product\ProductRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\Product\ProductService;
 use Auth;
@@ -66,5 +67,14 @@ class ProductController extends Controller
 
             return back()->withInput()->with(['error' => 'Failed to create product.']);
         }
+    }
+
+    public function show(Product $product)
+    {
+        Log::info('Product: Viewing product details.', ['product_id' => $product->id, 'action_user_id' => Auth::id()]);
+
+        return Inertia::render('erp/products/show', [
+            'product' => $product->load('category:id,name'),
+        ]);
     }
 }
