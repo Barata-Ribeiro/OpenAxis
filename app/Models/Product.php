@@ -85,7 +85,7 @@ class Product extends Model implements Auditable, HasMedia
         'product_category_id',
     ];
 
-    protected $appends = ['cover_image'];
+    protected $appends = ['cover_image', 'images'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -135,6 +135,16 @@ class Product extends Model implements Auditable, HasMedia
             'src' => $media?->getUrl(),
             'srcSet' => $media?->getSrcSet(),
         ];
+    }
+
+    public function getImagesAttribute()
+    {
+        return $this->getMedia('products_images')
+            ->filter(fn (Media $m) => $m->id !== ($this->getFirstMedia('products_images')->id ?? null))
+            ->map(fn (Media $m) => [
+                'src' => $m->getUrl(),
+                'srcSet' => $m->getSrcSet(),
+            ])->values();
     }
 
     public function registerMediaCollections(?Media $media = null): void
