@@ -6,6 +6,7 @@ use App\Http\Controllers\Management\PurchaseOrderController;
 use App\Http\Controllers\Management\SalesOrderController;
 use App\Http\Controllers\Management\SupplierController;
 use App\Http\Controllers\Management\VendorController;
+use App\Http\Controllers\product\InventoryController;
 use App\Http\Controllers\Product\ProductCategoryController;
 use App\Http\Controllers\Product\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,22 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('show', 'permission:product.show')
         ->middlewareFor(['edit', 'update'], 'permission:product.edit')
         ->middlewareFor('destroy', 'permission:product.destroy');
+
+    Route::resource('inventory', InventoryController::class)
+        ->names([
+            'index' => 'erp.inventory.index',
+            'create' => 'erp.inventory.create',
+            'store' => 'erp.inventory.store',
+            'show' => 'erp.inventory.show',
+            'edit' => 'erp.inventory.edit',
+            'update' => 'erp.inventory.update',
+            'destroy' => 'erp.inventory.destroy',
+        ])
+        ->middlewareFor('index', 'permission:supply.index')
+        ->middlewareFor(['create', 'store'], 'permission:supply.create')
+        ->middlewareFor('show', 'permission:supply.show')
+        ->middlewareFor(['edit', 'update'], 'permission:supply.edit')
+        ->middlewareFor('destroy', 'permission:supply.destroy');
 
     Route::delete('clients/{client}/force', [ClientController::class, 'forceDestroy'])
         ->name('erp.clients.force-destroy')
