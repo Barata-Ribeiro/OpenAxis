@@ -77,4 +77,30 @@ class ProductController extends Controller
             'product' => $product->load('category:id,name'),
         ]);
     }
+
+    public function edit(Product $product)
+    {
+        Log::info('Product: Editing product form.', ['product_id' => $product->id, 'action_user_id' => Auth::id()]);
+
+        return Inertia::render('erp/products/edit', [
+            'product' => $product->load('category:id,name')->makeVisible('media'),
+            'categories' => ProductCategory::pluck('name'),
+        ]);
+    }
+
+    public function update(ProductRequest $request, Product $product)
+    {
+        $userId = Auth::id();
+        try {
+            Log::info('Product: Updating product.', ['product_id' => $product->id, 'action_user_id' => $userId]);
+
+            $this->productService->updateProduct($request, $product);
+
+            return to_route('erp.products.index')->with('success', 'Product updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Product: Failed to update product.', ['product_id' => $product->id, 'action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->withInput()->with(['error' => 'Failed to update product.']);
+        }
+    }
 }
