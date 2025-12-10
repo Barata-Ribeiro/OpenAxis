@@ -426,6 +426,7 @@ namespace App\Models{
  * @property-read bool|null $audits_exists
  * @property-read \App\Models\ProductCategory $category
  * @property-read mixed $cover_image
+ * @property-read mixed $images
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
