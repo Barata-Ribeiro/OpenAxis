@@ -1,4 +1,5 @@
 import type { ImageSources } from '@/types/index';
+import type { Media } from '../application/media';
 import type { ProductCategory } from './product-category';
 
 export interface Product {
@@ -23,4 +24,5 @@ export interface Product {
 
 interface ProductWithRelations extends Product {
     category: Partial<ProductCategory>;
+    media?: Media[];
 }
