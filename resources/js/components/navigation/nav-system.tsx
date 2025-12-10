@@ -25,6 +25,7 @@ import {
     TelescopeIcon,
     TruckIcon,
     UsersIcon,
+    WarehouseIcon,
 } from 'lucide-react';
 import { Fragment } from 'react';
 
@@ -48,6 +49,12 @@ export function NavSystem() {
                 href: erp.categories.index().url,
                 icon: TagsIcon,
                 canView: can('product.index'),
+            },
+            {
+                title: 'Inventory',
+                href: erp.inventory.index().url,
+                icon: WarehouseIcon,
+                canView: can('supply.index'),
             },
             {
                 title: 'Clients',
