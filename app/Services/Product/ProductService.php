@@ -84,4 +84,28 @@ class ProductService implements ProductServiceInterface
             }
         });
     }
+
+    public function updateProduct(ProductRequest $request, Product $product): void
+    {
+        $validatedData = $request->validated();
+
+        $images = $validatedData['images'] ?? [];
+
+        $categoryId = ProductCategory::whereName($validatedData['category'])->value('id');
+
+        $payload = collect($validatedData)
+            ->except(['images', 'category'])
+            ->put('product_category_id', $categoryId)
+            ->toArray();
+
+        DB::transaction(function () use ($product, $payload, $images) {
+            $product->update($payload);
+
+            foreach ($images as $image) {
+                $product->addMedia($image)
+                    ->usingFileName(Str::uuid7().'_'.now()->timestamp.'.'.$image->getClientOriginalExtension())
+                    ->toMediaCollection('products_images');
+            }
+        });
+    }
 }

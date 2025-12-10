@@ -3,6 +3,7 @@
 namespace App\Interfaces\Product;
 
 use App\Http\Requests\product\ProductRequest;
+use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ProductServiceInterface
@@ -38,4 +39,18 @@ interface ProductServiceInterface
      * @throws \RuntimeException If the product cannot be created or persisted due to a storage or domain error.
      */
     public function createProduct(ProductRequest $request): void;
+
+    /**
+     * Update the specified product using the supplied request data.
+     *
+     * Applies validated attributes from the ProductRequest to the
+     * given Product model and persists the changes.
+     *
+     * @param  ProductRequest  $request  The validated request containing updated product attributes.
+     * @param  Product  $product  The product model instance to update.
+     *
+     * @throws \Illuminate\Validation\ValidationException If the request data fails validation.
+     * @throws \Throwable If an error occurs while persisting the update.
+     */
+    public function updateProduct(ProductRequest $request, Product $product): void;
 }
