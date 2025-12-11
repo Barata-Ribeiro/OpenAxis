@@ -99,4 +99,25 @@ class InventoryService implements InventoryServiceInterface
             $product->save();
         });
     }
+
+    public function getPaginatedStockMovements(?int $productId, ?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
+    {
+        $userId = Auth::id();
+
+        $createdAtRange = $filters['created_at'] ?? [];
+        $moveType = $filters['movement_type'] ?? [];
+
+        [$start, $end] = Helpers::getDateRange($createdAtRange);
+
+        return StockMovement::query()
+            ->whereProductId($productId)
+            ->whereUserId($userId)
+            ->when($search, fn ($qr) => $qr->whereLike('movement_type', "%$search%")
+                ->orWhereLike('reason', "%$search%")->orWhereLike('reference', "%$search%"))
+            ->when($moveType, fn ($qr) => $qr->whereIn('movement_type', $moveType))
+            ->when($createdAtRange, fn ($qr) => $qr->whereBetween('created_at', [$start, $end]))
+            ->orderBy($sortBy, $sortDir)
+            ->paginate($perPage)
+            ->withQueryString();
+    }
 }
