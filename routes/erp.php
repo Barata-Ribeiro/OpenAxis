@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('destroy', 'permission:product.destroy');
 
     Route::resource('inventory', InventoryController::class)
+        ->parameters(['inventory' => 'product'])
         ->names([
             'index' => 'erp.inventory.index',
             'create' => 'erp.inventory.create',
