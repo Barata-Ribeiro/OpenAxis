@@ -2,6 +2,8 @@
 
 namespace App\Interfaces\product;
 
+use App\Http\Requests\Product\AdjustInventoryRequest;
+use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface InventoryServiceInterface
@@ -22,4 +24,12 @@ interface InventoryServiceInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated collection of Inventory models.
      */
     public function getPaginatedInventory(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Adjust inventory for the given product according to the supplied request.
+     *
+     * @param  AdjustInventoryRequest  $request  Contains adjustment details.
+     * @param  Product  $product  The product entity to adjust; implementations may mutate and persist this entity.
+     */
+    public function adjustInventory(AdjustInventoryRequest $request, Product $product): void;
 }

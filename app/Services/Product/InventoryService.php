@@ -3,10 +3,14 @@
 namespace App\Services\product;
 
 use App\Common\Helpers;
+use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Interfaces\product\InventoryServiceInterface;
 use App\Models\Product;
+use App\Models\StockMovement;
+use Auth;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use InvalidArgumentException;
 
 class InventoryService implements InventoryServiceInterface
 {
@@ -66,5 +70,33 @@ class InventoryService implements InventoryServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function adjustInventory(AdjustInventoryRequest $request, Product $product): void
+    {
+        $userId = Auth::id();
+
+        $validated = $request->validated();
+        $validated['user_id'] = $userId;
+
+        DB::transaction(function () use ($validated, $product) {
+            StockMovement::create($validated);
+
+            switch ($validated['movement_type']) {
+                case 'inbound':
+                    $product->increment('current_stock', $validated['quantity']);
+                    break;
+                case 'outbound':
+                    $product->decrement('current_stock', $validated['quantity']);
+                    break;
+                case 'adjustment':
+                    $product->current_stock = $validated['quantity'];
+                    break;
+                default:
+                    throw new InvalidArgumentException('Invalid movement_type: '.($validated['movement_type'] ?? 'null'));
+            }
+
+            $product->save();
+        });
     }
 }

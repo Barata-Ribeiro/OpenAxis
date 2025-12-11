@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\product\InventoryService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -53,5 +55,27 @@ class InventoryController extends Controller
         return Inertia::render('erp/inventory/edit', [
             'product' => $product->only(['id', 'name', 'slug', 'current_stock', 'minimum_stock']),
         ]);
+    }
+
+    public function update(AdjustInventoryRequest $request, Product $product)
+    {
+        $userId = Auth::id();
+        Log::info('Inventory: Updating product inventory.', ['action_user_id' => $userId, 'product_id' => $product->id]);
+
+        try {
+            $this->inventoryService->adjustInventory($request, $product);
+
+            Log::info('Inventory: Successfully updated product inventory.', ['action_user_id' => $userId, 'product_id' => $product->id]);
+
+            return to_route('erp.inventory.index')->with('success', 'Inventory adjusted successfully.');
+        } catch (Exception $e) {
+            Log::error('Inventory: Failed to update product inventory.', [
+                'action_user_id' => $userId,
+                'product_id' => $product->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', 'Failed to adjust inventory. Try again later.');
+        }
     }
 }
