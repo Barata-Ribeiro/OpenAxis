@@ -4,9 +4,12 @@ namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
+use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\product\InventoryService;
+use Auth;
 use Inertia\Inertia;
+use Log;
 
 class InventoryController extends Controller
 {
@@ -35,9 +38,20 @@ class InventoryController extends Controller
             $filters
         );
 
+        Log::info('Inventory: Viewed inventory list.', ['action_user_id' => Auth::id()]);
+
         return Inertia::render('erp/inventory/index', [
             'inventory' => $inventory,
             'categories' => ProductCategory::pluck('name'),
+        ]);
+    }
+
+    public function edit(Product $product)
+    {
+        Log::info('Inventory: Editing product inventory.', ['action_user_id' => Auth::id(), 'product_id' => $product->id]);
+
+        return Inertia::render('erp/inventory/edit', [
+            'product' => $product->only(['id', 'name', 'slug', 'current_stock', 'minimum_stock']),
         ]);
     }
 }
