@@ -17,7 +17,7 @@ import erp from '@/routes/erp';
 import { ProductWithRelations } from '@/types/erp/product';
 import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { CircleDashed, EditIcon, Ellipsis } from 'lucide-react';
+import { ArrowDownUpIcon, BoxesIcon, CircleDashed, EditIcon, Ellipsis, EyeIcon } from 'lucide-react';
 
 export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWithRelations>> => [
     {
@@ -181,9 +181,24 @@ export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWi
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuGroup>
+                            <DropdownMenuItem disabled={!can('supply.show')} asChild>
+                                <Link className="block w-full" href={erp.inventory.show(row.original.slug)} as="button">
+                                    <ArrowDownUpIcon aria-hidden size={14} /> View Movements
+                                </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem disabled={!can('supply.edit')} asChild>
                                 <Link className="block w-full" href={erp.inventory.edit(row.original.slug)} as="button">
-                                    <EditIcon aria-hidden size={14} /> Edit
+                                    <BoxesIcon aria-hidden size={14} /> Adjust Stock
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled={!can('product.show')} asChild>
+                                <Link className="block w-full" href={erp.products.show(row.original.slug)} as="button">
+                                    <EyeIcon aria-hidden size={14} /> View Product
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled={!can('supply.edit')} asChild>
+                                <Link className="block w-full" href={erp.products.edit(row.original.slug)} as="button">
+                                    <EditIcon aria-hidden size={14} /> Edit Product
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
