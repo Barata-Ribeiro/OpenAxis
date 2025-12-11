@@ -1,5 +1,7 @@
 import type { ImageSources } from '@/types/index';
+import type { InventoryMovementType } from '../application/enums';
 import type { Media } from '../application/media';
+import type { User } from '../application/user';
 import type { ProductCategory } from './product-category';
 
 export interface Product {
@@ -22,7 +24,24 @@ export interface Product {
     deleted_at: string;
 }
 
-interface ProductWithRelations extends Product {
+export interface ProductWithRelations extends Product {
     category: Partial<ProductCategory>;
     media?: Media[];
+}
+
+export interface StockMovement {
+    id: number;
+    product_id: number;
+    user_id: number;
+    movement_type: InventoryMovementType;
+    quantity: number;
+    reason: string | null;
+    reference: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface StockMovementWithRelations extends StockMovement {
+    product: Partial<Product>;
+    user: Partial<User>;
 }
