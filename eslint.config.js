@@ -9,7 +9,8 @@ import typescript from 'typescript-eslint';
 export default [
     js.configs.recommended,
     reactHooks.configs.flat.recommended,
-    ...typescript.configs.recommended,
+    ...typescript.configs.strict,
+    ...typescript.configs.stylistic,
     {
         ...react.configs.flat.recommended,
         ...react.configs.flat['jsx-runtime'], // Required for React 17+
@@ -17,11 +18,15 @@ export default [
             globals: {
                 ...globals.browser,
             },
+            parserOptions: {
+                parser: '@typescript-eslint/parser',
+            },
         },
         rules: {
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
             'react/no-unescaped-entities': 'off',
+            '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
         },
         settings: {
             react: {
