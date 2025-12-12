@@ -1,4 +1,4 @@
-import { RoleNames } from './enums';
+import type { RoleNames } from '@/types/application/enums';
 
 type PermissionAction = 'index' | 'show' | 'create' | 'edit' | 'destroy';
 

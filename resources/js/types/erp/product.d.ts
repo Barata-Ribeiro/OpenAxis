@@ -1,8 +1,8 @@
+import type { Media } from '@/types/application/media';
+import type { User } from '@/types/application/user';
+import type { InventoryMovementType } from '@/types/erp/erp-enums';
+import type { ProductCategory } from '@/types/erp/product-category';
 import type { ImageSources } from '@/types/index';
-import type { InventoryMovementType } from '../application/enums';
-import type { Media } from '../application/media';
-import type { User } from '../application/user';
-import type { ProductCategory } from './product-category';
 
 export interface Product {
     id: number;

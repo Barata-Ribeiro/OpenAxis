@@ -1,5 +1,5 @@
 import type { Address } from '@/types/application/address';
-import { ClientType } from './erp-enums';
+import type { ClientType } from '@/types/erp/erp-enums';
 
 export interface Client {
     id: number;

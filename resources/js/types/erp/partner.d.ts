@@ -1,5 +1,5 @@
 import type { Address } from '@/types/application/address';
-import { PartnerTypes } from '../application/enums';
+import type { PartnerTypes } from '@/types/erp/erp-enums';
 
 export interface Partner {
     id: number;

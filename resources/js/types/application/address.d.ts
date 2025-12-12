@@ -1,4 +1,4 @@
-import { AddressTypes } from './enums';
+import type { AddressTypes } from './enums';
 
 export interface Address {
     id: number;

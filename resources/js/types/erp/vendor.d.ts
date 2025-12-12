@@ -1,4 +1,4 @@
-import { User, UserWithRelations } from '../application/user';
+import type { User, UserWithRelations } from '@/types/application/user';
 
 export interface Vendor {
     id: number;

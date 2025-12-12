@@ -1,6 +1,6 @@
-import { PurchaseOrderStatus } from '../application/enums';
-import type { User } from '../application/user';
-import type { Partner } from './partner';
+import type { User } from '@/types/application/user';
+import type { PurchaseOrderStatus } from '@/types/erp/erp-enums';
+import type { Partner } from '@/types/erp/partner';
 
 export interface PurchaseOrder {
     id: number;
