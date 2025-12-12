@@ -80,6 +80,21 @@ class InventoryController extends Controller
         ]);
     }
 
+    public function create(QueryRequest $request)
+    {
+        Log::info('Inventory: Accessed inventory adjustment creation page.', ['action_user_id' => Auth::id()]);
+
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        $products = $this->inventoryService->getProductsForSelect($search);
+
+        return Inertia::render('erp/inventory/create', [
+            'products' => Inertia::scroll(fn () => $products),
+        ]);
+    }
+
     public function edit(Product $product)
     {
         Log::info('Inventory: Editing product inventory.', ['action_user_id' => Auth::id(), 'product_id' => $product->id]);

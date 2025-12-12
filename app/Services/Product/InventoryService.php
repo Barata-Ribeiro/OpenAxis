@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\StockMovement;
 use Auth;
 use DB;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
 
@@ -119,5 +120,33 @@ class InventoryService implements InventoryServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function getProductsForSelect(?string $search): CursorPaginator
+    {
+        $isSql = $this->isSqlDriver;
+
+        $paginator = Product::query()
+            ->select(['id', 'name', 'sku', 'description'])
+            ->when($search, function ($qr) use ($search, $isSql) {
+                if ($isSql) {
+                    $booleanQuery = Helpers::buildBooleanQuery($search);
+                    $qr->whereFullText(['sku', 'name', 'description'], $booleanQuery, ['mode' => 'boolean']);
+                } else {
+                    $qr->where(function ($q) use ($search) {
+                        $q->whereLike('sku', "%$search%")
+                            ->orWhereLike('name', "%$search%")
+                            ->orWhereLike('description', "%$search%");
+                    });
+                }
+            })
+            ->whereIsActive(true)
+            ->cursorPaginate(10);
+
+        foreach ($paginator->items() as $item) {
+            $item->makeHidden(['sku', 'description'])->setAppends([]);
+        }
+
+        return $paginator;
     }
 }

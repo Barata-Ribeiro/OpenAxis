@@ -4,6 +4,7 @@ namespace App\Interfaces\product;
 
 use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Models\Product;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface InventoryServiceInterface
@@ -50,4 +51,6 @@ interface InventoryServiceInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator Paginated collection of StockMovement models.
      */
     public function getPaginatedStockMovements(?int $productId, ?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    public function getProductsForSelect(?string $search): CursorPaginator;
 }
