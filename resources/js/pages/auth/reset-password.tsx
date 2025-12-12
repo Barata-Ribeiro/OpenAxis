@@ -1,17 +1,16 @@
-import { update } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
-
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
+import { Spinner } from '@/components/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import AuthLayout from '@/layouts/auth-layout';
+import { update } from '@/routes/password';
+import { Form, Head } from '@inertiajs/react';
 import { InfoIcon } from 'lucide-react';
 import { Activity } from 'react';
+
 interface ResetPasswordProps {
     token: string;
     email: string;

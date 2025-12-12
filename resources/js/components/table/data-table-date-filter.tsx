@@ -1,15 +1,14 @@
 'use no memo';
 
-import type { Column } from '@tanstack/react-table';
-import { CalendarIcon, XCircle } from 'lucide-react';
-import type { DateRange } from 'react-day-picker';
-
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import type { Column } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { MouseEvent, useCallback, useMemo } from 'react';
+import { CalendarIcon, XCircle } from 'lucide-react';
+import { type MouseEvent, useCallback, useMemo } from 'react';
+import type { DateRange } from 'react-day-picker';
 
 type DateSelection = Date[] | DateRange;
 

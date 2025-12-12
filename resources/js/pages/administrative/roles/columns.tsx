@@ -1,6 +1,6 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,14 +16,14 @@ import { usePermission } from '@/hooks/use-permission';
 import { normalizeString } from '@/lib/utils';
 import administrative from '@/routes/administrative';
 import { RoleNames } from '@/types/application/enums';
-import { Role } from '@/types/application/role-permission';
+import type { Role } from '@/types/application/role-permission';
 import { Link } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { DeleteIcon, EditIcon, Ellipsis, InfinityIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export const columns: Array<ColumnDef<Role>> = [
+export const columns: ColumnDef<Role>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

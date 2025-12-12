@@ -1,7 +1,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import useIsMounted from '@/hooks/use-mounted';
-import { SharedData } from '@/types';
+import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';

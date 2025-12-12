@@ -2,14 +2,14 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { columns } from '@/pages/erp/vendors/columns';
 import erp from '@/routes/erp';
-import { BreadcrumbItem, PaginationMeta } from '@/types';
-import { VendorWithRelations } from '@/types/erp/vendor';
+import type { BreadcrumbItem, PaginationMeta } from '@/types';
+import type { VendorWithRelations } from '@/types/erp/vendor';
 import { Head } from '@inertiajs/react';
-import { columns } from './column';
 
 interface IndexPageProps {
-    vendors: PaginationMeta<Array<VendorWithRelations>>;
+    vendors: PaginationMeta<VendorWithRelations[]>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Vendors', href: erp.vendors.index().url }];

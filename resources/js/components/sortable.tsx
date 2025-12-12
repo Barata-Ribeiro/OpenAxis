@@ -16,12 +16,12 @@ export interface ImageFile {
     error?: string;
 }
 
-type SortableImage = {
+interface SortableImage {
     id: string;
     src: string;
     alt: string;
     type: 'default' | 'uploaded';
-};
+}
 
 interface ImageUploadProps {
     maxFiles?: number;

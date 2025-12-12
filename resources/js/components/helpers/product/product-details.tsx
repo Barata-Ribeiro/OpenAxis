@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatCurrency } from '@/lib/utils';
-import { ProductWithRelations } from '@/types/erp/product';
+import type { ProductWithRelations } from '@/types/erp/product';
 import { AlertTriangleIcon, DollarSignIcon, LayersIcon, PackageIcon, PercentIcon, TagIcon } from 'lucide-react';
 import { Activity } from 'react';
 

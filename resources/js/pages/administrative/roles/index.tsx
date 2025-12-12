@@ -2,11 +2,11 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { columns } from '@/pages/administrative/roles/columns';
 import administrative from '@/routes/administrative';
-import { PaginationMeta } from '@/types';
-import { Role } from '@/types/application/role-permission';
+import { type PaginationMeta } from '@/types';
+import { type Role } from '@/types/application/role-permission';
 import { Head } from '@inertiajs/react';
-import { columns } from './column';
 
 interface IndexPageProps {
     roles: PaginationMeta<Role[]>;

@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { Product } from '@/types/erp/product';
+import type { BreadcrumbItem } from '@/types';
+import type { Product } from '@/types/erp/product';
 import { Head } from '@inertiajs/react';
 
 interface EditInventoryPageProps {

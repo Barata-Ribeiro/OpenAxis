@@ -6,7 +6,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { resolveUrl } from '@/lib/utils';
-import { type NavItem } from '@/types';
+import type { NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
 export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {

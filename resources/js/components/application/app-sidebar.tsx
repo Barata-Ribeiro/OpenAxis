@@ -1,13 +1,13 @@
+import AppLogoSvg from '@/components/application/app-logo-svg';
 import { NavFooter } from '@/components/navigation/nav-footer';
 import { NavMain } from '@/components/navigation/nav-main';
 import { NavSystem } from '@/components/navigation/nav-system';
 import { NavUser } from '@/components/navigation/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { type NavItem } from '@/types';
+import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BugIcon, Folder, LayoutGrid } from 'lucide-react';
-import AppLogoSvg from './app-logo-svg';
 
 const mainNavItems: NavItem[] = [
     {

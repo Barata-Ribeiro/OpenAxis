@@ -1,8 +1,5 @@
 'use no memo';
 
-import type { Column } from '@tanstack/react-table';
-import { Check, PlusCircle, XCircle } from 'lucide-react';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +14,9 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { Activity, MouseEvent, useCallback, useMemo, useState } from 'react';
+import type { Column } from '@tanstack/react-table';
+import { Check, PlusCircle, XCircle } from 'lucide-react';
+import { Activity, type MouseEvent, useCallback, useMemo, useState } from 'react';
 
 export interface Option {
     label: string;

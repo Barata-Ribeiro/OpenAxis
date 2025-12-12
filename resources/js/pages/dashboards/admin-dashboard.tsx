@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CountingNumber } from '@/components/ui/counting-number';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -23,9 +23,7 @@ interface SummaryData {
     [key: string]: StatusInfo | string;
 }
 
-interface Data {
-    [key: string]: SummaryData;
-}
+type Data = Record<string, SummaryData>;
 
 interface AdminDashboardProps {
     data: Data;

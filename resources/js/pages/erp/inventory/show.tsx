@@ -10,7 +10,7 @@ import { Head } from '@inertiajs/react';
 
 interface InventoryShowMovementsProps {
     product: Pick<Product, 'id' | 'name' | 'slug' | 'current_stock' | 'minimum_stock'>;
-    movements: PaginationMeta<Array<StockMovement>>;
+    movements: PaginationMeta<StockMovement[]>;
 }
 
 export default function InventoryShowMovements({ product, movements }: Readonly<InventoryShowMovementsProps>) {

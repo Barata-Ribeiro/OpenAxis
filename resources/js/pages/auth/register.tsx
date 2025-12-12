@@ -1,7 +1,3 @@
-import { login } from '@/routes';
-import { store } from '@/routes/register';
-import { Form, Head } from '@inertiajs/react';
-
 import TextLink from '@/components/common/text-link';
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
@@ -11,6 +7,9 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Spinner } from '@/components/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import AuthLayout from '@/layouts/auth-layout';
+import { login } from '@/routes';
+import { store } from '@/routes/register';
+import { Form, Head } from '@inertiajs/react';
 import { HelpCircle, InfoIcon } from 'lucide-react';
 import { Activity } from 'react';
 

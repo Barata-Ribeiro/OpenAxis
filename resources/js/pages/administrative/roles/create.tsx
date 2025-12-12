@@ -3,12 +3,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import administrative from '@/routes/administrative';
-import { BreadcrumbItem } from '@/types';
-import { Permission } from '@/types/application/role-permission';
+import type { BreadcrumbItem } from '@/types';
+import type { Permission } from '@/types/application/role-permission';
 import { Head } from '@inertiajs/react';
 
 interface CreateRolePageProps {
-    permissions: Array<Pick<Permission, 'id' | 'title' | 'name'>>;
+    permissions: Pick<Permission, 'id' | 'title' | 'name'>[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [

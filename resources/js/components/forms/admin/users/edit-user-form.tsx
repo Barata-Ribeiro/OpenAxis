@@ -1,14 +1,13 @@
-import administrative from '@/routes/administrative';
-import { Form, Link } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import administrative from '@/routes/administrative';
 import { RoleNames, roleLabel } from '@/types/application/enums';
-import { UserWithRelations } from '@/types/application/user';
+import type { UserWithRelations } from '@/types/application/user';
+import { Form, Link } from '@inertiajs/react';
 import { Activity, useRef } from 'react';
 
 interface EditUserFormProps {

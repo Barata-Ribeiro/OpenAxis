@@ -5,10 +5,10 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { RouteDefinition } from '@/wayfinder';
+import type { RouteDefinition } from '@/wayfinder';
 import { Link } from '@inertiajs/react';
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { FileDownIcon, FileSpreadsheet, FileTextIcon } from 'lucide-react';
 
 interface DataTableExportDataProps {

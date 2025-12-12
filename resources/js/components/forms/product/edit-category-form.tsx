@@ -1,15 +1,13 @@
-import erp from '@/routes/erp';
-import { Form, Link } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { ProductCategory } from '@/types/erp/product-category';
+import erp from '@/routes/erp';
+import type { ProductCategory } from '@/types/erp/product-category';
+import { Form, Link } from '@inertiajs/react';
 import { Activity } from 'react';
 
 interface EditCategoryFormProps {

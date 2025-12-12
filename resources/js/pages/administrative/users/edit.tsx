@@ -3,8 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import administrative from '@/routes/administrative';
-import { BreadcrumbItem } from '@/types';
-import { UserWithRelations } from '@/types/application/user';
+import type { BreadcrumbItem } from '@/types';
+import type { UserWithRelations } from '@/types/application/user';
 import { Head } from '@inertiajs/react';
 
 interface EditUserProps {

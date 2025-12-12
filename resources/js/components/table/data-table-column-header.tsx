@@ -1,8 +1,5 @@
 'use no memo';
 
-import { Column } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOffIcon } from 'lucide-react';
-
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -12,14 +9,16 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { Activity, ComponentProps } from 'react';
+import type { Column } from '@tanstack/react-table';
+import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOffIcon } from 'lucide-react';
+import { Activity, type ComponentProps } from 'react';
 
 interface DataTableColumnHeaderProps<TData, TValue> extends ComponentProps<typeof DropdownMenuTrigger> {
     column: Column<TData, TValue>;
     title: string;
 }
 
-export function DataTableColumnHeader<TData, TValue>({
+export default function DataTableColumnHeader<TData, TValue>({
     column,
     title,
     className,

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { ClipboardCheckIcon, ClipboardIcon } from 'lucide-react';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { toast } from 'sonner';
 
 interface RawCopyButtonProps {

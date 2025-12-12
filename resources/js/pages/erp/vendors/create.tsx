@@ -3,16 +3,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { User } from '@/types/application/user';
+import type { BreadcrumbItem } from '@/types';
+import type { User } from '@/types/application/user';
 import { Head } from '@inertiajs/react';
+
+interface CreateVendorPageProps {
+    users: User[];
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Vendors', href: erp.vendors.index().url },
     { title: 'New Vendor', href: erp.vendors.create().url },
 ];
 
-export default function CreateVendorPage({ users }: Readonly<{ users: Array<User> }>) {
+export default function CreateVendorPage({ users }: Readonly<CreateVendorPageProps>) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Vendor" />

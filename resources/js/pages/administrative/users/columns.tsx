@@ -1,7 +1,8 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import RoleBadge from '@/components/common/role-badge';
 import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
-import { Badge } from '@/components/ui/badge';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -12,17 +13,20 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useInitials } from '@/hooks/use-initials';
 import { usePermission } from '@/hooks/use-permission';
-import { normalizeString } from '@/lib/utils';
-import erp from '@/routes/erp';
-import { VendorWithRelations } from '@/types/erp/vendor';
-import { Link } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import administrative from '@/routes/administrative';
+import profile from '@/routes/profile';
+import type { SharedData } from '@/types';
+import { roleLabel, RoleNames } from '@/types/application/enums';
+import type { UserWithRelations } from '@/types/application/user';
+import { Link, usePage } from '@inertiajs/react';
+import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CalendarIcon, CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export const columns: Array<ColumnDef<VendorWithRelations>> = [
+export const columns: ColumnDef<UserWithRelations>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
@@ -31,58 +35,68 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
         size: 40,
     },
     {
-        accessorKey: 'first_name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="First Name" />,
-        cell: ({ row }) => row.original.first_name,
-        enableSorting: true,
-    },
+        accessorKey: 'name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+        cell: function Cell({ row }) {
+            const getInitials = useInitials();
 
-    {
-        accessorKey: 'last_name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Last Name" />,
-        cell: ({ row }) => row.original.last_name,
+            return (
+                <div className="inline-flex items-center gap-x-2">
+                    <Avatar className="size-6 overflow-hidden rounded-full">
+                        <AvatarImage
+                            src={row.original.avatar.src ?? ''}
+                            srcSet={row.original.avatar.srcSet ?? ''}
+                            alt={row.original.name}
+                            className="object-cover"
+                        />
+                        <AvatarFallback className="rounded-lg bg-neutral-200 text-xs text-black select-none dark:bg-neutral-700 dark:text-white">
+                            {getInitials(row.original.name)}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate font-medium">{row.getValue('name')}</span>
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
-        accessorKey: 'user.email',
+        accessorKey: 'email',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
         cell: ({ row }) => (
             <a
-                href={`mailto:${row.original.user.email}`}
-                aria-label={`Send email to ${row.original.user.email}`}
+                href={`mailto:${row.original.email}`}
+                aria-label={`Send email to ${row.original.email}`}
                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
             >
-                {row.original.user.email}
+                {row.getValue('email')}
             </a>
         ),
         enableSorting: true,
     },
     {
-        accessorKey: 'commission_rate',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Commission Rate" />,
-        cell: ({ row }) => `${row.original.commission_rate}%`,
-        enableSorting: true,
-    },
-    {
-        accessorKey: 'is_active',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        accessorKey: 'roles',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
         cell: function Cell({ row }) {
-            const isActive = row.original.is_active;
-            const statusLabel = isActive ? 'Active' : 'Inactive';
-            const statusVariant = isActive ? 'secondary' : 'destructive';
+            const rawRoles = row.original.roles;
+
+            if (!rawRoles || rawRoles.length === 0) {
+                return <span className="text-muted-foreground">No Roles</span>;
+            }
 
             return (
-                <Badge variant={statusVariant} className="select-none">
-                    {statusLabel}
-                </Badge>
+                <ul className="flex flex-wrap items-center gap-1">
+                    {rawRoles.map((role) => (
+                        <RoleBadge key={role.name} role={role} />
+                    ))}
+                </ul>
             );
         },
         meta: {
-            label: 'Active Status',
-            variant: 'select',
-            options: ['active', 'inactive'].map((status) => ({
-                label: normalizeString(status),
-                value: status === 'active' ? 'true' : 'false',
+            label: 'Roles',
+            variant: 'multiSelect',
+            options: Object.values(RoleNames).map((role) => ({
+                label: roleLabel(role),
+                value: role,
             })),
             icon: CircleDashed,
         },
@@ -120,11 +134,18 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
     {
         id: 'actions',
         cell: function Cell({ row }) {
-            const [open, setOpen] = useState(false);
+            const { auth } = usePage<SharedData>().props;
             const { can } = usePermission();
+            const [open, setOpen] = useState(false);
 
-            const nameToCopy = row.original.full_name;
-            const emailToCopy = row.original.user.email;
+            const isCurrentUser = auth.user?.id === row.original.id;
+            const canEditUser = can('user.edit') && !isCurrentUser;
+            const canDeleteUser = can('user.destroy') && !isCurrentUser;
+            const isDeleted = row.original.deleted_at !== null;
+
+            const nameToCopy = row.original.name;
+            const emailToCopy = row.original.email;
+            const editRoute = canEditUser ? administrative.users.edit(row.original.id) : profile.edit();
 
             return (
                 <>
@@ -142,7 +163,7 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
                             <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
                             <DropdownMenuGroup>
                                 <DropdownMenuItem asChild>
-                                    <DropdownMenuCopyButton content={nameToCopy}>Copy Full Name</DropdownMenuCopyButton>
+                                    <DropdownMenuCopyButton content={nameToCopy}>Copy Name</DropdownMenuCopyButton>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
                                     <DropdownMenuCopyButton content={emailToCopy}>Copy Email</DropdownMenuCopyButton>
@@ -151,19 +172,23 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuGroup>
-                                <DropdownMenuItem disabled={!can('vendor.show')} asChild>
-                                    <Link className="block w-full" href={erp.vendors.show(row.original.id)} as="button">
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        className="block w-full"
+                                        href={administrative.users.show(row.original.id)}
+                                        as="button"
+                                    >
                                         <EyeIcon aria-hidden size={14} /> View
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem disabled={!can('vendor.edit')} asChild>
-                                    <Link className="block w-full" href={erp.vendors.edit(row.original.id)} as="button">
+                                <DropdownMenuItem disabled={!can('user.edit')} asChild>
+                                    <Link className="block w-full" href={editRoute} as="button">
                                         <EditIcon aria-hidden size={14} /> Edit
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     variant="destructive"
-                                    disabled={!can('vendor.destroy')}
+                                    disabled={!canDeleteUser || isDeleted}
                                     onSelect={() => setOpen(true)}
                                 >
                                     <DeleteIcon aria-hidden size={14} /> Delete
@@ -176,9 +201,9 @@ export const columns: Array<ColumnDef<VendorWithRelations>> = [
                         open={open}
                         setOpen={setOpen}
                         title="Confirm Deletion"
-                        description={`Are you sure you want to soft delete vendor "${row.original.full_name}"? This action can be undone later.`}
+                        description={`Are you sure you want to soft delete user "${row.original.name}"? This action can be undone later.`}
                         method="delete"
-                        route={erp.vendors.destroy(row.original.id)}
+                        route={administrative.users.destroy(row.original.id)}
                     />
                 </>
             );

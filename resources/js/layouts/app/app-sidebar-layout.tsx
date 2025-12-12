@@ -2,8 +2,8 @@ import { AppContent } from '@/components/application/app-content';
 import { AppShell } from '@/components/application/app-shell';
 import { AppSidebar } from '@/components/application/app-sidebar';
 import { AppSidebarHeader } from '@/components/application/app-sidebar-header';
-import { type BreadcrumbItem } from '@/types';
-import { type PropsWithChildren } from 'react';
+import type { BreadcrumbItem } from '@/types';
+import type { PropsWithChildren } from 'react';
 
 export default function AppSidebarLayout({
     children,

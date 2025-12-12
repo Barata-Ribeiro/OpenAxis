@@ -2,14 +2,14 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { columns } from '@/pages/erp/payment-conditions/columns';
 import erp from '@/routes/erp';
-import { BreadcrumbItem, PaginationMeta } from '@/types';
-import { PaymentCondition } from '@/types/erp/payment-condition';
+import type { BreadcrumbItem, PaginationMeta } from '@/types';
+import type { PaymentCondition } from '@/types/erp/payment-condition';
 import { Head } from '@inertiajs/react';
-import { columns } from './columns';
 
 interface IndexPageProps {
-    paymentConditions: PaginationMeta<Array<PaymentCondition>>;
+    paymentConditions: PaginationMeta<PaymentCondition[]>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Payment Conditions', href: erp.paymentConditions.index().url }];

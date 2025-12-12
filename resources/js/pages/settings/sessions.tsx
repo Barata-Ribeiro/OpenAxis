@@ -6,7 +6,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { logout } from '@/routes';
 import { destroy, index as listSessions } from '@/routes/sessions';
 import type { BreadcrumbItem } from '@/types';
-import { Session } from '@/types/application/session';
+import type { Session } from '@/types/application/session';
 import { Head, Link, router } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
 

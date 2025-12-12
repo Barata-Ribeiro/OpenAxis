@@ -1,6 +1,6 @@
 import Heading from '@/components/common/heading';
 import useIsMounted from '@/hooks/use-mounted';
-import { ReactNode, type PropsWithChildren } from 'react';
+import { type ReactNode, type PropsWithChildren } from 'react';
 
 interface PageLayoutProps extends PropsWithChildren {
     title: string;

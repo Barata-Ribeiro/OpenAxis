@@ -1,20 +1,28 @@
-import { ColumnDef, flexRender, getCoreRowModel, SortingState, useReactTable } from '@tanstack/react-table';
-
+import DataTableExportData from '@/components/table/data-table-export-data';
+import DataTablePagination from '@/components/table/data-table-pagination';
+import DataTableToolbar from '@/components/table/data-table-toolbar';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import useIsMounted from '@/hooks/use-mounted';
 import { buildParams } from '@/lib/utils';
-import { PaginationMeta } from '@/types';
-import { RouteDefinition } from '@/wayfinder';
+import type { PaginationMeta } from '@/types';
+import type { RouteDefinition } from '@/wayfinder';
 import { Link, router, usePage } from '@inertiajs/react';
-import type { Column, ColumnFiltersState, Updater, VisibilityState } from '@tanstack/react-table';
+import {
+    type Column,
+    type ColumnDef,
+    type ColumnFiltersState,
+    type SortingState,
+    type Updater,
+    type VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
 import { ClipboardPlusIcon } from 'lucide-react';
 import { type CSSProperties, useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react';
-import { ButtonGroup } from '../ui/button-group';
-import DataTableExportData from './data-table-export-data';
-import { DataTablePagination } from './data-table-pagination';
-import { DataTableToolbar } from './data-table-toolbar';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];

@@ -1,6 +1,3 @@
-import erp from '@/routes/erp';
-import { Form, Link } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
@@ -9,7 +6,10 @@ import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet 
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { AddressTypes, PartnerTypes, addressTypeLabel, partnerTypeLabel } from '@/types/application/enums';
+import erp from '@/routes/erp';
+import { addressTypeLabel, AddressTypes } from '@/types/application/enums';
+import { partnerTypeLabel, PartnerTypes } from '@/types/erp/erp-enums';
+import { Form, Link } from '@inertiajs/react';
 import { Activity } from 'react';
 
 export default function NewSupplierForm() {

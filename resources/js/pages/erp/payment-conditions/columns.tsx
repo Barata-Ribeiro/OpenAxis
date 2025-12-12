@@ -1,11 +1,11 @@
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { normalizeString } from '@/lib/utils';
-import { PaymentCondition } from '@/types/erp/payment-condition';
-import { ColumnDef } from '@tanstack/react-table';
+import type { PaymentCondition } from '@/types/erp/payment-condition';
+import type { ColumnDef } from '@tanstack/react-table';
 import { CircleDashed } from 'lucide-react';
 
-export const columns: Array<ColumnDef<Required<PaymentCondition>>> = [
+export const columns: ColumnDef<Required<PaymentCondition>>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

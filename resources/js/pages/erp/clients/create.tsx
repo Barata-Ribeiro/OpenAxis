@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [

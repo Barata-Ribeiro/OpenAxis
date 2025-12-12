@@ -1,12 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+
+interface SalesIndexPageProps {
+    sales: unknown; // TODO: Define proper type for sales prop
+}
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Sales', href: erp.salesOrders.index().url }];
 
-export default function SalesIndexPage({ sales }) {
+export default function SalesIndexPage({ sales }: Readonly<SalesIndexPageProps>) {
     // TODO: Define proper type for sales prop
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

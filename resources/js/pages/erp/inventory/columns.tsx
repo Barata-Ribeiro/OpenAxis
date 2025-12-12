@@ -1,5 +1,5 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,12 +14,12 @@ import {
 import { usePermission } from '@/hooks/use-permission';
 import { formatCurrency, normalizeString } from '@/lib/utils';
 import erp from '@/routes/erp';
-import { ProductWithRelations } from '@/types/erp/product';
+import type { ProductWithRelations } from '@/types/erp/product';
 import { Link } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowDownUpIcon, BoxesIcon, CircleDashed, EditIcon, Ellipsis, EyeIcon } from 'lucide-react';
 
-export const getColumns = (categories: Array<string>): Array<ColumnDef<ProductWithRelations>> => [
+export const getColumns = (categories: string[]): ColumnDef<ProductWithRelations>[] => [
     {
         accessorKey: 'sku',
         header: ({ column }) => <DataTableColumnHeader column={column} title="SKU" />,

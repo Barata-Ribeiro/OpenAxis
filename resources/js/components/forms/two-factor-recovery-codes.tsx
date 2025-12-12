@@ -1,12 +1,12 @@
+import AlertError from '@/components/feedback/alert-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { Activity, useCallback, useEffect, useRef, useState } from 'react';
 import slugify from 'slugify';
-import AlertError from '../feedback/alert-error';
-import { Spinner } from '../ui/spinner';
 
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];

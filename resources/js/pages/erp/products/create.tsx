@@ -3,15 +3,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+
+interface CreateProductPageProps {
+    categories: string[];
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Products', href: erp.products.index().url },
     { title: 'New Product', href: erp.products.create().url },
 ];
 
-export default function CreateProductPage({ categories }: Readonly<{ categories: string[] }>) {
+export default function CreateProductPage({ categories }: Readonly<CreateProductPageProps>) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />

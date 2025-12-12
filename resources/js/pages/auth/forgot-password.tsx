@@ -1,8 +1,3 @@
-// Components
-import { login } from '@/routes';
-import { email } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
-
 import TextLink from '@/components/common/text-link';
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
@@ -10,6 +5,9 @@ import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import { login } from '@/routes';
+import { email } from '@/routes/password';
+import { Form, Head } from '@inertiajs/react';
 import { Activity } from 'react';
 
 export default function ForgotPassword({ status }: Readonly<{ status?: string }>) {

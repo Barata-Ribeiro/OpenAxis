@@ -7,10 +7,10 @@ import {
     DropdownMenuContent,
     DropdownMenuLabel,
     DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { normalizeString } from '@/lib/utils';
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
-import { Table } from '@tanstack/react-table';
+import type { Table } from '@tanstack/react-table';
 import { Settings2 } from 'lucide-react';
 
 export default function DataTableColumnVisibility<TData>({

@@ -1,11 +1,11 @@
+import { UserInfo } from '@/components/navigation/complement/user-info';
+import { UserMenuContent } from '@/components/navigation/complement/user-menu-content';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { type SharedData } from '@/types';
+import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
-import { UserInfo } from './complement/user-info';
-import { UserMenuContent } from './complement/user-menu-content';
 
 export function NavUser() {
     const { auth } = usePage<SharedData>().props;

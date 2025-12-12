@@ -31,7 +31,7 @@ export function buildParams(overrides: Record<string, string | number | boolean 
     for (const k of Object.keys(overrides)) {
         const v = overrides[k];
 
-        if (v === undefined || v === null || v === '') delete params[k];
+        if (v === undefined || v === null || v === '') params[k] = undefined;
         else params[k] = v;
     }
 

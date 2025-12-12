@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { buildParams } from '@/lib/utils';
-import { PaginationMeta } from '@/types';
+import type { PaginationMeta } from '@/types';
 import { router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-export function DataTablePagination<TData>({
+export default function DataTablePagination<TData>({
     pagination,
 }: Readonly<{ pagination: Omit<PaginationMeta<TData[]>, 'data'> }>) {
     const goToUrl = (url?: string | null) => {

@@ -1,13 +1,13 @@
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { InventoryMovementType, inventoryMovementTypeLabel } from '@/types/application/enums';
-import { StockMovement } from '@/types/erp/product';
-import { ColumnDef } from '@tanstack/react-table';
+import { InventoryMovementType, inventoryMovementTypeLabel } from '@/types/erp/erp-enums';
+import { type StockMovement } from '@/types/erp/product';
+import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns/format';
 import { CalendarIcon, CircleDashed } from 'lucide-react';
 
-export const columns: Array<ColumnDef<StockMovement>> = [
+export const columns: ColumnDef<StockMovement>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

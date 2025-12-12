@@ -1,6 +1,6 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export const columns: Array<ColumnDef<Client>> = [
+export const columns: ColumnDef<Client>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

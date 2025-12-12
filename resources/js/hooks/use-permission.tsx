@@ -1,5 +1,5 @@
-import { SharedData } from '@/types';
-import { Permission } from '@/types/application/role-permission';
+import type { SharedData } from '@/types';
+import type { Permission } from '@/types/application/role-permission';
 import { usePage } from '@inertiajs/react';
 
 export const usePermission = () => {
@@ -30,7 +30,7 @@ export const usePermission = () => {
      *   being available in the surrounding scope.
      * - The function is side-effect free and synchronous.
      */
-    const can = (...perms: Array<Permission['name']>) => isSuperAdmin || perms.some((perm) => permissions.has(perm));
+    const can = (...perms: Permission['name'][]) => isSuperAdmin || perms.some((perm) => permissions.has(perm));
 
     return { can };
 };

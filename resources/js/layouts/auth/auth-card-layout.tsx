@@ -2,7 +2,7 @@ import AppLogoSvg from '@/components/application/app-logo-svg';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 export default function AuthCardLayout({
     children,

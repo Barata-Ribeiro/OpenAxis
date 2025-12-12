@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ImageSources } from '@/types';
+import type { ImageSources } from '@/types';
 import { AnimatePresence, motion } from 'motion/react';
 import { Activity, useState } from 'react';
 

@@ -1,7 +1,7 @@
 import AppLogoIcon from '@/components/application/app-logo-icon';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
     title?: string;

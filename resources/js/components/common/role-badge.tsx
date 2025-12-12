@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { normalizeString } from '@/lib/utils';
-import { Role } from '@/types/application/role-permission';
+import type { Role } from '@/types/application/role-permission';
 
 export default function RoleBadge({ role }: Readonly<{ role: Pick<Role, 'name'> }>) {
     const badgeVariant = role.name === 'super-admin' ? 'default' : 'secondary';

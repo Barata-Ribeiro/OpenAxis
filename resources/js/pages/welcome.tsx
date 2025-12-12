@@ -1,11 +1,15 @@
 import AppLogoSvg from '@/components/application/app-logo-svg';
 import { Button } from '@/components/ui/button';
 import { dashboard, login, register } from '@/routes';
-import { type SharedData } from '@/types';
+import type { SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Activity } from 'react';
 
-export default function Welcome({ canRegister = true }: Readonly<{ canRegister?: boolean }>) {
+interface WelcomeProps {
+    canRegister?: boolean;
+}
+
+export default function Welcome({ canRegister = true }: Readonly<WelcomeProps>) {
     const { auth } = usePage<SharedData>().props;
 
     return (
@@ -78,7 +82,6 @@ export default function Welcome({ canRegister = true }: Readonly<{ canRegister?:
                         </div>
                     </main>
                 </div>
-                <div className="hidden h-14.5 lg:block"></div>
             </div>
         </>
     );

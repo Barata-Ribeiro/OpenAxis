@@ -6,7 +6,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Activity, Fragment } from 'react';
 import slugify from 'slugify';
@@ -29,7 +29,10 @@ export function Breadcrumbs({ breadcrumbs }: Readonly<{ breadcrumbs: BreadcrumbI
                                         </BreadcrumbLink>
                                     )}
                                 </BreadcrumbItem>
-                                {!isLast && <BreadcrumbSeparator />}
+
+                                <Activity mode={isLast ? 'hidden' : 'visible'}>
+                                    <BreadcrumbSeparator />
+                                </Activity>
                             </Fragment>
                         );
                     })}

@@ -6,8 +6,8 @@ import ProductMetadata from '@/components/helpers/product/product-metadata';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { ProductWithRelations } from '@/types/erp/product';
+import type { BreadcrumbItem } from '@/types';
+import type { ProductWithRelations } from '@/types/erp/product';
 import { Head } from '@inertiajs/react';
 import { motion } from 'motion/react';
 

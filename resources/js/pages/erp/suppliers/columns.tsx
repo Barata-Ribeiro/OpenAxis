@@ -1,6 +1,6 @@
 import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,14 +15,14 @@ import {
 import { usePermission } from '@/hooks/use-permission';
 import { normalizeString } from '@/lib/utils';
 import erp from '@/routes/erp';
-import { Partner } from '@/types/erp/partner';
+import type { Partner } from '@/types/erp/partner';
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CalendarIcon, CircleDashed, DeleteIcon, EditIcon, Ellipsis, EyeIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export const columns: Array<ColumnDef<Partner>> = [
+export const columns: ColumnDef<Partner>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

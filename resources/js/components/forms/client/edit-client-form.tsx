@@ -1,14 +1,13 @@
-import erp from '@/routes/erp';
-import { Form, Link } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Client } from '@/types/erp/client';
+import erp from '@/routes/erp';
+import type { Client } from '@/types/erp/client';
 import { ClientType, clientTypeLabel } from '@/types/erp/erp-enums';
+import { Form, Link } from '@inertiajs/react';
 import { Activity } from 'react';
 
 export default function NewClientForm({ client }: Readonly<{ client: Client }>) {

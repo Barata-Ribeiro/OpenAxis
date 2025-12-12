@@ -9,7 +9,7 @@ import { usePermission } from '@/hooks/use-permission';
 import { resolveUrl } from '@/lib/utils';
 import administrative from '@/routes/administrative';
 import erp from '@/routes/erp';
-import { NavGroup, SharedData } from '@/types';
+import type { NavGroup, SharedData } from '@/types';
 import { RoleNames } from '@/types/application/enums';
 import { Link, usePage } from '@inertiajs/react';
 import {

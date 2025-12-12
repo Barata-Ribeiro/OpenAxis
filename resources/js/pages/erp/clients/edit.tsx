@@ -3,13 +3,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { Client } from '@/types/erp/client';
+import type { BreadcrumbItem } from '@/types';
+import type { Client } from '@/types/erp/client';
 import { Head } from '@inertiajs/react';
 
-export default function EditClientPage({ client }: Readonly<{ client: Client }>) {
-    console.log(client);
+interface EditClientPageProps {
+    client: Client;
+}
 
+export default function EditClientPage({ client }: Readonly<EditClientPageProps>) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Clients', href: erp.clients.index().url },
         { title: `#${client.name}`, href: erp.clients.show(client.id).url },

@@ -1,24 +1,29 @@
 'use no memo';
 
+import DataTableColumnVisibility from '@/components/table/data-table-column-visibility';
+import { DataTableDateFilter } from '@/components/table/data-table-date-filter';
+import { DataTableFacetedFilter } from '@/components/table/data-table-faceted-filter';
+import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import { Form, Link } from '@inertiajs/react';
-import { Column, Table } from '@tanstack/react-table';
+import type { Column, Table } from '@tanstack/react-table';
 import { EraserIcon } from 'lucide-react';
 import { type ComponentProps, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Button } from '../ui/button';
-import { Spinner } from '../ui/spinner';
-import DataTableColumnVisibility from './data-table-column-visibility';
-import { DataTableDateFilter } from './data-table-date-filter';
-import { DataTableFacetedFilter } from './data-table-faceted-filter';
 
 interface DataTableToolbarProps<TData> extends ComponentProps<'div'> {
     table: Table<TData>;
     path: string;
 }
 
-export function DataTableToolbar<TData>({ table, className, path, ...props }: Readonly<DataTableToolbarProps<TData>>) {
+export default function DataTableToolbar<TData>({
+    table,
+    className,
+    path,
+    ...props
+}: Readonly<DataTableToolbarProps<TData>>) {
     const columns = table.getAllColumns().filter((column) => column.getCanFilter());
 
     return (

@@ -1,6 +1,3 @@
-import { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-
 import HeadingSmall from '@/components/common/heading-small';
 import AddressCard from '@/components/extras/address-card';
 import EmptyAddress from '@/components/extras/empties/empty-address';
@@ -8,7 +5,9 @@ import NewAddressModal from '@/components/extras/new-address-modal';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import profile from '@/routes/profile';
-import { Address } from '@/types/application/address';
+import type { BreadcrumbItem } from '@/types';
+import type { Address } from '@/types/application/address';
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

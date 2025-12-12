@@ -1,3 +1,4 @@
+import { UserInfo } from '@/components/navigation/complement/user-info';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -7,10 +8,9 @@ import {
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
-import { type User } from '@/types/application/user';
+import type { User } from '@/types/application/user';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';
-import { UserInfo } from './user-info';
 
 interface UserMenuContentProps {
     user: User;

@@ -1,8 +1,5 @@
-import SortableImageUpload, { ImageFile } from '@/components/sortable';
-import erp from '@/routes/erp';
-import { Form, Link } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
+import SortableImageUpload, { type ImageFile } from '@/components/sortable';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -12,7 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { ProductWithRelations } from '@/types/erp/product';
+import erp from '@/routes/erp';
+import type { ProductWithRelations } from '@/types/erp/product';
+import { Form, Link } from '@inertiajs/react';
 import { AlertCircleIcon } from 'lucide-react';
 import { Activity, useState } from 'react';
 

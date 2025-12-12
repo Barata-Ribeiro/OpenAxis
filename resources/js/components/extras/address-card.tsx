@@ -1,3 +1,4 @@
+import EditAddressModal from '@/components/extras/edit-address-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -9,12 +10,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import profile from '@/routes/profile';
-import { Address } from '@/types/application/address';
+import type { Address } from '@/types/application/address';
 import { addressTypeLabel } from '@/types/application/enums';
 import { Link } from '@inertiajs/react';
 import { MapPin, MoreVertical, Pencil, Star, StarIcon, Trash2 } from 'lucide-react';
 import { Activity, useState } from 'react';
-import EditAddressModal from './edit-address-modal';
 
 const getTypeVariant = (type: Address['type']) => {
     switch (type) {

@@ -1,5 +1,5 @@
 import administrative from '@/routes/administrative';
-import { Permission, Role } from '@/types/application/role-permission';
+import type { Permission, Role } from '@/types/application/role-permission';
 import { Deferred, Form, Link } from '@inertiajs/react';
 
 import InputError from '@/components/feedback/input-error';
@@ -17,7 +17,7 @@ import { Activity, useMemo } from 'react';
 
 interface EditRoleFormProps {
     role: Role;
-    permissions: Array<Pick<Permission, 'id' | 'title' | 'name'>>;
+    permissions: Pick<Permission, 'id' | 'title' | 'name'>[];
 }
 
 export default function EditRoleForm({ role, permissions }: Readonly<EditRoleFormProps>) {
@@ -30,7 +30,7 @@ export default function EditRoleForm({ role, permissions }: Readonly<EditRoleFor
                 acc[group].push(permission);
                 return acc;
             },
-            {} as Record<string, Array<Pick<Permission, 'id' | 'title' | 'name'>>>,
+            {} as Record<string, Pick<Permission, 'id' | 'title' | 'name'>[]>,
         );
     }, [permissions]);
 

@@ -3,13 +3,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { Vendor } from '@/types/erp/vendor';
+import type { BreadcrumbItem } from '@/types';
+import type { Vendor } from '@/types/erp/vendor';
 import { Head } from '@inertiajs/react';
 
-export default function EditVendorPage({ vendor }: Readonly<{ vendor: Vendor }>) {
-    console.log(vendor);
+interface EditVendorPageProps {
+    vendor: Vendor;
+}
 
+export default function EditVendorPage({ vendor }: Readonly<EditVendorPageProps>) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Vendors', href: erp.vendors.index().url },
         { title: `#${vendor.full_name}`, href: erp.vendors.show(vendor.id).url },

@@ -1,9 +1,3 @@
-import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field';
-import erp from '@/routes/erp';
-import { User } from '@/types/application/user';
-import { Deferred, Form, Link } from '@inertiajs/react';
-import { Activity, useState } from 'react';
-
 import InputError from '@/components/feedback/input-error';
 import InputSkeleton from '@/components/feedback/skeletons/input-skeleton';
 import { Button } from '@/components/ui/button';
@@ -11,13 +5,17 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Spinner } from '@/components/ui/spinner';
+import erp from '@/routes/erp';
+import type { User } from '@/types/application/user';
+import { Deferred, Form, Link } from '@inertiajs/react';
 import { Check, ChevronDownIcon, ChevronsUpDown } from 'lucide-react';
+import { Activity, useState } from 'react';
 
-export default function NewVendorForm({ users }: { users: Array<User> }) {
+export default function NewVendorForm({ users }: { users: User[] }) {
     // State for Date of Birth picker
     const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
     const [bodOpen, setBodOpen] = useState(false);

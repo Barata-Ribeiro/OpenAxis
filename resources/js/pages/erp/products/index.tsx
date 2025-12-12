@@ -2,14 +2,14 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { getColumns } from '@/pages/erp/products/columns';
 import erp from '@/routes/erp';
-import { BreadcrumbItem, PaginationMeta } from '@/types';
-import { ProductWithRelations } from '@/types/erp/product';
+import type { BreadcrumbItem, PaginationMeta } from '@/types';
+import type { ProductWithRelations } from '@/types/erp/product';
 import { Head } from '@inertiajs/react';
-import { getColumns } from './column';
 
 interface IndexPageProps {
-    products: PaginationMeta<Array<ProductWithRelations>>;
+    products: PaginationMeta<ProductWithRelations[]>;
     categories: string[];
 }
 

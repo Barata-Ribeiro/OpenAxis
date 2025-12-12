@@ -1,18 +1,16 @@
-import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field';
-import erp from '@/routes/erp';
-import { Vendor } from '@/types/erp/vendor';
-import { Form, Link } from '@inertiajs/react';
-import { Activity, useState } from 'react';
-
 import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Spinner } from '@/components/ui/spinner';
+import erp from '@/routes/erp';
+import type { Vendor } from '@/types/erp/vendor';
+import { Form, Link } from '@inertiajs/react';
 import { ChevronDownIcon } from 'lucide-react';
+import { Activity, useState } from 'react';
 
 export default function EditVendorForm({ vendor }: Readonly<{ vendor: Vendor }>) {
     // State for Date of Birth picker

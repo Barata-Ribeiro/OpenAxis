@@ -7,8 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Spinner } from '@/components/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import erp from '@/routes/erp';
-import { InventoryMovementType, inventoryMovementTypeLabel } from '@/types/application/enums';
-import { Product } from '@/types/erp/product';
+import { InventoryMovementType, inventoryMovementTypeLabel } from '@/types/erp/erp-enums';
+import { type Product } from '@/types/erp/product';
 import { Form, Link } from '@inertiajs/react';
 import { HelpCircle } from 'lucide-react';
 import { Activity } from 'react';

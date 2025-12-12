@@ -7,9 +7,9 @@ import { addresses, edit } from '@/routes/profile';
 import { index as sessions } from '@/routes/sessions';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
-import { type NavItem } from '@/types';
+import type { NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
     {

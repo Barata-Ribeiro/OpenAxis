@@ -1,11 +1,11 @@
-import { DataTableColumnHeader } from '@/components/table/data-table-column-header';
+import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { formatCurrency } from '@/lib/utils';
 import type { PurchaseOrderWithRelations } from '@/types/erp/purchase-order';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
-export const columns: Array<ColumnDef<PurchaseOrderWithRelations>> = [
+export const columns: ColumnDef<PurchaseOrderWithRelations>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,

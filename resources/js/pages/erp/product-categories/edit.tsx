@@ -3,11 +3,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { ProductCategory } from '@/types/erp/product-category';
+import type { BreadcrumbItem } from '@/types';
+import type { ProductCategory } from '@/types/erp/product-category';
 import { Head } from '@inertiajs/react';
 
-export default function EditCategoryPage({ category }: Readonly<{ category: ProductCategory }>) {
+interface EditCategoryPageProps {
+    category: ProductCategory;
+}
+
+export default function EditCategoryPage({ category }: Readonly<EditCategoryPageProps>) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Categories', href: erp.categories.index().url },
         { title: `#${category.name}`, href: erp.categories.edit(category.slug).url },

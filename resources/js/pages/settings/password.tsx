@@ -1,18 +1,17 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
-import InputError from '@/components/feedback/input-error';
-import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
-import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
-import { Form, Head } from '@inertiajs/react';
-import { Activity, useRef } from 'react';
-
 import HeadingSmall from '@/components/common/heading-small';
+import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/user-password';
+import type { BreadcrumbItem } from '@/types';
+import { Transition } from '@headlessui/react';
+import { Form, Head } from '@inertiajs/react';
+import { Activity, useRef } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

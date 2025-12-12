@@ -3,13 +3,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import administrative from '@/routes/administrative';
-import { BreadcrumbItem } from '@/types';
-import { Permission, Role } from '@/types/application/role-permission';
+import type { BreadcrumbItem } from '@/types';
+import type { Permission, Role } from '@/types/application/role-permission';
 import { Head } from '@inertiajs/react';
 
 interface EditRolePageProps {
     role: Role;
-    permissions: Array<Pick<Permission, 'id' | 'title' | 'name'>>;
+    permissions: Pick<Permission, 'id' | 'title' | 'name'>[];
 }
 
 export default function EditRolePage({ role, permissions }: Readonly<EditRolePageProps>) {

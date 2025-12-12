@@ -2,14 +2,14 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { getColumns } from '@/pages/erp/inventory/columns';
 import erp from '@/routes/erp';
-import { BreadcrumbItem, PaginationMeta } from '@/types';
-import { ProductWithRelations } from '@/types/erp/product';
+import type { BreadcrumbItem, PaginationMeta } from '@/types';
+import type { ProductWithRelations } from '@/types/erp/product';
 import { Head } from '@inertiajs/react';
-import { getColumns } from './columns';
 
 interface IndexPageProps {
-    inventory: PaginationMeta<Array<ProductWithRelations>>;
+    inventory: PaginationMeta<ProductWithRelations[]>;
     categories: string[];
 }
 
@@ -18,8 +18,6 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Inventory', href: erp.inventory
 export default function IndexPage({ inventory, categories }: Readonly<IndexPageProps>) {
     const { data, ...pagination } = inventory;
     const { can } = usePermission();
-
-    console.log({ data, pagination });
 
     const columns = getColumns(categories);
 

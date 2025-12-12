@@ -1,7 +1,3 @@
-import administrative from '@/routes/administrative';
-import { Permission } from '@/types/application/role-permission';
-import { Deferred, Form, Link } from '@inertiajs/react';
-
 import InputError from '@/components/feedback/input-error';
 import InputSkeleton from '@/components/feedback/skeletons/input-skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -13,11 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { normalizeString } from '@/lib/utils';
+import administrative from '@/routes/administrative';
+import type { Permission } from '@/types/application/role-permission';
+import { Deferred, Form, Link } from '@inertiajs/react';
 import { InfoIcon } from 'lucide-react';
 import { Activity, useMemo } from 'react';
 
 interface NewRoleFormProps {
-    permissions: Array<Pick<Permission, 'id' | 'title' | 'name'>>;
+    permissions: Pick<Permission, 'id' | 'title' | 'name'>[];
 }
 
 export default function NewRoleForm({ permissions }: Readonly<NewRoleFormProps>) {
@@ -30,7 +29,7 @@ export default function NewRoleForm({ permissions }: Readonly<NewRoleFormProps>)
                 acc[group].push(permission);
                 return acc;
             },
-            {} as Record<string, Array<Pick<Permission, 'id' | 'title' | 'name'>>>,
+            {} as Record<string, Pick<Permission, 'id' | 'title' | 'name'>[]>,
         );
     }, [permissions]);
 

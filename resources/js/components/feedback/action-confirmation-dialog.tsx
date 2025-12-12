@@ -8,10 +8,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { RouteDefinition } from '@/wayfinder';
-import { type Method } from '@inertiajs/core';
+import type { RouteDefinition } from '@/wayfinder';
+import type { Method } from '@inertiajs/core';
 import { Link } from '@inertiajs/react';
-import { Dispatch, SetStateAction } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
 
 interface ActionConfirmationDialogProps {
     title: string;

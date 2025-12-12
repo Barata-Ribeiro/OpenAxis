@@ -3,8 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import erp from '@/routes/erp';
-import { BreadcrumbItem } from '@/types';
-import { PartnerWithRelations } from '@/types/erp/partner';
+import type { BreadcrumbItem } from '@/types';
+import type { PartnerWithRelations } from '@/types/erp/partner';
 import { Head } from '@inertiajs/react';
 
 interface EditSupplierPageProps {

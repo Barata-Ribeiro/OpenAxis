@@ -1,9 +1,4 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import { send } from '@/routes/verification';
-import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Transition } from '@headlessui/react';
-import { Form, Head, Link, usePage } from '@inertiajs/react';
-
 import AvatarUpload from '@/components/avatar-upload';
 import HeadingSmall from '@/components/common/heading-small';
 import InputError from '@/components/feedback/input-error';
@@ -15,6 +10,10 @@ import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
+import { send } from '@/routes/verification';
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { Transition } from '@headlessui/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { BadgeCheckIcon } from 'lucide-react';
 import { Activity, useState } from 'react';
 
@@ -52,7 +51,7 @@ export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVeri
                             <>
                                 <Field data-invalid={!!errors.avatar}>
                                     <AvatarUpload
-                                        defaultAvatar={auth.user.avatar?.original}
+                                        defaultAvatar={auth.user.avatar.src ?? undefined}
                                         onFileChange={(file) =>
                                             setAvatarFile(file?.file instanceof File ? file.file : null)
                                         }

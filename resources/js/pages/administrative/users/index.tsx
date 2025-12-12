@@ -2,11 +2,11 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { columns } from '@/pages/administrative/users/columns';
 import administrative from '@/routes/administrative';
-import { BreadcrumbItem, PaginationMeta } from '@/types';
-import { UserWithRelations } from '@/types/application/user';
+import { type BreadcrumbItem, type PaginationMeta } from '@/types';
+import { type UserWithRelations } from '@/types/application/user';
 import { Head } from '@inertiajs/react';
-import { columns } from './column';
 
 interface IndexPageProps {
     users: PaginationMeta<UserWithRelations[]>;
