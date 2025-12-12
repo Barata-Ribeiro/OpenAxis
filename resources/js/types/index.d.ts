@@ -59,7 +59,7 @@ export interface PaginationMeta<T> {
 }
 
 export interface ScrollMeta<T> {
-    data: T[];
+    data: T;
     path: string;
     per_page: number;
     next_cursor?: string;
