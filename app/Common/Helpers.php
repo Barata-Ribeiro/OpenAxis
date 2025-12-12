@@ -8,34 +8,73 @@ use Carbon\Carbon;
 class Helpers
 {
     /**
-     * Build a boolean-mode search query from a raw input string.
+     * Build a boolean search query string from a raw user-provided query.
      *
-     * This method parses and normalizes a user-provided search string and returns
-     * a sanitized boolean-style query suitable for use in full-text search engines
-     * (for example, MySQL's MATCH ... AGAINST (... IN BOOLEAN MODE)).
+     * Normalizes and sanitizes the input for use with boolean-style search engines
+     * (for example MySQL fulltext boolean mode, or other boolean-capable backends).
+     * Typical transformations include trimming and collapsing whitespace, preserving
+     * quoted phrases, translating common logical operators (AND / OR / NOT) to the
+     * backend's expected symbols or syntax, and escaping or removing characters that
+     * would break boolean operators or allow injection.
      *
-     * The implementation is expected to:
-     *  - Trim and normalize whitespace,
-     *  - Preserve quoted phrases as single units,
-     *  - Apply or normalize boolean operators/flags for individual terms,
-     *  - Escape or remove characters that would break the target query syntax.
+     * The method returns a string that is safe to pass to a boolean search routine
+     * and makes minimal assumptions about the underlying search implementation.
+     * If the input contains no valid tokens or is only whitespace, an empty string
+     * is returned.
      *
-     * @param  string  $query  Raw user-provided search string.
-     * @return string A sanitized, normalized boolean-mode query string ready for use in full-text searches.
+     * Example inputs:
+     *  - 'apple banana'          => returns a space-separated/boolean-ready expression
+     *  - '"exact phrase" -bad'   => preserves phrase and exclusion operator
+     *
+     * @param  string  $query  Raw, user-supplied search query.
+     * @return string Sanitized, boolean-search-ready query string (may be empty).
      */
     public static function buildBooleanQuery(string $query): string
     {
-        $terms = preg_split('/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY);
+        $query = trim(preg_replace('/\s+/', ' ', $query ?? ''));
 
-        $booleanParts = array_map(function ($t) {
-            $t = preg_replace('/[+\-<>()~\"*]/', '', $t);
+        if (empty($query)) {
+            return '';
+        }
 
-            return $t !== '' ? '+'.$t.'*' : null;
-        }, $terms);
+        // Tokenize while preserving quoted phrases: "foo bar" baz -> ["foo bar", "baz"]
+        preg_match_all('/"[^"]*"|\S+/u', $query, $matches);
+        $tokens = $matches[0] ?? [];
 
-        $booleanParts = array_filter($booleanParts);
+        $booleanParts = [];
 
-        return $booleanParts ? implode(' ', $booleanParts) : $query;
+        foreach ($tokens as $token) {
+            $token = trim($token);
+
+            if (\strlen($token) >= 2 && $token[0] === '"' && substr($token, -1) === '"') {
+                $phrase = substr($token, 1, -1);
+                $phrase = preg_replace('/\s+/u', ' ', $phrase);
+
+                // Remove boolean-mode special chars; keep alphanumerics and spaces
+                $phrase = preg_replace('/[+\-><\(\)~*\"@]+/u', '', $phrase);
+                $phrase = trim($phrase);
+
+                if (! empty($phrase)) {
+                    $booleanParts[] = "+\"{$phrase}\"";
+                }
+
+                continue;
+            }
+
+            // Split on internal separators so it matches indexed terms.
+            $token = preg_replace('/(?<=\pL|\pN)[\-_\.\/:]+(?=\pL|\pN)/u', ' ', $token);
+
+            foreach (preg_split('/\s+/u', $token, -1, PREG_SPLIT_NO_EMPTY) as $part) {
+                $part = preg_replace('/[+\-<>()~"*]/u', '', $part);
+                $part = preg_replace('/[^\pL\pN_]+/u', '', $part);
+
+                if (! empty($part)) {
+                    $booleanParts[] = "+{$part}*";
+                }
+            }
+        }
+
+        return trim(implode(' ', $booleanParts));
     }
 
     /**
