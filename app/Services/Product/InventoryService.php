@@ -128,6 +128,8 @@ class InventoryService implements InventoryServiceInterface
 
         $paginator = Product::query()
             ->select(['id', 'name', 'sku', 'description'])
+            ->orderByDesc('id')
+            ->whereIsActive(true)
             ->when($search, function ($qr) use ($search, $isSql) {
                 if ($isSql) {
                     $booleanQuery = Helpers::buildBooleanQuery($search);
@@ -140,8 +142,8 @@ class InventoryService implements InventoryServiceInterface
                     });
                 }
             })
-            ->whereIsActive(true)
-            ->cursorPaginate(10);
+            ->cursorPaginate(10)
+            ->withQueryString();
 
         foreach ($paginator->items() as $item) {
             $item->makeHidden(['sku', 'description'])->setAppends([]);
