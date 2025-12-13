@@ -4,6 +4,7 @@ namespace App\Services\Common;
 
 use App\Interfaces\Common\DashboardServiceInterface;
 use App\Models\Client;
+use App\Models\Product;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
 use Concurrency;
@@ -36,7 +37,8 @@ class DashboardService implements DashboardServiceInterface
             $totalProfits,
             $totalCompletedBilling,
             $totalCompletedProfits,
-            $totalPendingProfits] = $this->runDashboardTasks([
+            $totalPendingProfits,
+            $inventoryAppreciation] = $this->runDashboardTasks([
                 fn () => $this->getTotalSales($year, $month),
                 fn () => $this->getTotalClients($year, $month),
                 fn () => $this->getTotalVendors($year, $month),
@@ -45,6 +47,7 @@ class DashboardService implements DashboardServiceInterface
                 fn () => $this->getTotalCompletedBilling($year, $month),
                 fn () => $this->getTotalCompletedProfits($year, $month),
                 fn () => $this->getTotalPendingProfits($year, $month),
+                fn () => $this->getInventoryAppreciation($year, $month),
             ]);
 
         return [
@@ -64,6 +67,7 @@ class DashboardService implements DashboardServiceInterface
             'inventoryAndCostsSummary' => [
                 'title' => 'Inventory and Costs Summary',
                 'totalPendingProfits' => $totalPendingProfits,
+                'inventoryAppreciation' => $inventoryAppreciation,
             ],
             'commissions' => [
                 'title' => 'Commissions',
@@ -337,6 +341,34 @@ class DashboardService implements DashboardServiceInterface
             'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
             'lastMonth' => $pastMonth,
             'positive' => $currentMonth >= $pastMonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    public function getInventoryAppreciation($year, $month): mixed
+    {
+        [$currentMonth, $pastmonth] = $this->runDashboardTasks([
+            fn () => Product::query()
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->whereIsActive(true)
+                ->where('current_stock', '>', 0)
+                ->sum(DB::raw('current_stock * selling_price')),
+            fn () => Product::query()
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month - 1)
+                ->whereIsActive(true)
+                ->where('current_stock', '>', 0)
+                ->sum(DB::raw('current_stock * selling_price')),
+        ]);
+
+        return [
+            'title' => 'Inventory Appreciation',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastmonth) / ($pastmonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastmonth,
+            'positive' => $currentMonth >= $pastmonth,
             'prefix' => '$',
             'suffix' => $currentMonth >= 1000000 ? 'M' : null,
         ];
