@@ -10,11 +10,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
             theme={theme as ToasterProps['theme']}
             className="toaster group"
             icons={{
-                success: <CircleCheckIcon aria-hidden size={16} />,
-                info: <InfoIcon aria-hidden size={16} />,
-                warning: <TriangleAlertIcon aria-hidden size={16} />,
-                error: <OctagonXIcon aria-hidden size={16} />,
-                loading: <Loader2Icon aria-hidden size={16} className="animate-spin" />,
+                success: <CircleCheckIcon className="size-4" />,
+                info: <InfoIcon className="size-4" />,
+                warning: <TriangleAlertIcon className="size-4" />,
+                error: <OctagonXIcon className="size-4" />,
+                loading: <Loader2Icon className="size-4 animate-spin" />,
             }}
             style={
                 {
@@ -24,8 +24,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
                     '--border-radius': 'var(--radius)',
                 } as React.CSSProperties
             }
-            richColors
-            closeButton
+            toastOptions={{
+                classNames: {
+                    toast: 'cn-toast',
+                },
+            }}
             {...props}
         />
     );

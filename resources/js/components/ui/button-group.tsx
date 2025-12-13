@@ -1,5 +1,5 @@
-import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Slot } from 'radix-ui';
 
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
@@ -10,9 +10,9 @@ const buttonGroupVariants = cva(
         variants: {
             orientation: {
                 horizontal:
-                    '[&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none',
+                    '[&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-md!',
                 vertical:
-                    'flex-col [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none',
+                    'flex-col [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none [&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-md!',
             },
         },
         defaultVariants: {
@@ -44,12 +44,12 @@ function ButtonGroupText({
 }: React.ComponentProps<'div'> & {
     asChild?: boolean;
 }) {
-    const Comp = asChild ? Slot : 'div';
+    const Comp = asChild ? Slot.Root : 'div';
 
     return (
         <Comp
             className={cn(
-                "flex items-center gap-2 rounded-md border bg-muted px-4 text-sm font-medium shadow-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+                "flex items-center gap-2 rounded-md border bg-muted px-2.5 text-sm font-medium shadow-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
                 className,
             )}
             {...props}
@@ -66,7 +66,10 @@ function ButtonGroupSeparator({
         <Separator
             data-slot="button-group-separator"
             orientation={orientation}
-            className={cn('relative !m-0 self-stretch bg-input data-[orientation=vertical]:h-auto', className)}
+            className={cn(
+                'relative self-stretch bg-input data-[orientation=horizontal]:mx-px data-[orientation=horizontal]:w-auto data-[orientation=vertical]:my-px data-[orientation=vertical]:h-auto',
+                className,
+            )}
             {...props}
         />
     );

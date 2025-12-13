@@ -27,7 +27,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot } from 'radix-ui';
 import * as React from 'react';
 
 interface KanbanContextProps<T> {
@@ -355,7 +355,7 @@ export interface KanbanColumnHandleProps {
 function KanbanColumnHandle({ asChild, className, children, cursor = true }: Readonly<KanbanColumnHandleProps>) {
     const { attributes, listeners, isDragging, disabled } = React.useContext(ColumnContext);
 
-    const Comp = asChild ? Slot : 'div';
+    const Comp = asChild ? Slot.Root : 'div';
 
     return (
         <Comp
@@ -404,7 +404,7 @@ function KanbanItem({ value, asChild = false, className, children, disabled }: R
         transform: CSS.Translate.toString(transform),
     } as React.CSSProperties;
 
-    const Comp = asChild ? Slot : 'div';
+    const Comp = asChild ? Slot.Root : 'div';
 
     const contextValue = React.useMemo(
         () => ({ listeners, isDragging: isItemDragging, disabled }),
@@ -439,7 +439,7 @@ export interface KanbanItemHandleProps {
 function KanbanItemHandle({ asChild, className, children, cursor = true }: Readonly<KanbanItemHandleProps>) {
     const { listeners, isDragging, disabled } = React.useContext(ItemContext);
 
-    const Comp = asChild ? Slot : 'div';
+    const Comp = asChild ? Slot.Root : 'div';
 
     return (
         <Comp
@@ -674,7 +674,7 @@ function SortableItem({ value, asChild = false, className, children, disabled }:
         transform: CSS.Translate.toString(transform),
     } as React.CSSProperties;
 
-    const Comp = asChild ? Slot : 'div';
+    const Comp = asChild ? Slot.Root : 'div';
 
     const contextValue = React.useMemo(
         () => ({ listeners, isDragging: isSortableDragging, disabled }),
@@ -709,7 +709,7 @@ export interface SortableItemHandleProps {
 function SortableItemHandle({ asChild, className, children, cursor = true }: Readonly<SortableItemHandleProps>) {
     const { listeners, isDragging, disabled } = React.useContext(SortableItemContext);
 
-    const Comp = asChild ? Slot : 'div';
+    const Comp = asChild ? Slot.Root : 'div';
 
     return (
         <Comp

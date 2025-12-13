@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@/lib/utils';
 import { animate, motion, useInView, type UseInViewOptions, useMotionValue } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
