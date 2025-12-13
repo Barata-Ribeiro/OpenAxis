@@ -76,6 +76,9 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
 
                                             const changeIndicatorType = info.positive ? 'success' : 'destructive';
 
+                                            const badgeLabel = `${info.positive ? 'Increased' : 'Decreased'} by ${formattedDelta} percent compared to last month`;
+                                            const valueLabel = `${info.title} is ${info.prefix ?? ''}${formatNumber(info.value)}${info.suffix ?? ''}, and ${badgeLabel}`;
+
                                             return (
                                                 <Card key={cardKey} className="p-4">
                                                     <CardHeader className="border-0">
@@ -85,7 +88,11 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                                     </CardHeader>
 
                                                     <CardContent className="space-y-2.5">
-                                                        <div className="flex items-center gap-2.5">
+                                                        <div
+                                                            className="flex items-center gap-2.5"
+                                                            aria-label={valueLabel}
+                                                            title={valueLabel}
+                                                        >
                                                             <CountingNumber
                                                                 from={0}
                                                                 to={info.value}
@@ -98,6 +105,8 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                                             <Badge
                                                                 className="select-none"
                                                                 variant={changeIndicatorType}
+                                                                aria-label={badgeLabel}
+                                                                title={badgeLabel}
                                                             >
                                                                 {valueChangeIndicator}
                                                                 {formattedDelta}%
