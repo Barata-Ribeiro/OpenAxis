@@ -37,7 +37,7 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="offcanvas" variant="sidebar">
+        <Sidebar collapsible="offExamples" variant="sidebar">
             <SidebarHeader>
                 <Link href={dashboard()} aria-label="Go to dashboard" title="Go to dashboard" prefetch>
                     <AppLogoSvg className="my-1 h-9 w-full" />
