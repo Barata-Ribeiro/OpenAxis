@@ -28,7 +28,9 @@ class DashboardController extends Controller
             case RoleEnum::SUPER_ADMIN->value:
                 $data = $this->dashboardService->getAdminDashboardData($yearMonth);
 
-                return Inertia::render('dashboards/admin-dashboard', ['data' => $data]);
+                return Inertia::render('dashboards/admin-dashboard', [
+                    'data' => Inertia::defer(fn () => $data, 'dashboard'),
+                ]);
             case RoleEnum::BUYER->value:
             case RoleEnum::VENDOR->value:
             case RoleEnum::FINANCE->value:
