@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\PaymentConditionRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\PaymentCondition;
 use App\Services\Management\PaymentConditionService;
+use Auth;
+use Exception;
 use Inertia\Inertia;
+use Log;
 
 class PaymentConditionController extends Controller
 {
@@ -34,8 +39,49 @@ class PaymentConditionController extends Controller
             $filters
         );
 
+        Log::info('Payment Condition: accessed index page', ['action_user_id' => Auth::id()]);
+
         return Inertia::render('erp/payment-conditions/index', [
             'paymentConditions' => $paymentConditions,
         ]);
+    }
+
+    public function create()
+    {
+        Log::info('Payment Condition: access creation form', ['action_user_id' => Auth::id()]);
+
+        return Inertia::render('erp/payment-conditions/create');
+    }
+
+    public function edit(PaymentCondition $paymentCondition)
+    {
+        Log::info('Payment Condition: access editing form', ['payment_condition_id' => $paymentCondition->id, 'action_user_id' => Auth::id()]);
+
+        return Inertia::render('erp/payment-conditions/edit', [
+            'paymentCondition' => $paymentCondition,
+        ]);
+    }
+
+    public function update(PaymentConditionRequest $request, PaymentCondition $paymentCondition)
+    {
+        $userId = Auth::id();
+
+        $validated = $request->validated();
+
+        try {
+            Log::info('Payment Condition: updating', ['payment_condition_id' => $paymentCondition->id, 'action_user_id' => Auth::id()]);
+
+            $paymentCondition->update($validated);
+
+            return to_route('erp.payment-conditions.index')->with('success', 'Payment condition updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Payment Condition: Error updating payment condition.', [
+                'action_user_id' => $userId,
+                'payment_condition_id' => $paymentCondition->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return to_route('erp.payment-conditions.index')->with('error', 'An error occurred while updating the payment condition.');
+        }
     }
 }
