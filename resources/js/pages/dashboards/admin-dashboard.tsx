@@ -1,3 +1,4 @@
+import AdminDashboardSkeleton from '@/components/feedback/skeletons/admin-dashboard-skeleton';
 import DashboardMonthYearForm from '@/components/forms/dashboard-month-year-form';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import { CountingNumber } from '@/components/ui/counting-number';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Deferred, Head } from '@inertiajs/react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
 interface StatusInfo {
@@ -26,7 +27,7 @@ interface SummaryData {
 type Data = Record<string, SummaryData>;
 
 interface AdminDashboardProps {
-    data: Data;
+    data?: Data;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -43,6 +44,8 @@ function formatNumber(n: number): string {
 }
 
 export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) {
+    const resolvedData: Data = data ?? {};
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -50,9 +53,9 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
             <section className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <DashboardMonthYearForm />
 
-                <div className="grid gap-6">
-                    {Object.entries(data).map(([summaryKey, summary]) => {
-                        return (
+                <Deferred data="data" fallback={<AdminDashboardSkeleton />}>
+                    <div className="grid gap-6">
+                        {Object.entries(resolvedData).map(([summaryKey, summary]) => (
                             <Card key={summaryKey} className="rounded-md bg-muted/50">
                                 <CardHeader>
                                     <CardTitle className="text-3xl">{summary.title}</CardTitle>
@@ -124,9 +127,9 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                         })}
                                 </CardContent>
                             </Card>
-                        );
-                    })}
-                </div>
+                        ))}
+                    </div>
+                </Deferred>
             </section>
         </AppLayout>
     );
