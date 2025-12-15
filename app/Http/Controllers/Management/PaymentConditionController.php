@@ -84,4 +84,25 @@ class PaymentConditionController extends Controller
             return to_route('erp.payment-conditions.index')->with('error', 'An error occurred while updating the payment condition.');
         }
     }
+
+    public function destroy(PaymentCondition $paymentCondition)
+    {
+        $userId = Auth::id();
+
+        try {
+            Log::info('Payment Condition: deleting', ['payment_condition_id' => $paymentCondition->id, 'action_user_id' => Auth::id()]);
+
+            $paymentCondition->delete();
+
+            return to_route('erp.payment-conditions.index')->with('success', 'Payment condition deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Payment Condition: Error deleting payment condition.', [
+                'action_user_id' => $userId,
+                'payment_condition_id' => $paymentCondition->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An error occurred while deleting the payment condition.');
+        }
+    }
 }
