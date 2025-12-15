@@ -16,6 +16,7 @@ import erp from '@/routes/erp';
 import type { PaymentCondition } from '@/types/erp/payment-condition';
 import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { CircleDashed, DeleteIcon, EditIcon, Ellipsis } from 'lucide-react';
 import { useState } from 'react';
 
@@ -83,6 +84,18 @@ export const columns: ColumnDef<Required<PaymentCondition>>[] = [
         },
         enableSorting: true,
         enableColumnFilter: true,
+    },
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+        cell: ({ row }) => format(row.original.created_at, 'PPpp'),
+        enableSorting: true,
+    },
+    {
+        accessorKey: 'updated_at',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
+        cell: ({ row }) => format(row.original.updated_at, 'PPpp'),
+        enableSorting: true,
     },
     {
         id: 'actions',
