@@ -2,7 +2,6 @@
 
 use App\Enums\RoleEnum;
 use App\Models\Client;
-use App\Models\User;
 use Carbon\Carbon;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
@@ -336,26 +335,3 @@ describe('tests for the "forceDestroy" method of Management/ClientController', f
         $this->assertDatabaseMissing('clients', ['id' => $targetClient->id]);
     });
 });
-
-function getUserWithRole(string $roleName): User
-{
-    return User::whereHas('roles', fn ($query) => $query->where('name', $roleName))->inRandomOrder()->first()
-        ?? User::factory()->create()->assignRole($roleName);
-}
-
-function getSuperAdmin(): User
-{
-    return User::where('email', config('app.admin_email'))->firstOrFail();
-}
-
-function generateValidIdentification(): string
-{
-    do {
-        $area = random_int(100, 899);
-    } while ($area === 666);
-
-    $group = random_int(1, 99);
-    $serial = random_int(1, 9999);
-
-    return sprintf('%03d%02d%04d', $area, $group, $serial);
-}

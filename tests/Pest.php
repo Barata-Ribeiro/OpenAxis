@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -41,7 +43,25 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function getUserWithRole(string $roleName): User
 {
-    // ..
+    return User::whereHas('roles', fn ($query) => $query->where('name', $roleName))->inRandomOrder()->first()
+        ?? User::factory()->create()->assignRole($roleName);
+}
+
+function getSuperAdmin(): User
+{
+    return User::where('email', config('app.admin_email'))->firstOrFail();
+}
+
+function generateValidIdentification(): string
+{
+    do {
+        $area = random_int(100, 899);
+    } while ($area === 666);
+
+    $group = random_int(1, 99);
+    $serial = random_int(1, 9999);
+
+    return sprintf('%03d%02d%04d', $area, $group, $serial);
 }
