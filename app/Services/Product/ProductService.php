@@ -3,7 +3,7 @@
 namespace App\Services\Product;
 
 use App\Common\Helpers;
-use App\Http\Requests\product\ProductRequest;
+use App\Http\Requests\Product\ProductRequest;
 use App\Interfaces\Product\ProductServiceInterface;
 use App\Models\Product;
 use App\Models\ProductCategory;

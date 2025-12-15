@@ -6,7 +6,7 @@ use App\Http\Controllers\Management\PurchaseOrderController;
 use App\Http\Controllers\Management\SalesOrderController;
 use App\Http\Controllers\Management\SupplierController;
 use App\Http\Controllers\Management\VendorController;
-use App\Http\Controllers\product\InventoryController;
+use App\Http\Controllers\Product\InventoryController;
 use App\Http\Controllers\Product\ProductCategoryController;
 use App\Http\Controllers\Product\ProductController;
 use Illuminate\Support\Facades\Route;

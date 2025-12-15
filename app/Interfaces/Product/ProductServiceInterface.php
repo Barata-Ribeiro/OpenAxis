@@ -2,7 +2,7 @@
 
 namespace App\Interfaces\Product;
 
-use App\Http\Requests\product\ProductRequest;
+use App\Http\Requests\Product\ProductRequest;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 

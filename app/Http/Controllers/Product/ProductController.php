@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\product\ProductRequest;
+use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
