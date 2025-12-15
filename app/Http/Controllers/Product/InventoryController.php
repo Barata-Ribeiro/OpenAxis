@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\product;
+namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Services\product\InventoryService;
+use App\Services\Product\InventoryService;
 use Auth;
 use Exception;
 use Inertia\Inertia;

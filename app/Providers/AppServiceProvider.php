@@ -77,8 +77,8 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \App\Interfaces\product\InventoryServiceInterface::class,
-            \App\Services\product\InventoryService::class
+            \App\Interfaces\Product\InventoryServiceInterface::class,
+            \App\Services\Product\InventoryService::class
         );
     }
 

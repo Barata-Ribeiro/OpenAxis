@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\product;
+namespace App\Services\Product;
 
 use App\Common\Helpers;
 use App\Http\Requests\Product\AdjustInventoryRequest;
-use App\Interfaces\product\InventoryServiceInterface;
+use App\Interfaces\Product\InventoryServiceInterface;
 use App\Models\Product;
 use App\Models\StockMovement;
 use Auth;

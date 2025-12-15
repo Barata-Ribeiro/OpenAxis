@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interfaces\product;
+namespace App\Interfaces\Product;
 
 use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Models\Product;
@@ -52,5 +52,14 @@ interface InventoryServiceInterface
      */
     public function getPaginatedStockMovements(?int $productId, ?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
 
+    /**
+     * Retrieve a cursor-paginated list of products suitable for populating select inputs.
+     *
+     * Results are filtered by an optional search term (e.g., product name, SKU or other searchable fields).
+     * Implementations should return lightweight records appropriate for option lists (commonly id and label).
+     *
+     * @param  string|null  $search  Optional search term to filter products. Pass null to return the default set.
+     * @return CursorPaginator Cursor-paginated collection of products for use in select controls.
+     */
     public function getProductsForSelect(?string $search): CursorPaginator;
 }
