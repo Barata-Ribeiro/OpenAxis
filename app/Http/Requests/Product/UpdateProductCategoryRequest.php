@@ -27,7 +27,7 @@ class UpdateProductCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:100', Rule::unique(ProductCategory::class)->ignore($this->category->id)],
+            'name' => ['required', 'string', 'max:100', Rule::unique(ProductCategory::class)->ignore($this->route('product_category')->id ?? $this->route('product_category'))],
             'description' => ['required', 'string'],
             'is_active' => ['required', 'boolean'],
         ];

@@ -29,7 +29,7 @@ class EditUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'string', 'email', 'max:320', Rule::unique(User::class)->ignore($this->user->id)],
+            'email' => ['required', 'string', 'email', 'max:320', Rule::unique(User::class)->ignore($this->route('user')->id ?? $this->route('user'))],
             'password' => ['sometimes', 'nullable', Password::defaults(), 'confirmed'],
             'role' => ['required', 'string', 'exists:roles,name'],
         ];

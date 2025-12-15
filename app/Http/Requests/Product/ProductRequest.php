@@ -27,7 +27,7 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sku' => ['required', 'string', 'max:50', Rule::unique(Product::class)->ignore($this->product)],
+            'sku' => ['required', 'string', 'max:50', Rule::unique(Product::class)->ignore($this->route('product')->id ?? $this->route('product'))],
             'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string'],
             'cost_price' => ['required', 'numeric', 'min:0'],

@@ -27,7 +27,7 @@ class PaymentConditionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['request', 'string', 'max:20', Rule::unique(PaymentCondition::class)->ignore($this->payment_condition()?->id)],
+            'code' => ['request', 'string', 'max:20', Rule::unique(PaymentCondition::class)->ignore($this->route('payment_condition')->id ?? $this->route('payment_condition'))],
             'name' => ['required', 'string', 'max:100'],
             'days_until_due' => ['required', 'integer', 'min:0'],
             'installments' => ['required', 'integer', 'min:1'],
