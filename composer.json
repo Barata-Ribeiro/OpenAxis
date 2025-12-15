@@ -13,13 +13,13 @@
         "asika/agent": "^2.7",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.32",
-        "laravel/framework": "^12.41",
-        "laravel/telescope": "^5.15",
+        "laravel/framework": "^12.42",
+        "laravel/telescope": "^5.16",
         "laravel/tinker": "^2.10",
         "laravel/wayfinder": "^0.1",
         "owen-it/laravel-auditing": "^14.0",
         "spatie/laravel-medialibrary": "^11.17",
-        "spatie/laravel-permission": "^6.23"
+        "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
@@ -28,7 +28,7 @@
         "laravel/boost": "^1.8",
         "laravel/pail": "^1.2",
         "laravel/pint": "^1.26",
-        "laravel/sail": "^1.50",
+        "laravel/sail": "^1.51",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.8",
         "pestphp/pest": "^4.1",
