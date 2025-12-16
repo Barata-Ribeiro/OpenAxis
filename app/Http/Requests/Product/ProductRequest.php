@@ -16,7 +16,13 @@ class ProductRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('product.create') || $user->hasRole('super-admin');
+        $route = $this->route();
+
+        return match ($route->getName()) {
+            'erp.products.store' => $user->hasPermissionTo('product.create') || $user->hasRole('super-admin'),
+            'erp.products.update' => $user->hasPermissionTo('product.edit') || $user->hasRole('super-admin'),
+            default => false,
+        };
     }
 
     /**
@@ -27,7 +33,7 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sku' => ['required', 'string', 'max:50', Rule::unique(Product::class)->ignore($this->route('product')->id ?? $this->route('product'))],
+            'sku' => ['required', 'string', 'max:50', Rule::unique(Product::class)->ignore($this->route('product')?->id)],
             'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string'],
             'cost_price' => ['required', 'numeric', 'min:0'],
