@@ -16,7 +16,13 @@ class RoleRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('role.create') || $user->hasRole('super-admin');
+        $route = $this->route();
+
+        return match ($route->getName()) {
+            'administrative.roles.store' => $user->hasPermissionTo('role.create') || $user->hasRole('super-admin'),
+            'administrative.roles.update' => $user->hasPermissionTo('role.edit') || $user->hasRole('super-admin'),
+            default => false,
+        };
     }
 
     /**
@@ -27,7 +33,7 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique(Role::class)->ignore($this->route('role')->id ?? $this->route('role'))],
+            'name' => ['required', 'string', 'max:255', Rule::unique(Role::class)->ignore($this->route('role')?->id)],
             'permissions' => ['array', 'min:1'],
             'permissions.*' => ['string', 'exists:permissions,name'],
         ];
