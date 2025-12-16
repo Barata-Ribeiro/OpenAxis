@@ -15,7 +15,13 @@ class SupplierRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('supplier.create') || $user->hasRole('super-admin');
+        $route = $this->route();
+
+        return match ($route->getName()) {
+            'erp.suppliers.store' => $user->hasPermissionTo('supplier.create') || $user->hasRole('super-admin'),
+            'erp.suppliers.update' => $user->hasPermissionTo('supplier.edit') || $user->hasRole('super-admin'),
+            default => false,
+        };
     }
 
     /**
