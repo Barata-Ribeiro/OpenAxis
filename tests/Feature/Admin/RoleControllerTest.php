@@ -16,7 +16,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
     });
 
     test('authenticated admin users can visit the role administration page', function () {
-        $admin = User::where('email', config('app.admin_email'))->first();
+        $admin = getSuperAdmin();
 
         $this->actingAs($admin);
 
@@ -24,7 +24,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
     });
 
     test('role administration page displays roles', function () use ($componentName) {
-        $this->actingAs($user = User::where('email', config('app.admin_email'))->first());
+        $this->actingAs($user = getSuperAdmin());
 
         $response = $this->get(route('administrative.roles.index'));
 
@@ -36,7 +36,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
     });
 
     test('role administration page supports search', function () use ($componentName) {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $searchRole = Role::create(['name' => 'UniqueRole123']);
 
@@ -50,7 +50,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
     });
 
     test('role administration page supports sorting', function () use ($componentName) {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->get(route('administrative.roles.index', ['sort_by' => 'name', 'sort_dir' => 'desc']));
 
@@ -62,7 +62,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
     });
 
     test('role administration page supports pagination', function () use ($componentName) {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $guard = config('auth.defaults.guard', 'web');
 
@@ -81,7 +81,7 @@ describe('tests for the "index" method of Admin\RoleController', function () {
     });
 
     test('role administration page handles invalid sort parameters gracefully', function () use ($componentName) {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->get(route('administrative.roles.index', ['sort_by' => 'invalid_column', 'sort_dir' => 'asc']));
 
@@ -103,7 +103,7 @@ describe('tests for the "create" method of Admin\RoleController', function () {
     });
 
     test('authenticated admin users can access the role creation form', function () {
-        $admin = User::where('email', config('app.admin_email'))->first();
+        $admin = getSuperAdmin();
 
         $this->actingAs($admin);
 
@@ -111,7 +111,7 @@ describe('tests for the "create" method of Admin\RoleController', function () {
     });
 
     test('role creation form loads permissions', function () use ($componentName) {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->get(route('administrative.roles.create'));
 
@@ -134,7 +134,7 @@ describe('tests for the "store" method of Admin\RoleController', function () {
     });
 
     test('authenticated admin can create a role', function () {
-        $admin = User::where('email', config('app.admin_email'))->first();
+        $admin = getSuperAdmin();
 
         $this->actingAs($admin);
 
@@ -153,7 +153,7 @@ describe('tests for the "store" method of Admin\RoleController', function () {
     });
 
     test('role creation fails with invalid data', function () {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->post(route('administrative.roles.store'), ['name' => '']);
 
@@ -162,7 +162,7 @@ describe('tests for the "store" method of Admin\RoleController', function () {
     });
 
     test('role creation handles exceptions gracefully', function () {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->post(route('administrative.roles.store'), ['name' => str_repeat('a', 256)]);
 
@@ -183,7 +183,7 @@ describe('tests for the "edit" method of Admin\RoleController', function () {
     });
 
     test('authenticated admin can access the role edit form', function () {
-        $admin = User::where('email', config('app.admin_email'))->first();
+        $admin = getSuperAdmin();
 
         $this->actingAs($admin);
 
@@ -193,7 +193,7 @@ describe('tests for the "edit" method of Admin\RoleController', function () {
     });
 
     test('super admin role cannot be edited', function () {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $superAdminRole = Role::where('name', RoleEnum::SUPER_ADMIN->value)->first();
 
@@ -204,7 +204,7 @@ describe('tests for the "edit" method of Admin\RoleController', function () {
     });
 
     test('role edit form loads role and permissions', function () use ($componentName) {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $role = Role::create(['name' => 'Test Role']);
         $permission = Permission::create(['name' => 'test.permission', 'title' => 'Test Permission', 'guard_name' => 'web']);
@@ -233,7 +233,7 @@ describe('tests for the "update" method of Admin\RoleController', function () {
     });
 
     test('authenticated admin can update a role', function () {
-        $admin = User::where('email', config('app.admin_email'))->first();
+        $admin = getSuperAdmin();
 
         $this->actingAs($admin);
 
@@ -253,7 +253,7 @@ describe('tests for the "update" method of Admin\RoleController', function () {
 
     test('role update fails with invalid data', function () {
         $role = Role::create(['name' => 'Test Role']);
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->patch(route('administrative.roles.update', $role), ['name' => '']);
 
@@ -263,7 +263,7 @@ describe('tests for the "update" method of Admin\RoleController', function () {
 
     test('role update handles exceptions gracefully', function () {
         $role = Role::create(['name' => 'Test Role']);
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $response = $this->patch(route('administrative.roles.update', $role), ['name' => str_repeat('a', 256)]);
 
@@ -281,7 +281,7 @@ describe('tests for the "destroy" method of Admin\RoleController', function () {
     });
 
     test('authenticated admin can delete a role', function () {
-        $admin = User::where('email', config('app.admin_email'))->first();
+        $admin = getSuperAdmin();
 
         $this->actingAs($admin);
 
@@ -295,7 +295,7 @@ describe('tests for the "destroy" method of Admin\RoleController', function () {
     });
 
     test('protected roles cannot be deleted', function () {
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $protectedRole = Role::where('name', RoleEnum::SUPER_ADMIN->value)->first();
 
@@ -309,7 +309,7 @@ describe('tests for the "destroy" method of Admin\RoleController', function () {
 
     test('role deletion handles exceptions gracefully', function () {
         $role = Role::create(['name' => 'Test Role']);
-        $this->actingAs(User::where('email', config('app.admin_email'))->first());
+        $this->actingAs(getSuperAdmin());
 
         $this->delete(route('administrative.roles.destroy', $role))
             ->assertRedirect(route('administrative.roles.index'));
