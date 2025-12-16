@@ -19,7 +19,7 @@ interface EditPaymentConditionFormProps {
 export default function EditPaymentConditionForm({ paymentCondition }: Readonly<EditPaymentConditionFormProps>) {
     return (
         <Form
-            {...erp.paymentConditions.store.form()}
+            {...erp.paymentConditions.update.form(paymentCondition.code)}
             options={{ preserveScroll: true }}
             disableWhileProcessing
             className="space-y-6 inert:pointer-events-none inert:opacity-60 inert:grayscale-100"
