@@ -16,7 +16,13 @@ class PaymentConditionRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('finance.create') || $user->hasRole('super-admin');
+        $route = $this->route();
+
+        return match ($route->getName()) {
+            'erp.payment-conditions.store' => $user->hasPermissionTo('finance.create') || $user->hasRole('super-admin'),
+            'erp.payment-conditions.update' => $user->hasPermissionTo('finance.edit') || $user->hasRole('super-admin'),
+            default => false,
+        };
     }
 
     /**
@@ -27,7 +33,7 @@ class PaymentConditionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['request', 'string', 'max:20', Rule::unique(PaymentCondition::class)->ignore($this->route('payment_condition')->id ?? $this->route('payment_condition'))],
+            'code' => ['required', 'string', 'max:20', Rule::unique(PaymentCondition::class)->ignore($this->route('paymentCondition')?->id)],
             'name' => ['required', 'string', 'max:100'],
             'days_until_due' => ['required', 'integer', 'min:0'],
             'installments' => ['required', 'integer', 'min:1'],
@@ -37,15 +43,15 @@ class PaymentConditionRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        if ($this->filled('is_primary')) {
-            $isActive = $this->input('is_primary');
+        if ($this->filled('is_active')) {
+            $isActive = $this->input('is_active');
 
             $this->merge([
-                'is_primary' => filter_var($isActive, FILTER_VALIDATE_BOOLEAN),
+                'is_active' => filter_var($isActive, FILTER_VALIDATE_BOOLEAN),
             ]);
         } else {
             $this->merge([
-                'is_primary' => false,
+                'is_active' => false,
             ]);
         }
     }
