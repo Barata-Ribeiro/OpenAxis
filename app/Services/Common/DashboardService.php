@@ -38,6 +38,7 @@ class DashboardService implements DashboardServiceInterface
             $totalCompletedBilling,
             $totalCompletedProfits,
             $inventoryAppreciation,
+            $totalCosts,
             $totalPendingProfits,
             $totalCanceled
         ] = $this->runDashboardTasks([
@@ -49,6 +50,7 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalCompletedBilling($year, $month),
             fn () => $this->getTotalCompletedProfits($year, $month),
             fn () => $this->getInventoryAppreciation($year, $month),
+            fn () => $this->getTotalCosts($year, $month),
             fn () => $this->getTotalPendingProfits($year, $month),
             fn () => $this->getTotalCanceled($year, $month),
         ]);
@@ -70,7 +72,7 @@ class DashboardService implements DashboardServiceInterface
             'inventoryAndCostsSummary' => [
                 'title' => 'Inventory and Costs Summary',
                 'inventoryAppreciation' => $inventoryAppreciation,
-                'totalCosts' => null, // Placeholder for future cost metrics
+                'totalCosts' => $totalCosts,
                 'totalPendingProfits' => $totalPendingProfits,
                 'totalCanceled' => $totalCanceled,
             ],
@@ -359,6 +361,49 @@ class DashboardService implements DashboardServiceInterface
             'delta' => round((($currentMonth - $pastmonth) / ($pastmonth ?: 1)) * 100, 2),
             'lastMonth' => $pastmonth,
             'positive' => $currentMonth >= $pastmonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
+     * Calculate total costs for a given year and optional month.
+     *
+     * Retrieves aggregated cost totals for the specified period. If a month is
+     * provided (1-12) the result is limited to that month; if no month is
+     * provided the result covers the entire year.
+     *
+     * @param  int|string  $year  Four-digit year (e.g. 2025).
+     * @param  int|string|null  $month  Optional month number (1-12). Pass null to compute totals for the whole year.
+     * @return float|int|array|null Numeric total (float or int) when a single value is returned,
+     *                              an associative array when results are grouped (e.g. by cost category),
+     *                              or null if no costs are found for the period.
+     *
+     * @throws \InvalidArgumentException If the year or month values are invalid.
+     */
+    public function getTotalCosts($year, $month): mixed
+    {
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
+            fn () => Product::query()
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->whereIsActive(true)
+                ->where('current_stock', '>', 0)
+                ->sum(DB::raw('current_stock * cost_price')),
+            fn () => Product::query()
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month - 1)
+                ->whereIsActive(true)
+                ->where('current_stock', '>', 0)
+                ->sum(DB::raw('current_stock * cost_price')),
+        ]);
+
+        return [
+            'title' => 'Total Costs',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonth,
+            'positive' => $currentMonth >= $pastMonth,
             'prefix' => '$',
             'suffix' => $currentMonth >= 1000000 ? 'M' : null,
         ];
