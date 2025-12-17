@@ -37,18 +37,21 @@ class DashboardService implements DashboardServiceInterface
             $totalProfits,
             $totalCompletedBilling,
             $totalCompletedProfits,
+            $inventoryAppreciation,
             $totalPendingProfits,
-            $inventoryAppreciation] = $this->runDashboardTasks([
-                fn () => $this->getTotalSales($year, $month),
-                fn () => $this->getTotalClients($year, $month),
-                fn () => $this->getTotalVendors($year, $month),
-                fn () => $this->getTotalOrders($year, $month),
-                fn () => $this->getTotalProfits($year, $month),
-                fn () => $this->getTotalCompletedBilling($year, $month),
-                fn () => $this->getTotalCompletedProfits($year, $month),
-                fn () => $this->getTotalPendingProfits($year, $month),
-                fn () => $this->getInventoryAppreciation($year, $month),
-            ]);
+            $totalCanceled
+        ] = $this->runDashboardTasks([
+            fn () => $this->getTotalSales($year, $month),
+            fn () => $this->getTotalClients($year, $month),
+            fn () => $this->getTotalVendors($year, $month),
+            fn () => $this->getTotalOrders($year, $month),
+            fn () => $this->getTotalProfits($year, $month),
+            fn () => $this->getTotalCompletedBilling($year, $month),
+            fn () => $this->getTotalCompletedProfits($year, $month),
+            fn () => $this->getInventoryAppreciation($year, $month),
+            fn () => $this->getTotalPendingProfits($year, $month),
+            fn () => $this->getTotalCanceled($year, $month),
+        ]);
 
         return [
             'generalSummary' => [
@@ -66,8 +69,10 @@ class DashboardService implements DashboardServiceInterface
             ],
             'inventoryAndCostsSummary' => [
                 'title' => 'Inventory and Costs Summary',
-                'totalPendingProfits' => $totalPendingProfits,
                 'inventoryAppreciation' => $inventoryAppreciation,
+                'totalCosts' => null, // Placeholder for future cost metrics
+                'totalPendingProfits' => $totalPendingProfits,
+                'totalCanceled' => $totalCanceled,
             ],
             'commissions' => [
                 'title' => 'Commissions',
@@ -317,6 +322,49 @@ class DashboardService implements DashboardServiceInterface
     }
 
     /**
+     * Compute inventory appreciation for a specific year and month.
+     *
+     * Retrieves and/or calculates inventory appreciation metrics for the given
+     * period. The exact return format is implementation dependent (e.g. a single
+     * numeric value, an associative array of metrics, or null when no data exists).
+     *
+     * @param  int  $year  Four-digit year (e.g. 2025)
+     * @param  int  $month  Month number (1-12)
+     * @return mixed Inventory appreciation data (float|array|null), structure is
+     *               determined by the service implementation.
+     *
+     * @throws \InvalidArgumentException If $year or $month are invalid.
+     * @throws \RuntimeException If an error occurs while retrieving or computing data.
+     */
+    public function getInventoryAppreciation($year, $month): mixed
+    {
+        [$currentMonth, $pastmonth] = $this->runDashboardTasks([
+            fn () => Product::query()
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->whereIsActive(true)
+                ->where('current_stock', '>', 0)
+                ->sum(DB::raw('current_stock * selling_price')),
+            fn () => Product::query()
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month - 1)
+                ->whereIsActive(true)
+                ->where('current_stock', '>', 0)
+                ->sum(DB::raw('current_stock * selling_price')),
+        ]);
+
+        return [
+            'title' => 'Inventory Appreciation',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastmonth) / ($pastmonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastmonth,
+            'positive' => $currentMonth >= $pastmonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
      * Get the total pending profits for a given year and optional month.
      *
      * If $month is provided (1–12) the function returns the profit for that month in the specified year.
@@ -346,29 +394,45 @@ class DashboardService implements DashboardServiceInterface
         ];
     }
 
-    public function getInventoryAppreciation($year, $month): mixed
+    /**
+     * Retrieve the total number (or aggregate) of cancelled items for a given period.
+     *
+     * Filters cancellation records by the provided year and month and returns the computed
+     * total or an aggregate structure. The exact return shape is implementation-specific,
+     * hence the mixed return type.
+     *
+     * @param  int|string  $year  Four-digit year (e.g. 2025).
+     * @param  int|string  $month  Month number (1-12). Implementations may treat other values
+     *                             (e.g. 0 or null) as "whole year" if applicable.
+     * @return mixed An integer total of cancelled items, or an aggregate/collection with
+     *               additional details depending on implementation.
+     *
+     * @throws \InvalidArgumentException If $year or $month are invalid.
+     * @throws \Throwable For underlying data access or unexpected errors.
+     */
+    public function getTotalCanceled($year, $month): mixed
     {
-        [$currentMonth, $pastmonth] = $this->runDashboardTasks([
-            fn () => Product::query()
-                ->whereYear('created_at', $year)
-                ->whereMonth('created_at', $month)
-                ->whereIsActive(true)
-                ->where('current_stock', '>', 0)
-                ->sum(DB::raw('current_stock * selling_price')),
-            fn () => Product::query()
-                ->whereYear('created_at', $year)
-                ->whereMonth('created_at', $month - 1)
-                ->whereIsActive(true)
-                ->where('current_stock', '>', 0)
-                ->sum(DB::raw('current_stock * selling_price')),
+        $possibleStatuses = ['canceled', 'cancelled'];
+
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
+            fn () => SalesOrder::query()
+                ->whereYear('order_date', $year)
+                ->whereMonth('order_date', $month)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('total_cost'),
+            fn () => SalesOrder::query()
+                ->whereYear('order_date', $year)
+                ->whereMonth('order_date', $month - 1)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('total_cost'),
         ]);
 
         return [
-            'title' => 'Inventory Appreciation',
+            'title' => 'Total Canceled',
             'value' => $currentMonth,
-            'delta' => round((($currentMonth - $pastmonth) / ($pastmonth ?: 1)) * 100, 2),
-            'lastMonth' => $pastmonth,
-            'positive' => $currentMonth >= $pastmonth,
+            'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonth,
+            'positive' => $currentMonth >= $pastMonth,
             'prefix' => '$',
             'suffix' => $currentMonth >= 1000000 ? 'M' : null,
         ];
