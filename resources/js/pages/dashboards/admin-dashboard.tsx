@@ -63,7 +63,7 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
 
                                 <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                     {Object.entries(summary)
-                                        .filter(([statusKey]) => statusKey !== 'title')
+                                        .filter(([key, val]) => key !== 'title' && val && typeof val === 'object')
                                         .map(([statusKey, status]) => {
                                             const info = status as StatusInfo;
                                             const cardKey = `${summaryKey}-${statusKey}`;
