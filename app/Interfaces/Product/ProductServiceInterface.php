@@ -53,4 +53,14 @@ interface ProductServiceInterface
      * @throws \Throwable If an error occurs while persisting the update.
      */
     public function updateProduct(ProductRequest $request, Product $product): void;
+
+    /**
+     * Permanently delete the given product.
+     *
+     * This method force-deletes the provided Product instance from persistent storage,
+     * bypassing any soft-delete mechanism and ensuring the record is removed permanently.
+     *
+     * @param  Product  $product  The product instance to permanently delete.
+     */
+    public function forceDeleteProduct(Product $product): void;
 }

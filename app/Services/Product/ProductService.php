@@ -108,4 +108,12 @@ class ProductService implements ProductServiceInterface
             }
         });
     }
+
+    public function forceDeleteProduct(Product $product): void
+    {
+        DB::transaction(function () use ($product) {
+            $product->clearMediaCollection('products_images');
+            $product->forceDelete();
+        });
+    }
 }
