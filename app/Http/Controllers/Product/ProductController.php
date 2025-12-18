@@ -28,7 +28,7 @@ class ProductController extends Controller
         $filters = $validated['filters'] ?? [];
 
         $allowedSorts = ['id', 'sku', 'name', 'category_name', 'cost_price', 'selling_price', 'current_stock',  'comission', 'is_active', 'created_at', 'updated_at'];
-        if (! in_array($sortBy, $allowedSorts)) {
+        if (! \in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
 
@@ -101,6 +101,43 @@ class ProductController extends Controller
             Log::error('Product: Failed to update product.', ['product_id' => $product->id, 'action_user_id' => $userId, 'error' => $e->getMessage()]);
 
             return back()->withInput()->with(['error' => 'Failed to update product.']);
+        }
+    }
+
+    public function destroy(Product $product)
+    {
+        $userId = Auth::id();
+        try {
+            Log::info('Product: Deleting product.', ['product_id' => $product->id, 'action_user_id' => $userId]);
+
+            $product->deleteOrFail();
+
+            return to_route('erp.products.index')->with('success', 'Product deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Product: Failed to delete product.', ['product_id' => $product->id, 'action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->with(['error' => 'Failed to delete product.']);
+        }
+    }
+
+    public function forceDestroy($productRouteKey)
+    {
+        $userId = Auth::id();
+        try {
+
+            $routeKeyName = (new Product)->getRouteKeyName();
+
+            $product = Product::withTrashed()->where($routeKeyName, $productRouteKey)->firstOrFail();
+
+            $this->productService->forceDeleteProduct($product);
+
+            Log::info('Product: Permanently deleting product.', ['product_id' => $product->id, 'action_user_id' => $userId]);
+
+            return to_route('erp.products.index')->with('success', 'Product permanently deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Product: Failed to permanently delete product.', ['product_id' => $product->id, 'action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->with(['error' => 'Failed to permanently delete product.']);
         }
     }
 }
