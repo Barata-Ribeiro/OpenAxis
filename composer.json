@@ -14,6 +14,7 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.32",
         "laravel/framework": "^12.42",
+        "laravel/reverb": "^1.0",
         "laravel/telescope": "^5.16",
         "laravel/tinker": "^2.10",
         "laravel/wayfinder": "^0.1",
@@ -57,12 +58,12 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --no-reload\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --no-reload\" \"php artisan queue:listen --tries=1\" \"npm run dev\" \"php artisan reverb:start\" --names='server,queue,vite,reverb'"
         ],
         "dev:ssr": [
             "npm run build:ssr",
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --no-reload\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr --kill-others"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --no-reload\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" \"php artisan reverb:start\" --names=server,queue,logs,ssr,reverb --kill-others"
         ],
         "test": [
             "@php artisan config:clear --ansi",
