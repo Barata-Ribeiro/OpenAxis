@@ -82,6 +82,9 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                             const badgeLabel = `${info.positive ? 'Increased' : 'Decreased'} by ${formattedDelta} percent compared to last month`;
                                             const valueLabel = `${info.title} is ${info.prefix ?? ''}${formatNumber(info.value)}${info.suffix ?? ''}, and ${badgeLabel}`;
 
+                                            const toValue = Number(info.value);
+                                            const safeTo = Number.isFinite(toValue) ? toValue : 0;
+
                                             return (
                                                 <Card key={cardKey} className="p-4">
                                                     <CardHeader className="border-0">
@@ -98,7 +101,7 @@ export default function AdminDashboard({ data }: Readonly<AdminDashboardProps>) 
                                                         >
                                                             <CountingNumber
                                                                 from={0}
-                                                                to={info.value}
+                                                                to={safeTo}
                                                                 duration={2}
                                                                 className="text-2xl font-medium tracking-tight text-foreground"
                                                                 format={(value) =>
