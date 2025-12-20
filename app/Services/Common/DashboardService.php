@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Product;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
+use Auth;
 use Concurrency;
 use DB;
 
@@ -21,8 +22,14 @@ class DashboardService implements DashboardServiceInterface
 
     public function getUserDashboardData(): array
     {
-        // TODO: Implement user dashboard data retrieval
-        return [];
+        $profile = Auth::user();
+
+        return [
+            'welcomeMessage' => "Welcome back, {$profile->name}!",
+            'notifications' => [
+                'unreadCount' => $profile->unreadNotifications()->count(),
+            ],
+        ];
     }
 
     public function getAdminDashboardData($yearMonth): array
@@ -40,7 +47,8 @@ class DashboardService implements DashboardServiceInterface
             $inventoryAppreciation,
             $totalCosts,
             $totalPendingProfits,
-            $totalCanceled
+            $totalCanceled,
+            $totalPaidComissions
         ] = $this->runDashboardTasks([
             fn () => $this->getTotalSales($year, $month),
             fn () => $this->getTotalClients($year, $month),
@@ -53,6 +61,7 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalCosts($year, $month),
             fn () => $this->getTotalPendingProfits($year, $month),
             fn () => $this->getTotalCanceled($year, $month),
+            fn () => $this->getTotalPaidCommissions($year, $month),
         ]);
 
         return [
@@ -78,7 +87,7 @@ class DashboardService implements DashboardServiceInterface
             ],
             'commissions' => [
                 'title' => 'Commissions',
-                // Future metrics can be added here
+                'totalPaidCommissions' => $totalPaidComissions,
             ],
             'payables' => [
                 'title' => 'Payables',
@@ -98,7 +107,7 @@ class DashboardService implements DashboardServiceInterface
      * @param  int|string|null  $month  The month number (1-12). Use null to calculate totals for the entire year.
      * @return mixed The total sales for the requested period.
      */
-    public function getTotalSales($year, $month): mixed
+    private function getTotalSales($year, $month): mixed
     {
         [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => SalesOrder::query()
@@ -249,11 +258,11 @@ class DashboardService implements DashboardServiceInterface
      *
      * @param  int|string  $year  Year to filter billings (e.g., 2024). Accepts integer or numeric string.
      * @param  int|string  $month  Month to filter billings (1-12 or '01'-'12'). Accepts integer or numeric string.
-     * @return int|float|array|mixed
-     *                               The aggregated total for completed billings. Common return shapes:
-     *                               - int|float: the summed billing amount.
-     *                               - array: breakdowns by currency/client/other dimensions.
-     *                               - mixed: other shapes used by the underlying data layer.
+     * @return mixed
+     *               The aggregated total for completed billings. Common return shapes:
+     *               - int|float: the summed billing amount.
+     *               - array: breakdowns by currency/client/other dimensions.
+     *               - mixed: other shapes used by the underlying data layer.
      *
      * @throws \InvalidArgumentException If $year or $month are not valid or parsable.
      * @throws \RuntimeException If the data source query or aggregation fails.
@@ -303,7 +312,7 @@ class DashboardService implements DashboardServiceInterface
      * @param  int|string|null  $month  Month number (1–12) or null to compute the yearly total.
      * @return mixed Numeric total completed profit (float|int) or null if no data is available.
      */
-    public function getTotalCompletedProfits($year, $month): mixed
+    private function getTotalCompletedProfits($year, $month): mixed
     {
         $possibleStatuses = ['delivered', 'completed', 'fulfilled'];
 
@@ -338,7 +347,7 @@ class DashboardService implements DashboardServiceInterface
      * @throws \InvalidArgumentException If $year or $month are invalid.
      * @throws \RuntimeException If an error occurs while retrieving or computing data.
      */
-    public function getInventoryAppreciation($year, $month): mixed
+    private function getInventoryAppreciation($year, $month): mixed
     {
         [$currentMonth, $pastmonth] = $this->runDashboardTasks([
             fn () => Product::query()
@@ -375,13 +384,13 @@ class DashboardService implements DashboardServiceInterface
      *
      * @param  int|string  $year  Four-digit year (e.g. 2025).
      * @param  int|string|null  $month  Optional month number (1-12). Pass null to compute totals for the whole year.
-     * @return float|int|array|null Numeric total (float or int) when a single value is returned,
-     *                              an associative array when results are grouped (e.g. by cost category),
-     *                              or null if no costs are found for the period.
+     * @return mixed Numeric total (float or int) when a single value is returned,
+     *               an associative array when results are grouped (e.g. by cost category),
+     *               or null if no costs are found for the period.
      *
      * @throws \InvalidArgumentException If the year or month values are invalid.
      */
-    public function getTotalCosts($year, $month): mixed
+    private function getTotalCosts($year, $month): mixed
     {
         [$currentMonth, $pastMonth] = $this->runDashboardTasks([
             fn () => Product::query()
@@ -419,7 +428,7 @@ class DashboardService implements DashboardServiceInterface
      * @param  int|string|null  $month  Month number (1–12) or null to compute the yearly total.
      * @return mixed Numeric total pending profit (float|int) or null if no data is available.
      */
-    public function getTotalPendingProfits($year, $month): mixed
+    private function getTotalPendingProfits($year, $month): mixed
     {
         $possibleStatuses = ['pending', 'processing', 'on-hold', 'awaiting-payment'];
 
@@ -455,7 +464,7 @@ class DashboardService implements DashboardServiceInterface
      * @throws \InvalidArgumentException If $year or $month are invalid.
      * @throws \Throwable For underlying data access or unexpected errors.
      */
-    public function getTotalCanceled($year, $month): mixed
+    private function getTotalCanceled($year, $month): mixed
     {
         $possibleStatuses = ['canceled', 'cancelled'];
 
@@ -474,6 +483,47 @@ class DashboardService implements DashboardServiceInterface
 
         return [
             'title' => 'Total Canceled',
+            'value' => $currentMonth,
+            'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonth,
+            'positive' => $currentMonth >= $pastMonth,
+            'prefix' => '$',
+            'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
+     * Calculate the total amount of commissions marked as paid for a specific year and month.
+     *
+     * Aggregates commission records filtered by the provided year and month and returns the summed
+     * amount. Months should be provided as integers from 1 to 12; year as a four-digit integer.
+     *
+     * @param  int  $year  Four-digit year (e.g., 2025)
+     * @param  int  $month  Month number (1-12)
+     * @return mixed The total paid commissions for the specified period.
+     *
+     * @throws \InvalidArgumentException If $year or $month are invalid.
+     * @throws \Throwable For underlying data access or unexpected errors.
+     */
+    private function getTotalPaidCommissions($year, $month): mixed
+    {
+        $possibleStatuses = ['delivered', 'completed', 'fulfilled'];
+
+        [$currentMonth, $pastMonth] = $this->runDashboardTasks([
+            fn () => SalesOrder::query()
+                ->whereYear('order_date', $year)
+                ->whereMonth('order_date', $month)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('total_commission'),
+            fn () => SalesOrder::query()
+                ->whereYear('order_date', $year)
+                ->whereMonth('order_date', $month - 1)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('total_commission'),
+        ]);
+
+        return [
+            'title' => 'Total Paid Commissions',
             'value' => $currentMonth,
             'delta' => round((($currentMonth - $pastMonth) / ($pastMonth ?: 1)) * 100, 2),
             'lastMonth' => $pastMonth,
