@@ -24,6 +24,7 @@ export interface NavItem {
     icon?: LucideIcon | null;
     isActive?: boolean;
     canView?: boolean;
+    isExternal?: boolean;
 }
 
 export interface SharedData {

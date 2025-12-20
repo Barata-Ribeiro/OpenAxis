@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/sidebar';
 import { usePermission } from '@/hooks/use-permission';
 import { resolveUrl } from '@/lib/utils';
+import { telescope } from '@/routes';
 import administrative from '@/routes/administrative';
 import erp from '@/routes/erp';
 import type { NavGroup, SharedData } from '@/types';
@@ -112,9 +113,10 @@ export function NavSystem() {
             },
             {
                 title: 'Telescope',
-                href: '/telescope',
+                href: telescope().url,
                 icon: TelescopeIcon,
                 canView: isSuperAdmin,
+                isExternal: true,
             },
         ],
     };
@@ -127,6 +129,7 @@ export function NavSystem() {
                 href: administrative.mailable.newAccount().url,
                 icon: MailIcon,
                 canView: can('user.create'),
+                isExternal: true,
             },
         ],
     };
@@ -149,14 +152,21 @@ export function NavSystem() {
                                 .map((item) => (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
-                                            asChild
                                             isActive={page.url.startsWith(resolveUrl(item.href))}
                                             tooltip={{ children: item.title }}
+                                            asChild
                                         >
-                                            <Link href={item.href} prefetch>
-                                                {item.icon && <item.icon />}
-                                                <span>{item.title}</span>
-                                            </Link>
+                                            {item.isExternal ? (
+                                                <a href={String(item.href)} target="_blank" rel="noopener noreferrer">
+                                                    {item.icon && <item.icon />}
+                                                    <span>{item.title}</span>
+                                                </a>
+                                            ) : (
+                                                <Link href={item.href} prefetch>
+                                                    {item.icon && <item.icon />}
+                                                    <span>{item.title}</span>
+                                                </Link>
+                                            )}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 ))}
