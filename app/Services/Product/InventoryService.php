@@ -3,10 +3,13 @@
 namespace App\Services\Product;
 
 use App\Common\Helpers;
+use App\Enums\RoleEnum;
 use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Interfaces\Product\InventoryServiceInterface;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\User;
+use App\Notifications\ManualSupplyAdjustment;
 use Auth;
 use DB;
 use Illuminate\Contracts\Pagination\CursorPaginator;
@@ -81,7 +84,7 @@ class InventoryService implements InventoryServiceInterface
         $validated['user_id'] = $userId;
 
         DB::transaction(function () use ($validated, $product) {
-            StockMovement::create($validated);
+            $stockMovement = StockMovement::create($validated);
 
             switch ($validated['movement_type']) {
                 case 'inbound':
@@ -98,6 +101,11 @@ class InventoryService implements InventoryServiceInterface
             }
 
             $product->save();
+
+            User::query()->whereHas('roles', fn ($q) => $q->where('name', RoleEnum::VENDOR->value))
+                ->each(function (User $user) use ($stockMovement) {
+                    $user->notify(new ManualSupplyAdjustment($stockMovement));
+                });
         });
     }
 
