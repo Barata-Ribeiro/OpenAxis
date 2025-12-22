@@ -4,6 +4,7 @@ namespace App\Services\Common;
 
 use App\Interfaces\Common\DashboardServiceInterface;
 use App\Models\Client;
+use App\Models\Payable;
 use App\Models\Product;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
@@ -48,7 +49,8 @@ class DashboardService implements DashboardServiceInterface
             $totalCosts,
             $totalPendingProfits,
             $totalCanceled,
-            $totalPaidComissions
+            $totalPaidComissions,
+            $totalPayablesToday,
         ] = $this->runDashboardTasks([
             fn () => $this->getTotalSales($year, $month),
             fn () => $this->getTotalClients($year, $month),
@@ -62,6 +64,7 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalPendingProfits($year, $month),
             fn () => $this->getTotalCanceled($year, $month),
             fn () => $this->getTotalPaidCommissions($year, $month),
+            fn () => $this->getTotalPayablesToday(),
         ]);
 
         return [
@@ -91,7 +94,7 @@ class DashboardService implements DashboardServiceInterface
             ],
             'payables' => [
                 'title' => 'Payables',
-                // Future metrics can be added here
+                'totalPayablesToday' => $totalPayablesToday,
             ],
             'receivables' => [
                 'title' => 'Receivables',
@@ -530,6 +533,42 @@ class DashboardService implements DashboardServiceInterface
             'positive' => $currentMonth >= $pastMonth,
             'prefix' => '$',
             'suffix' => $currentMonth >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
+     * Calculate and return the total amount of payables due today.
+     *
+     * @return mixed Total amount of payables due today (numeric or domain-specific type)
+     *
+     * @throws \Throwable If an error occurs while querying or aggregating payables
+     */
+    private function getTotalPayablesToday(): mixed
+    {
+        $today = now()->toDateString();
+        $monthBefore = now()->subMonth()->toDateString();
+
+        $possibleStatuses = ['pending', 'processing', 'on-hold', 'awaiting-payment'];
+
+        [$todayPayables, $pastMonthPayables] = $this->runDashboardTasks([
+            fn () => Payable::query()
+                ->whereDueDate($today)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+            fn () => Payable::query()
+                ->whereDueDate($monthBefore)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+        ]);
+
+        return [
+            'title' => 'Total Payables Today',
+            'value' => $todayPayables,
+            'delta' => round((($todayPayables - $pastMonthPayables) / ($pastMonthPayables ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonthPayables,
+            'positive' => $todayPayables >= $pastMonthPayables,
+            'prefix' => '$',
+            'suffix' => $todayPayables >= 1000000 ? 'M' : null,
         ];
     }
 
