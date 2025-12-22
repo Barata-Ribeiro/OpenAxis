@@ -1,4 +1,3 @@
-import AppOnlineUsers from '@/components/application/app-online-users';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import useIsMounted from '@/hooks/use-mounted';
@@ -38,7 +37,6 @@ export function AppShell({ children, variant = 'header' }: Readonly<AppShellProp
     return (
         <SidebarProvider defaultOpen={isOpen}>
             {children}
-            <AppOnlineUsers />
             <Toaster />
         </SidebarProvider>
     );
