@@ -4,16 +4,36 @@ import { useInitials } from '@/hooks/use-initials';
 import { normalizeString } from '@/lib/utils';
 import type { User } from '@/types/application/user';
 import { useEchoPresence } from '@laravel/echo-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 type OnlineUser = Pick<User, 'id' | 'name' | 'avatar'> & { roles: string[] };
 
+interface PresenceChannelWithMembers {
+    subscription?: {
+        members?: {
+            members?: Record<string, OnlineUser>;
+        };
+    };
+}
+
 export default function AppOnlineUsers() {
-    const [users, setUsers] = useState<OnlineUser[]>([]);
     const getInitials = useInitials();
-    const { channel, leaveChannel } = useEchoPresence('online', [], (event) => console.debug('Presence event:', event));
+    const { channel } = useEchoPresence('online');
+    const isBoundRef = useRef(false);
+    const [users, setUsers] = useState<OnlineUser[]>(() => {
+        const presenceChannel = channel() as unknown as PresenceChannelWithMembers;
+        const existingMembers = presenceChannel.subscription?.members?.members;
+
+        if (!existingMembers) return [];
+
+        return [...new Map(Object.values(existingMembers).map((u) => [u.id, u])).values()];
+    });
 
     useEffect(() => {
+        if (isBoundRef.current) return;
+
+        isBoundRef.current = true;
         const presenceChannel = channel();
 
         presenceChannel.here((users: OnlineUser[]) => {
@@ -22,19 +42,18 @@ export default function AppOnlineUsers() {
 
         presenceChannel.joining((user: OnlineUser) => {
             setUsers((prev) => (prev.some((u) => u.id === user.id) ? prev : [...prev, user]));
+            toast.success(`${user.name} is online`, { duration: 3000 });
         });
 
         presenceChannel.leaving((leftUser: OnlineUser) => {
             setUsers((prev) => prev.filter((user) => user.id !== leftUser.id));
+            toast.warning(`${leftUser.name} went offline`, { duration: 3000 });
         });
 
         return () => {
-            presenceChannel.stopListening('here');
-            presenceChannel.stopListening('joining');
-            presenceChannel.stopListening('leaving');
-            leaveChannel();
+            isBoundRef.current = false;
         };
-    }, [channel, leaveChannel]);
+    }, [channel]);
 
     const extraUsersCount = Math.max(0, users.length - 3);
 
