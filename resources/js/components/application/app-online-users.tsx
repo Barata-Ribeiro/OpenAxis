@@ -1,23 +1,19 @@
+import { Avatar, AvatarBadge, AvatarFallback, AvatarGroupCount, AvatarImage } from '@/components/ui/avatar';
+import { AvatarGroup, AvatarGroupTooltip } from '@/components/ui/shadcn-io/avatar-group';
 import { useInitials } from '@/hooks/use-initials';
-import useIsMounted from '@/hooks/use-mounted';
 import { normalizeString } from '@/lib/utils';
 import type { User } from '@/types/application/user';
 import { useEchoPresence } from '@laravel/echo-react';
 import { useEffect, useState } from 'react';
-import { Avatar, AvatarBadge, AvatarFallback, AvatarGroupCount, AvatarImage } from '../ui/avatar';
-import { AvatarGroup, AvatarGroupTooltip } from '../ui/shadcn-io/avatar-group';
 
 type OnlineUser = Pick<User, 'id' | 'name' | 'avatar'> & { roles: string[] };
 
 export default function AppOnlineUsers() {
-    const isMounted = useIsMounted();
     const [users, setUsers] = useState<OnlineUser[]>([]);
     const getInitials = useInitials();
     const { channel, leaveChannel } = useEchoPresence('online', [], (event) => console.debug('Presence event:', event));
 
     useEffect(() => {
-        if (!isMounted) return;
-
         const presenceChannel = channel();
 
         presenceChannel.here((users: OnlineUser[]) => {
@@ -38,41 +34,40 @@ export default function AppOnlineUsers() {
             presenceChannel.stopListening('leaving');
             leaveChannel();
         };
-    }, [channel, isMounted, leaveChannel]);
+    }, [channel, leaveChannel]);
 
     const extraUsersCount = Math.max(0, users.length - 3);
 
     return (
-        <div className="fixed top-4 right-4 z-20 border bg-white shadow-lg">
-            <h3 className="border-b px-3 py-1.5 text-sm font-medium">Online Users</h3>
-            <div className="bg-muted/20 p-1.5">
-                <AvatarGroup variant="css" tooltipProps={{ side: 'bottom', sideOffset: 12 }}>
-                    {users.slice(0, 3).map((user) => (
-                        <Avatar key={user.id}>
-                            <AvatarImage
-                                src={user.avatar.src ?? undefined}
-                                srcSet={user.avatar.srcSet ?? undefined}
-                                alt={user.name}
-                            />
-                            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                            <AvatarBadge className="bg-success" />
-                            <AvatarGroupTooltip>
-                                <p className="font-semibold">{user.name}</p>
-                                <p className="text-sm">{normalizeString(user.roles.at(0) ?? '')}</p>
-                            </AvatarGroupTooltip>
-                        </Avatar>
-                    ))}
+        <div className="rounded-full border bg-background p-1.5 shadow-lg">
+            <AvatarGroup variant="css" tooltipProps={{ side: 'bottom', sideOffset: 12 }}>
+                {users.slice(0, 3).map((user) => (
+                    <Avatar key={user.id}>
+                        <AvatarImage
+                            src={user.avatar.src ?? undefined}
+                            srcSet={user.avatar.srcSet ?? undefined}
+                            alt={user.name}
+                        />
+                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                        <AvatarBadge aria-hidden className="bg-success">
+                            <div className="absolute size-3 animate-ping rounded-full bg-success duration-1000" />
+                        </AvatarBadge>
+                        <AvatarGroupTooltip>
+                            <p className="font-semibold">{user.name}</p>
+                            <p className="text-sm">{normalizeString(user.roles.at(0) ?? '')}</p>
+                        </AvatarGroupTooltip>
+                    </Avatar>
+                ))}
 
-                    {extraUsersCount > 0 && (
-                        <Avatar className="z-10 text-sm font-medium text-muted-foreground">
-                            <AvatarGroupCount>+{extraUsersCount}</AvatarGroupCount>
-                            <AvatarGroupTooltip>
-                                <p>+{extraUsersCount} more users</p>
-                            </AvatarGroupTooltip>
-                        </Avatar>
-                    )}
-                </AvatarGroup>
-            </div>
+                {extraUsersCount > 0 && (
+                    <Avatar className="z-10 text-sm font-medium text-muted-foreground">
+                        <AvatarGroupCount>+{extraUsersCount}</AvatarGroupCount>
+                        <AvatarGroupTooltip>
+                            <p>+{extraUsersCount} more users</p>
+                        </AvatarGroupTooltip>
+                    </Avatar>
+                )}
+            </AvatarGroup>
         </div>
     );
 }
