@@ -28,13 +28,20 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user()?->load(['roles:id,name', 'media']),
-                'permissions' => fn () => $request->user()?->getAllPermissions()->pluck('name'),
+                'user' => $user?->load(['roles:id,name', 'media']),
+                'permissions' => fn () => $user?->getAllPermissions()->pluck('name'),
+                'notifications' => [
+                    'latest' => fn () => $user?->notifications()->latest()->take(3)->get(),
+                    'unread_count' => fn () => $user?->unreadNotifications()->count(),
+                    'total_count' => fn () => $user?->notifications()->count(),
+                ],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
