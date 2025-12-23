@@ -3,15 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
-import { addresses, edit } from '@/routes/profile';
+import { addresses, edit, notifications } from '@/routes/profile';
 import { index as sessions } from '@/routes/sessions';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
-import type { NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import type { PropsWithChildren } from 'react';
+import type { NavItem, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { useMemo, type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
+const baseSidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
         href: edit(),
@@ -45,10 +45,23 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: Readonly<PropsWithChildren>) {
-    // When server-side rendering, we only render the layout on the client...
-    if (typeof globalThis === 'undefined') {
-        return null;
-    }
+    const { auth } = usePage<SharedData>().props;
+
+    const sidebarNavItems = useMemo(() => {
+        const items = [...baseSidebarNavItems];
+
+        if (auth.notifications) {
+            items.splice(0 + 1, 0, {
+                title: `Notifications (${auth.notifications.total_count})`,
+                href: notifications(),
+                icon: null,
+            });
+        }
+
+        return items;
+    }, [auth.notifications]);
+
+    if (typeof globalThis === 'undefined') return null;
 
     const currentPath = globalThis.window.location.pathname;
 
