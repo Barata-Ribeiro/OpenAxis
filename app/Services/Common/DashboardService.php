@@ -28,6 +28,7 @@ class DashboardService implements DashboardServiceInterface
         return [
             'welcomeMessage' => "Welcome back, {$profile->name}!",
             'notifications' => [
+                'totalCount' => $profile->notifications()->count(),
                 'unreadCount' => $profile->unreadNotifications()->count(),
             ],
         ];
@@ -51,6 +52,7 @@ class DashboardService implements DashboardServiceInterface
             $totalCanceled,
             $totalPaidComissions,
             $totalPayablesToday,
+            $totalPayablesMonthAndBefore
         ] = $this->runDashboardTasks([
             fn () => $this->getTotalSales($year, $month),
             fn () => $this->getTotalClients($year, $month),
@@ -65,6 +67,7 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalCanceled($year, $month),
             fn () => $this->getTotalPaidCommissions($year, $month),
             fn () => $this->getTotalPayablesToday(),
+            fn () => $this->getTotalPayablesOfCurrentMonthAndBefore(),
         ]);
 
         return [
@@ -95,6 +98,7 @@ class DashboardService implements DashboardServiceInterface
             'payables' => [
                 'title' => 'Payables',
                 'totalPayablesToday' => $totalPayablesToday,
+                'totalPayablesMonth' => $totalPayablesMonthAndBefore,
             ],
             'receivables' => [
                 'title' => 'Receivables',
@@ -569,6 +573,46 @@ class DashboardService implements DashboardServiceInterface
             'positive' => $todayPayables >= $pastMonthPayables,
             'prefix' => '$',
             'suffix' => $todayPayables >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
+     * Calculates the total amount of payables due in the current month and any prior period.
+     *
+     * Aggregates payable amounts with due dates up to and including the current month,
+     * returning the computed total (or an implementation-specific structure).
+     *
+     * @return mixed The total payables for the current month and earlier.
+     */
+    private function getTotalPayablesOfCurrentMonthAndBefore(): mixed
+    {
+        $startCurrentMonth = now()->startOfMonth()->toDateString();
+        $endCurrentMonth = now()->endOfMonth()->toDateString();
+
+        $startPastMonth = now()->subMonth()->startOfMonth()->toDateString();
+        $endPastMonth = now()->subMonth()->endOfMonth()->toDateString();
+
+        $possibleStatuses = ['pending', 'processing', 'on-hold', 'awaiting-payment'];
+
+        [$currentMonthPayables, $pastMonthPayables] = $this->runDashboardTasks([
+            fn () => Payable::query()
+                ->whereBetween('due_date', [$startCurrentMonth, $endCurrentMonth])
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+            fn () => Payable::query()
+                ->whereBetween('due_date', [$startPastMonth, $endPastMonth])
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+        ]);
+
+        return [
+            'title' => 'Total Payables Month',
+            'value' => $currentMonthPayables,
+            'delta' => round((($currentMonthPayables - $pastMonthPayables) / ($pastMonthPayables ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonthPayables,
+            'positive' => $currentMonthPayables >= $pastMonthPayables,
+            'prefix' => '$',
+            'suffix' => $currentMonthPayables >= 1000000 ? 'M' : null,
         ];
     }
 
