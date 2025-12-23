@@ -1,3 +1,4 @@
+import type { NotificationSummary } from '@/types/application/notification';
 import type { Permission } from '@/types/application/role-permission';
 import type { UserWithRelations } from '@/types/application/user';
 import type { InertiaLinkProps } from '@inertiajs/react';
@@ -6,6 +7,7 @@ import type { LucideIcon } from 'lucide-react';
 export interface Auth {
     user: UserWithRelations;
     permissions: Permission['name'][];
+    notifications: NotificationSummary;
 }
 
 export interface BreadcrumbItem {
