@@ -80,6 +80,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Product\InventoryServiceInterface::class,
             \App\Services\Product\InventoryService::class
         );
+
+        $this->app->bind(
+            \App\Interfaces\Management\PayableServiceInterface::class,
+            \App\Services\Management\PayableService::class
+        );
     }
 
     /**
