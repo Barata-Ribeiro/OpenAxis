@@ -6,6 +6,7 @@ use App\Interfaces\Common\DashboardServiceInterface;
 use App\Models\Client;
 use App\Models\Payable;
 use App\Models\Product;
+use App\Models\Receivable;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
 use Auth;
@@ -52,7 +53,8 @@ class DashboardService implements DashboardServiceInterface
             $totalCanceled,
             $totalPaidComissions,
             $totalPayablesToday,
-            $totalPayablesMonthAndBefore
+            $totalPayablesMonthAndBefore,
+            $totalReceivablesToday
         ] = $this->runDashboardTasks([
             fn () => $this->getTotalSales($year, $month),
             fn () => $this->getTotalClients($year, $month),
@@ -68,6 +70,7 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalPaidCommissions($year, $month),
             fn () => $this->getTotalPayablesToday(),
             fn () => $this->getTotalPayablesOfCurrentMonthAndBefore(),
+            fn () => $this->getTotalReceivablesToday(),
         ]);
 
         return [
@@ -102,7 +105,7 @@ class DashboardService implements DashboardServiceInterface
             ],
             'receivables' => [
                 'title' => 'Receivables',
-                // Future metrics can be added here
+                'totalReceivablesToday' => $totalReceivablesToday,
             ],
         ];
     }
@@ -613,6 +616,35 @@ class DashboardService implements DashboardServiceInterface
             'positive' => $currentMonthPayables >= $pastMonthPayables,
             'prefix' => '$',
             'suffix' => $currentMonthPayables >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    private function getTotalReceivablesToday(): mixed
+    {
+        $today = now()->toDateString();
+        $monthBefore = now()->subMonth()->toDateString();
+
+        $possibleStatuses = ['pending', 'processing', 'on-hold', 'awaiting-payment'];
+
+        [$todayReceivables, $pastMonthReceivables] = $this->runDashboardTasks([
+            fn () => Receivable::query()
+                ->whereDueDate($today)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+            fn () => Receivable::query()
+                ->whereDueDate($monthBefore)
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+        ]);
+
+        return [
+            'title' => 'Total Receivables Today',
+            'value' => $todayReceivables,
+            'delta' => round((($todayReceivables - $pastMonthReceivables) / ($pastMonthReceivables ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonthReceivables,
+            'positive' => $todayReceivables >= $pastMonthReceivables,
+            'prefix' => '$',
+            'suffix' => $todayReceivables >= 1000000 ? 'M' : null,
         ];
     }
 
