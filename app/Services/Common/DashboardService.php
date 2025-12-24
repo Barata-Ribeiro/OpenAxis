@@ -54,7 +54,8 @@ class DashboardService implements DashboardServiceInterface
             $totalPaidComissions,
             $totalPayablesToday,
             $totalPayablesMonthAndBefore,
-            $totalReceivablesToday
+            $totalReceivablesToday,
+            $totalReceivablesMonthAndBefore
         ] = $this->runDashboardTasks([
             fn () => $this->getTotalSales($year, $month),
             fn () => $this->getTotalClients($year, $month),
@@ -71,6 +72,7 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalPayablesToday(),
             fn () => $this->getTotalPayablesOfCurrentMonthAndBefore(),
             fn () => $this->getTotalReceivablesToday(),
+            fn () => $this->getTotalReceivablesOfCurrentMonthAndBefore(),
         ]);
 
         return [
@@ -106,6 +108,7 @@ class DashboardService implements DashboardServiceInterface
             'receivables' => [
                 'title' => 'Receivables',
                 'totalReceivablesToday' => $totalReceivablesToday,
+                'totalReceivablesMonth' => $totalReceivablesMonthAndBefore,
             ],
         ];
     }
@@ -619,6 +622,15 @@ class DashboardService implements DashboardServiceInterface
         ];
     }
 
+    /**
+     * Calculates the total amount of receivables due/expected for the current day.
+     *
+     * Intended for dashboard metrics and returns an aggregated value representing
+     * today's receivables.
+     *
+     * @return mixed The total receivables for today (type depends on the underlying
+     *               aggregation/DB driver; commonly numeric or string-cast numeric).
+     */
     private function getTotalReceivablesToday(): mixed
     {
         $today = now()->toDateString();
@@ -645,6 +657,46 @@ class DashboardService implements DashboardServiceInterface
             'positive' => $todayReceivables >= $pastMonthReceivables,
             'prefix' => '$',
             'suffix' => $todayReceivables >= 1000000 ? 'M' : null,
+        ];
+    }
+
+    /**
+     * Get the total amount of receivables for the current month and all prior months.
+     *
+     * This method is intended for dashboard reporting, aggregating receivable values
+     * up to and including the current month.
+     *
+     * @return mixed The aggregated total receivables amount for the current month and before.
+     */
+    public function getTotalReceivablesOfCurrentMonthAndBefore(): mixed
+    {
+        $startCurrentMonth = now()->startOfMonth()->toDateString();
+        $endCurrentMonth = now()->endOfMonth()->toDateString();
+
+        $startPastMonth = now()->subMonth()->startOfMonth()->toDateString();
+        $endPastMonth = now()->subMonth()->endOfMonth()->toDateString();
+
+        $possibleStatuses = ['pending', 'processing', 'on-hold', 'awaiting-payment'];
+
+        [$currentMonthReceivables, $pastMonthReceivables] = $this->runDashboardTasks([
+            fn () => Receivable::query()
+                ->whereBetween('due_date', [$startCurrentMonth, $endCurrentMonth])
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+            fn () => Receivable::query()
+                ->whereBetween('due_date', [$startPastMonth, $endPastMonth])
+                ->whereIn('status', $possibleStatuses)
+                ->sum('amount'),
+        ]);
+
+        return [
+            'title' => 'Total Receivables Month',
+            'value' => $currentMonthReceivables,
+            'delta' => round((($currentMonthReceivables - $pastMonthReceivables) / ($pastMonthReceivables ?: 1)) * 100, 2),
+            'lastMonth' => $pastMonthReceivables,
+            'positive' => $currentMonthReceivables >= $pastMonthReceivables,
+            'prefix' => '$',
+            'suffix' => $currentMonthReceivables >= 1000000 ? 'M' : null,
         ];
     }
 
