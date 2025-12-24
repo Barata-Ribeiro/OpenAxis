@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\ProductCategory;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Str;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
@@ -19,8 +19,13 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
-        $sku = fake()->unique()->bothify('PROD-####');
+        $sku = 'PROD-'.strtoupper((string) Str::ulid());
         $name = fake()->unique()->words(3, true);
+
+        $baseSlug = Str::slug($name);
+        $skuSlug = Str::slug($sku);
+        $maxBaseLength = 100 - 1 - \strlen($skuSlug);
+        $safeBaseSlug = $maxBaseLength > 0 ? substr($baseSlug, 0, $maxBaseLength) : substr($baseSlug, 0, 1);
 
         // cost price (decimal 10,2)
         $costPrice = fake()->randomFloat(2, 1, 5000);
@@ -38,7 +43,7 @@ class ProductFactory extends Factory
             'sku' => $sku,
             'name' => $name,
             'description' => fake()->sentences(5, true),
-            'slug' => Str::slug("$name-$sku"),
+            'slug' => "{$safeBaseSlug}-{$skuSlug}",
             'cost_price' => $costPrice,
             'selling_price' => $sellingPrice,
             'current_stock' => fake()->numberBetween(0, 100),
