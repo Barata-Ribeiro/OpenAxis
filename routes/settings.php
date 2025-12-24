@@ -17,6 +17,7 @@ Route::middleware('auth')->prefix('settings')->group(function () {
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('profile.notifications');
+    Route::patch('notifications/{id}/toggle-read', [NotificationController::class, 'toggleRead'])->name('profile.notifications.toggle-read');
 
     Route::get('addresses', [AddressController::class, 'index'])->name('profile.addresses');
     Route::post('addresses', [AddressController::class, 'store'])->name('profile.addresses.store');
