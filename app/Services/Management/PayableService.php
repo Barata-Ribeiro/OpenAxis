@@ -13,10 +13,13 @@ class PayableService implements PayableServiceInterface
 {
     public function getPaginatedPayables(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
-        $is_active = $filters['is_active'][0] ?? null;
+        $status = $filters['status'] ?? null;
 
         $createdAtRange = $filters['created_at'] ?? [];
         [$start, $end] = Helpers::getDateRange($createdAtRange);
+
+        $dueDateRange = $filters['due_date'] ?? [];
+        [$dueStart, $dueEnd] = Helpers::getDateRange($dueDateRange);
 
         $sortByStartsWithSupplier = str_starts_with((string) $sortBy, 'supplier_name');
 
@@ -25,14 +28,15 @@ class PayableService implements PayableServiceInterface
         }
 
         return Payable::query()
-            ->select('payables.id', 'payables.code', 'payables.amount', 'payables.due_date', 'payables.status', 'payables.supplier_id', 'payables.vendor_id', 'payables.created_at', 'payables.updated_at')
+            ->select(['payables.id', 'payables.code', 'payables.amount', 'payables.due_date', 'payables.status', 'payables.supplier_id', 'payables.vendor_id', 'payables.created_at', 'payables.updated_at'])
             ->with(['partner:id,name', 'vendor:id,name'])
             ->when($search, fn ($q, $search) => $q->whereLike('payables.code', "%$search%")
                 ->orWhereLike('payables.description', "%$search%")->orWhereLike('payables.amount', "%$search%")
                 ->orWhereHas('partner', fn ($partnerQuery) => $partnerQuery->whereLike('partners.name', "%$search%")->orWhereLike('partners.email', "%$search%"))
                 ->orWhereHas('vendor', fn ($vendorQuery) => $vendorQuery->whereLike('vendors.name', "%$search%")->orWhereLike('vendors.email', "%$search%")))
+            ->when($status, fn ($q, $status) => $q->whereIn('payables.status', (array) $status))
             ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
-            ->when($is_active, fn ($query) => $query->where('is_active', filter_var($is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
+            ->when($dueDateRange, fn ($q) => $q->whereBetween('due_date', [$dueStart, $dueEnd]))
             ->leftJoin(new Partner()->getTable(), 'payables.supplier_id', '=', 'partners.id')
             ->leftJoin(new Vendor()->getTable(), 'payables.vendor_id', '=', 'vendors.id')
             ->orderBy($sortBy, $sortDir)
