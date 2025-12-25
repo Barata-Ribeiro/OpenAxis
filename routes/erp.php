@@ -4,6 +4,7 @@ use App\Http\Controllers\Management\ClientController;
 use App\Http\Controllers\Management\PayableController;
 use App\Http\Controllers\Management\PaymentConditionController;
 use App\Http\Controllers\Management\PurchaseOrderController;
+use App\Http\Controllers\Management\ReceivableController;
 use App\Http\Controllers\Management\SalesOrderController;
 use App\Http\Controllers\Management\SupplierController;
 use App\Http\Controllers\Management\VendorController;
@@ -168,6 +169,22 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
             'edit' => 'erp.payables.edit',
             'update' => 'erp.payables.update',
             'destroy' => 'erp.payables.destroy',
+        ])
+        ->middlewareFor('index', 'permission:finance.index')
+        ->middlewareFor(['create', 'store'], 'permission:finance.create')
+        ->middlewareFor(['edit', 'update'], 'permission:finance.edit')
+        ->middlewareFor('destroy', 'permission:finance.destroy');
+
+    Route::resource('receivables', ReceivableController::class)
+        ->except('show')
+        ->parameters(['receivables' => 'receivable'])
+        ->names([
+            'index' => 'erp.receivables.index',
+            'create' => 'erp.receivables.create',
+            'store' => 'erp.receivables.store',
+            'edit' => 'erp.receivables.edit',
+            'update' => 'erp.receivables.update',
+            'destroy' => 'erp.receivables.destroy',
         ])
         ->middlewareFor('index', 'permission:finance.index')
         ->middlewareFor(['create', 'store'], 'permission:finance.create')
