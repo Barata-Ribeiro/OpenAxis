@@ -85,6 +85,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Management\PayableServiceInterface::class,
             \App\Services\Management\PayableService::class
         );
+
+        $this->app->bind(
+            \App\Interfaces\Management\ReceivableServiceInterface::class,
+            \App\Services\Management\ReceivableService::class
+        );
     }
 
     /**
