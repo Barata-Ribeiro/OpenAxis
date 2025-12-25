@@ -65,3 +65,20 @@ export const INVENTORY_MOVEMENT_TYPE_LABELS: Record<InventoryMovementType, strin
 export function inventoryMovementTypeLabel(type: InventoryMovementType): string {
     return INVENTORY_MOVEMENT_TYPE_LABELS[type] ?? type;
 }
+
+// Payable Status
+export enum PayableStatus {
+    PENDING = 'pending',
+    PAID = 'paid',
+    CANCELED = 'canceled',
+}
+
+export const PAYABLE_STATUS_LABELS: Record<PayableStatus, string> = {
+    [PayableStatus.PENDING]: 'Pending',
+    [PayableStatus.PAID]: 'Paid',
+    [PayableStatus.CANCELED]: 'Canceled',
+};
+
+export function payableStatusLabel(status: PayableStatus): string {
+    return PAYABLE_STATUS_LABELS[status] ?? status;
+}
