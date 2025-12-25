@@ -69,10 +69,10 @@ class DashboardService implements DashboardServiceInterface
             fn () => $this->getTotalPendingProfits($year, $month),
             fn () => $this->getTotalCanceled($year, $month),
             fn () => $this->getTotalPaidCommissions($year, $month),
-            fn () => $this->getTotalPayablesToday(),
-            fn () => $this->getTotalPayablesOfCurrentMonthAndBefore(),
-            fn () => $this->getTotalReceivablesToday(),
-            fn () => $this->getTotalReceivablesOfCurrentMonthAndBefore(),
+            $this->getTotalPayablesToday(...),
+            $this->getTotalPayablesOfCurrentMonthAndBefore(...),
+            $this->getTotalReceivablesToday(...),
+            $this->getTotalReceivablesOfCurrentMonthAndBefore(...),
         ]);
 
         return [
