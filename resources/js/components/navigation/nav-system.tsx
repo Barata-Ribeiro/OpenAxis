@@ -14,6 +14,8 @@ import type { NavGroup, SharedData } from '@/types';
 import { RoleNames } from '@/types/application/enums';
 import { Link, usePage } from '@inertiajs/react';
 import {
+    BanknoteArrowDownIcon,
+    BanknoteArrowUpIcon,
     BookUserIcon,
     FactoryIcon,
     FileUserIcon,
@@ -86,6 +88,18 @@ export function NavSystem() {
                 href: erp.suppliers.index().url,
                 icon: FactoryIcon,
                 canView: can('supplier.index'),
+            },
+            {
+                title: 'Payables',
+                href: erp.payables.index().url,
+                icon: BanknoteArrowUpIcon,
+                canView: can('finance.index'),
+            },
+            {
+                title: 'Receivables',
+                href: erp.receivables.index().url,
+                icon: BanknoteArrowDownIcon,
+                canView: can('finance.index'),
             },
             {
                 title: 'Payment Conditions',
