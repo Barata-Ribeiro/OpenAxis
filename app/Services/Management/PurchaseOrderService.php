@@ -6,13 +6,22 @@ use App\Common\Helpers;
 use App\Enums\RoleEnum;
 use App\Interfaces\Management\PurchaseOrderServiceInterface;
 use App\Models\Partner;
+use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\User;
 use Auth;
+use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PurchaseOrderService implements PurchaseOrderServiceInterface
 {
+    private bool $isSqlDriver;
+
+    public function __construct()
+    {
+        $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
+    }
+
     public function getPaginatedPurchaseOrders(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $requestingUser = Auth::user();
@@ -52,5 +61,47 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function getCreateDataForSelect(?string $search): array
+    {
+        $isSql = $this->isSqlDriver;
+
+        $supplierSearch = explode('supplier_', (string) $search)[1] ?? null;
+        $productSearch = explode('product_', (string) $search)[1] ?? null;
+
+        $suppliers = Partner::query()
+            ->select(['id', 'name'])
+            ->whereType('supplier')
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($supplierSearch, fn ($qr) => $qr->whereLike('name', "%$supplierSearch%")
+                ->orWhereLike('email', "%$supplierSearch%")->orWhereLike('identification', "%$supplierSearch%"))
+            ->cursorPaginate(10)
+            ->withQueryString();
+
+        $products = Product::query()
+            ->select(['id', 'name', 'sku', 'description', 'selling_price'])
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($productSearch, function ($qr) use ($productSearch, $isSql) {
+                if ($isSql) {
+                    $booleanQuery = Helpers::buildBooleanQuery($productSearch);
+                    $qr->whereFullText(['sku', 'name', 'description'], $booleanQuery, ['mode' => 'boolean']);
+                } else {
+                    $qr->where(function ($q) use ($productSearch) {
+                        $q->whereLike('sku', "%$productSearch%")->orWhereLike('name', "%$productSearch%")
+                            ->orWhereLike('description', "%$productSearch%");
+                    });
+                }
+            })
+            ->cursorPaginate(10)
+            ->withQueryString();
+
+        foreach ($products->items() as $item) {
+            $item->makeHidden(['sku', 'description'])->setAppends([]);
+        }
+
+        return [$suppliers, $products];
     }
 }
