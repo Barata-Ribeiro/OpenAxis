@@ -42,4 +42,20 @@ class PurchaseOrderController extends Controller
             'purchases' => $purchases,
         ]);
     }
+
+    public function create(QueryRequest $request)
+    {
+        Log::info('Purchase Orders: Accessed create purchase order page', ['action_user_id' => Auth::id()]);
+
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        [$suppliers, $products] = $this->purchaseOrderService->getCreateDataForSelect($search);
+
+        return Inertia::render('erp/purchases/create', [
+            'suppliers' => Inertia::scroll(fn () => $suppliers),
+            'products' => Inertia::scroll(fn () => $products),
+        ]);
+    }
 }
