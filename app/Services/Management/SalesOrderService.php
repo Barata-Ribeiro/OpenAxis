@@ -20,14 +20,26 @@ class SalesOrderService implements SalesOrderServiceInterface
 
         $vendorId = $requestingUser->hasRole(RoleEnum::VENDOR->value) ? Vendor::whereUserId($requestingUser->id)->pluck('id') : null;
 
+        $status = $filters['status'] ?? [];
         $createdAtRange = $filters['created_at'] ?? [];
         [$start, $end] = Helpers::getDateRange($createdAtRange);
 
+        $sortByStartsWithClient = str_starts_with((string) $sortBy, 'client_name');
+        $sortByStartsWithVendor = str_starts_with((string) $sortBy, 'vendor_name');
+
+        if (! empty($sortBy) && $sortByStartsWithClient) {
+            $sortBy = str_replace('client_name', 'partners.name', $sortBy);
+        }
+
+        if (! empty($sortBy) && $sortByStartsWithVendor) {
+            $sortBy = str_replace('vendor_name', 'vendors.name', $sortBy);
+        }
+
         return SalesOrder::query()
             ->select('sales_orders.*')
-            ->with('user:id,name,email')
-            ->select('partners.name as client_name', 'vendors.name as vendor_name', 'payment_conditions.terms as payment_terms')
+            ->with(['user:id,name,email', 'user.media', 'client:id,name', 'vendor:id,name', 'paymentCondition:id,code,name'])
             ->when($vendorId, fn ($q, $vId) => $q->whereIn('sales_orders.vendor_id', $vId))
+            ->when($status, fn ($q) => $q->whereIn('sales_orders.status', $status))
             ->when($search, fn ($query, $search) => $query->whereLike('sales_orders.order_number', "%$search%")
                 ->orWhereLike('sales_orders.notes', "%$search%")->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('name', "%$search%")
                 ->orWhereLike('email', "%$search%"))->orWhereLike('partners.name', "%$search%")->orWhereLike('vendors.name', "%$search%")
@@ -36,6 +48,8 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->leftJoin((new Partner)->getTable(), 'sales_orders.client_id', '=', 'partners.id')
             ->leftJoin((new Vendor)->getTable(), 'sales_orders.vendor_id', '=', 'vendors.id')
             ->leftJoin((new PaymentCondition)->getTable(), 'sales_orders.payment_condition_id', '=', 'payment_conditions.id')
-            ->paginate($perPage);
+            ->orderBy($sortBy, $sortDir)
+            ->paginate($perPage)
+            ->withQueryString();
     }
 }
