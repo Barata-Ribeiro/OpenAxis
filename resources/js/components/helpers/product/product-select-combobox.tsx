@@ -2,23 +2,21 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useDebounceCallback } from '@/hooks/use-debounce-callback';
-import erp from '@/routes/erp';
 import type { ScrollMeta } from '@/types';
 import type { Product } from '@/types/erp/product';
+import type { RouteDefinition } from '@/wayfinder';
 import { InfiniteScroll, router, usePage } from '@inertiajs/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { Activity, useMemo, useState } from 'react';
 
-interface NewInventoryInventorySelectComboboxProps {
+interface ProductSelectComboboxProps {
     value: number | null;
     setValue: Dispatch<SetStateAction<number | null>>;
+    route: RouteDefinition<'get'>;
 }
 
-export default function NewInventoryInventorySelectCombobox({
-    value,
-    setValue,
-}: Readonly<NewInventoryInventorySelectComboboxProps>) {
+export default function ProductSelectCombobox({ value, setValue, route }: Readonly<ProductSelectComboboxProps>) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
     const { products } = usePage<{ products: ScrollMeta<Pick<Product, 'id' | 'name'>[]> }>().props;
@@ -32,8 +30,8 @@ export default function NewInventoryInventorySelectCombobox({
     const debouncedSearch = useDebounceCallback((q: string) => {
         const normalizedQ = q.trim();
 
-        router.visit(erp.inventory.create(), {
-            data: normalizedQ ? { search: normalizedQ } : {},
+        router.visit(route, {
+            data: normalizedQ ? { search: normalizedQ } : undefined,
             replace: true,
             preserveState: true,
             preserveScroll: true,
@@ -60,7 +58,7 @@ export default function NewInventoryInventorySelectCombobox({
                         value={search}
                         onValueChange={(next) => {
                             setSearch(next);
-                            debouncedSearch(next.trim());
+                            debouncedSearch(next);
                         }}
                     />
 
