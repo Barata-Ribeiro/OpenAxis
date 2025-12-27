@@ -21,7 +21,7 @@ class SalesOrderController extends Controller
         $search = trim($validated['search'] ?? '');
         $filters = $validated['filters'] ?? [];
 
-        $allowedSorts = ['id']; // Todo: define allowed sorts later
+        $allowedSorts = ['id', 'client_name', 'total_cost', 'status', 'vendor_name', 'created_at', 'updated_at'];
         if (! \in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
