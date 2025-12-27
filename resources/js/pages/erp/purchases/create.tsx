@@ -27,6 +27,7 @@ export default function CreatePurchaseOrderPage({ suppliers, products }: Readonl
                     <Card>
                         <CardContent>
                             {/* TODO: Purchase Order Form - Suppliers and Products loaded from server. */}
+                            <pre>{JSON.stringify({ suppliers, products }, null, 2)}</pre>
                         </CardContent>
                     </Card>
                 </div>
