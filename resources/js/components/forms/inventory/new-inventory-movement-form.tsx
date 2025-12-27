@@ -1,5 +1,5 @@
 import InputError from '@/components/feedback/input-error';
-import NewInventoryInventorySelectCombobox from '@/components/helpers/inventory/inventory-select-combobox';
+import ProductSelectCombobox from '@/components/helpers/product/product-select-combobox';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Field, FieldLabel } from '@/components/ui/field';
@@ -31,7 +31,11 @@ export default function NewInventoryMovementForm() {
                 <>
                     <Field aria-invalid={!!errors.product_id}>
                         <FieldLabel htmlFor="product_id">Product</FieldLabel>
-                        <NewInventoryInventorySelectCombobox value={productId} setValue={setProductId} />
+                        <ProductSelectCombobox
+                            value={productId}
+                            setValue={setProductId}
+                            route={erp.inventory.create()}
+                        />
                         <InputError message={errors.product_id} />
                     </Field>
 
