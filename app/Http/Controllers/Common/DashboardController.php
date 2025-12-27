@@ -35,7 +35,7 @@ class DashboardController extends Controller
             case RoleEnum::VENDOR->value:
             case RoleEnum::FINANCE->value:
             default:
-                // $data = $this->dashboardService->getUserDashboardData(); TODO: Implement user dashboard data
+                $data = $this->dashboardService->getUserDashboardData();
 
                 return Inertia::render('dashboards/dashboard', $data);
         }
