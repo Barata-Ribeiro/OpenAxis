@@ -1,9 +1,11 @@
 import DataTableColumnHeader from '@/components/table/data-table-column-header';
+import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
+import { PurchaseOrderStatus, purchaseOrderStatusLabel } from '@/types/erp/erp-enums';
 import type { PurchaseOrderWithRelations } from '@/types/erp/purchase-order';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, CircleDashed } from 'lucide-react';
 
 export const columns: ColumnDef<PurchaseOrderWithRelations>[] = [
     {
@@ -25,9 +27,35 @@ export const columns: ColumnDef<PurchaseOrderWithRelations>[] = [
         enableSorting: true,
     },
     {
-        accessorKey: 'status', // TODO: use enum mapping to display user-friendly status
+        accessorKey: 'status',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: function Cell({ row }) {
+            const status = row.original.status;
+            const variant = status === PurchaseOrderStatus.CANCELED ? 'destructive' : 'outline';
+            const label = `Purchase order status is '${purchaseOrderStatusLabel(status)}'`;
+
+            return (
+                <Badge
+                    className="h-5 min-w-5 px-2 font-mono tabular-nums"
+                    variant={variant}
+                    aria-label={label}
+                    title={label}
+                >
+                    {purchaseOrderStatusLabel(status)}
+                </Badge>
+            );
+        },
+        meta: {
+            label: 'Purchase Order Status',
+            variant: 'multiSelect',
+            options: Object.values(PurchaseOrderStatus).map((status) => ({
+                label: purchaseOrderStatusLabel(status),
+                value: status,
+            })),
+            icon: CircleDashed,
+        },
         enableSorting: true,
+        enableColumnFilter: true,
     },
     {
         accessorKey: 'user.name',
@@ -51,4 +79,6 @@ export const columns: ColumnDef<PurchaseOrderWithRelations>[] = [
         cell: ({ row }) => format(row.original.updated_at, 'PPpp'),
         enableSorting: true,
     },
+
+    //TODO: Add actions column
 ];
