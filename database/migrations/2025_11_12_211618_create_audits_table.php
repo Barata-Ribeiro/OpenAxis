@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $connection = config('audit.drivers.database.connection', config('database.default'));
+        $configuredConnection = config('audit.drivers.database.connection');
+        $defaultConnection = config('database.default');
+        $connection = $configuredConnection ?? $defaultConnection;
+
         $table = config('audit.drivers.database.table', 'audits');
+        $morphPrefix = config('audit.user.morph_prefix', 'user');
 
-        Schema::connection($connection)->create($table, function (Blueprint $table) {
-
-            $morphPrefix = config('audit.user.morph_prefix', 'user');
-
+        $buildTable = function (Blueprint $table) use ($morphPrefix): void {
             $table->bigIncrements('id');
-            $table->string($morphPrefix.'_type')->nullable();
-            $table->unsignedBigInteger($morphPrefix.'_id')->nullable();
+            $table->string("{$morphPrefix}_type")->nullable();
+            $table->unsignedBigInteger("{$morphPrefix}_id")->nullable();
             $table->string('event');
             $table->morphs('auditable');
             $table->text('old_values')->nullable();
@@ -31,8 +32,16 @@ return new class extends Migration
             $table->string('tags')->nullable();
             $table->timestamps();
 
-            $table->index([$morphPrefix.'_id', $morphPrefix.'_type']);
-        });
+            $table->index(["{$morphPrefix}_id", "{$morphPrefix}_type"]);
+        };
+
+        if (is_string($connection) && $connection !== '') {
+            Schema::connection($connection)->create($table, $buildTable);
+
+            return;
+        }
+
+        Schema::create($table, $buildTable);
     }
 
     /**
@@ -40,9 +49,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $connection = config('audit.drivers.database.connection', config('database.default'));
+        $configuredConnection = config('audit.drivers.database.connection');
+        $defaultConnection = config('database.default');
+        $connection = $configuredConnection ?? $defaultConnection;
+
         $table = config('audit.drivers.database.table', 'audits');
 
-        Schema::connection($connection)->drop($table);
+        if (is_string($connection) && $connection !== '') {
+            Schema::connection($connection)->dropIfExists($table);
+
+            return;
+        }
+
+        Schema::dropIfExists($table);
     }
 };
