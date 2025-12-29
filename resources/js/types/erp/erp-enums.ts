@@ -49,6 +49,23 @@ export function purchaseOrderStatusLabel(status: PurchaseOrderStatus): string {
     return PURCHASE_ORDER_STATUS_LABELS[status] ?? status;
 }
 
+// Sale Order Status
+export enum SaleOrderStatus {
+    PENDING = 'pending',
+    DELIVERED = 'delivered',
+    CANCELED = 'canceled',
+}
+
+export const SALE_ORDER_STATUS_LABELS: Record<SaleOrderStatus, string> = {
+    [SaleOrderStatus.PENDING]: 'Pending',
+    [SaleOrderStatus.DELIVERED]: 'Delivered',
+    [SaleOrderStatus.CANCELED]: 'Canceled',
+};
+
+export function saleOrderStatusLabel(status: SaleOrderStatus): string {
+    return SALE_ORDER_STATUS_LABELS[status] ?? status;
+}
+
 // Inventory Movement Type
 export enum InventoryMovementType {
     INBOUND = 'inbound',
