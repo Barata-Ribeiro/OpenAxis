@@ -2,12 +2,12 @@ import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { PayableStatus, payableStatusLabel } from '@/types/erp/erp-enums';
+import type { Payable } from '@/types/erp/payable';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CalendarIcon, CircleDashed } from 'lucide-react';
 
-// TODO: Update 'unknown' to the actual Payable type when available
-export const columns: ColumnDef<unknown>[] = [
+export const columns: ColumnDef<Payable>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
@@ -79,4 +79,6 @@ export const columns: ColumnDef<unknown>[] = [
         cell: ({ row }) => format(row.original.updated_at, 'PPpp'),
         enableSorting: true,
     },
+
+    // TODO: Add actions column here in the future
 ];

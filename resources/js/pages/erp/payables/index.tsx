@@ -5,10 +5,11 @@ import PageLayout from '@/layouts/page/layout';
 import { columns } from '@/pages/erp/payables/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
+import type { Payable } from '@/types/erp/payable';
 import { Head } from '@inertiajs/react';
 
 interface IndexPageProps {
-    payables: PaginationMeta<unknown[]>; // TODO: Replace 'unknown' with the actual Payable type when available
+    payables: PaginationMeta<Payable[]>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Payables', href: erp.payables.index().url }];
@@ -16,6 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Payables', href: erp.payables.i
 export default function IndexPage({ payables }: Readonly<IndexPageProps>) {
     const { data, ...pagination } = payables;
     const { can } = usePermission();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Payables" />
