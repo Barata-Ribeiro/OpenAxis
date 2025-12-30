@@ -3,7 +3,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { configureEcho } from '@laravel/echo-react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { hydrateRoot } from 'react-dom/client';
 import '../css/app.css';
 
 configureEcho({
@@ -16,9 +16,8 @@ createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
-        const root = createRoot(el);
-
-        root.render(
+        hydrateRoot(
+            el,
             <StrictMode>
                 <App {...props} />
             </StrictMode>,
