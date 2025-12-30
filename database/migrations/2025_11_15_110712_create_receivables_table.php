@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('issue_date')->useCurrent();
             $table->date('due_date');
             $table->date('received_date')->nullable();
-            $table->enum('status', ['pending', 'received', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'received', 'canceled'])->default('pending');
             $table->enum('payment_method', ['bank_transfer', 'credit_card', 'cash', 'check']);
             $table->foreignId('bank_account_id')->constrained('bank_accounts')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('sales_order_id')->constrained('sales_orders')->cascadeOnUpdate()->cascadeOnDelete();
