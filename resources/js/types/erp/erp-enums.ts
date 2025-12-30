@@ -99,3 +99,19 @@ export const PAYABLE_STATUS_LABELS: Record<PayableStatus, string> = {
 export function payableStatusLabel(status: PayableStatus): string {
     return PAYABLE_STATUS_LABELS[status] ?? status;
 }
+
+export enum ReceivableStatus {
+    PENDING = 'pending',
+    RECEIVED = 'received',
+    CANCELED = 'canceled',
+}
+
+export const RECEIVABLE_STATUS_LABELS: Record<ReceivableStatus, string> = {
+    [ReceivableStatus.PENDING]: 'Pending',
+    [ReceivableStatus.RECEIVED]: 'Received',
+    [ReceivableStatus.CANCELED]: 'Canceled',
+};
+
+export function receivableStatusLabel(status: ReceivableStatus): string {
+    return RECEIVABLE_STATUS_LABELS[status] ?? status;
+}
