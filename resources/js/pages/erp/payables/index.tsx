@@ -5,11 +5,11 @@ import PageLayout from '@/layouts/page/layout';
 import { columns } from '@/pages/erp/payables/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
-import type { Payable } from '@/types/erp/payable';
+import type { PayableWithRelations } from '@/types/erp/payable';
 import { Head } from '@inertiajs/react';
 
 interface IndexPageProps {
-    payables: PaginationMeta<Payable[]>;
+    payables: PaginationMeta<PayableWithRelations[]>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Payables', href: erp.payables.index().url }];

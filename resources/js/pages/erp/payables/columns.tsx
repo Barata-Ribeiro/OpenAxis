@@ -2,12 +2,12 @@ import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { PayableStatus, payableStatusLabel } from '@/types/erp/erp-enums';
-import type { Payable } from '@/types/erp/payable';
+import type { PayableWithRelations } from '@/types/erp/payable';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CalendarIcon, CircleDashed } from 'lucide-react';
 
-export const columns: ColumnDef<Payable>[] = [
+export const columns: ColumnDef<PayableWithRelations>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
