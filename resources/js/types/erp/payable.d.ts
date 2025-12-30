@@ -9,7 +9,7 @@ type PaymentMethod = 'bank_transfer' | 'credit_card' | 'cash' | 'check';
 export interface Payable {
     id: number;
     code: string;
-    dsecription: string;
+    description: string;
     supplier_id: number;
     vendor_id: number;
     amount: number;
