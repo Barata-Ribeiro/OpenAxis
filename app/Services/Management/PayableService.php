@@ -29,10 +29,10 @@ class PayableService implements PayableServiceInterface
 
         return Payable::query()
             ->select(['payables.id', 'payables.code', 'payables.amount', 'payables.due_date', 'payables.status', 'payables.supplier_id', 'payables.vendor_id', 'payables.created_at', 'payables.updated_at'])
-            ->with(['partner:id,name', 'vendor:id,name'])
+            ->with(['supplier:id,name', 'vendor:id,name'])
             ->when($search, fn ($q, $search) => $q->whereLike('payables.code', "%$search%")
                 ->orWhereLike('payables.description', "%$search%")->orWhereLike('payables.amount', "%$search%")
-                ->orWhereHas('partner', fn ($partnerQuery) => $partnerQuery->whereLike('partners.name', "%$search%")->orWhereLike('partners.email', "%$search%"))
+                ->orWhereHas('supplier', fn ($supplierQuery) => $supplierQuery->whereLike('partners.name', "%$search%")->orWhereLike('partners.email', "%$search%"))
                 ->orWhereHas('vendor', fn ($vendorQuery) => $vendorQuery->whereLike('vendors.name', "%$search%")->orWhereLike('vendors.email', "%$search%")))
             ->when($status, fn ($q, $status) => $q->whereIn('payables.status', (array) $status))
             ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
