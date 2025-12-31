@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('media', function (Blueprint $table) {
@@ -30,5 +33,13 @@ return new class extends Migration
 
             $table->index(['model_type', 'model_id', 'collection_name'], 'media_model_collection_index');
         });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('media');
     }
 };
