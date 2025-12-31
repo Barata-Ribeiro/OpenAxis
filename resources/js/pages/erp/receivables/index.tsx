@@ -2,6 +2,7 @@ import { DataTable } from '@/components/table/data-table';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
+import { columns } from '@/pages/erp/receivables/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
 import type { ReceivableWithRelations } from '@/types/erp/receivable';
@@ -22,7 +23,7 @@ export default function IndexPage({ receivables }: Readonly<IndexPageProps>) {
 
             <PageLayout title="Receivables" description="Listing all receivables in the system.">
                 <DataTable
-                    columns={[]} // TODO: Define columns for receivables
+                    columns={columns}
                     data={data}
                     pagination={pagination}
                     createRoute={can('finance.create') ? erp.receivables.create() : undefined}
