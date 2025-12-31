@@ -6,11 +6,27 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>New Account</title>
         <style type="text/css">
+            :root {
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+
+                --backgroud-color: #f8fafc;
+                --text-color: #09090b;
+                --container-bg-color: #ffffff;
+                --container-border-color: #e6e9ee;
+                --heading-color: #fb2c36;
+                --credentials-bg-color: #f1f5f9;
+                --credentials-border-color: #e2e8f0;
+                --strong-color: #09090b;
+
+                --font-family-base: Arial, Helvetica, sans-serif;
+            }
+
             /* Simple CSS2 */
             body {
-                background: #f8fafc;
-                color: #09090b;
-                font-family: Arial, Helvetica, sans-serif;
+                background: var(--backgroud-color);
+                color: var(--text-color);
+                font-family: var(--font-family-base);
                 margin: 0;
                 padding: 20px;
             }
@@ -19,13 +35,13 @@
                 width: 100%;
                 max-width: 600px;
                 margin: 0 auto;
-                background: #ffffff;
-                border: 1px solid #e6e9ee;
+                background: var(--container-bg-color);
+                border: 1px solid var(--container-border-color);
                 padding: 18px;
             }
 
             h1 {
-                color: #fb2c36;
+                color: var(--heading-color);
                 font-size: 18px;
                 margin: 0 0 12px 0;
             }
@@ -37,24 +53,22 @@
             }
 
             .credentials {
-                background: #f1f5f9;
-                border: 1px solid #e2e8f0;
+                background: var(--credentials-bg-color);
+                border: 1px solid var(--credentials-border-color);
                 padding: 10px;
                 display: block;
                 margin: 10px 0;
             }
 
             strong {
-                color: #09090b;
+                color: var(--strong-color);
             }
         </style>
     </head>
 
     <body>
         @php
-            $sanitize = function ($value) {
-                return str_replace('&#039;', "'", e($value));
-            };
+            $sanitize = fn($value) => str_replace('&#039;', "'", e($value));
         @endphp
         <div class="container">
             <h1>New account created</h1>
