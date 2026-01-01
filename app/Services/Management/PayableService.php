@@ -58,13 +58,13 @@ class PayableService implements PayableServiceInterface
             ->whereType('supplier')
             ->whereIsActive(true)
             ->when($supplierSearch, fn ($q, $supplierSearch) => $q->whereLike('name', "%$supplierSearch%"))
-            ->cursorPaginate(10)
+            ->cursorPaginate(10, ['id', 'name'], 'suppliers_cursor')
             ->withQueryString();
 
         $vendors = Vendor::select(['id', 'first_name', 'last_name'])
             ->whereIsActive(true)
             ->when($vendorSearch, fn ($q, $vendorSearch) => $q->whereLike('first_name', "%$vendorSearch%")->orWhereLike('last_name', "%$vendorSearch%"))
-            ->cursorPaginate(10)
+            ->cursorPaginate(10, ['id', 'first_name', 'last_name'], 'vendors_cursor')
             ->withQueryString();
 
         return [$suppliers, $vendors];
