@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\PayableServiceInterface;
 use App\Models\Partner;
 use App\Models\Payable;
@@ -42,5 +43,30 @@ class PayableService implements PayableServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function getCreateFormData(QueryRequest $request): array
+    {
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        $supplierSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+        $vendorSearch = $search && str_starts_with($search, 'vendor:') ? substr($search, 7) : null;
+
+        $suppliers = Partner::select(['id', 'name'])
+            ->whereType('supplier')
+            ->whereIsActive(true)
+            ->when($supplierSearch, fn ($q, $supplierSearch) => $q->whereLike('name', "%$supplierSearch%"))
+            ->cursorPaginate(10)
+            ->withQueryString();
+
+        $vendors = Vendor::select(['id', 'first_name', 'last_name'])
+            ->whereIsActive(true)
+            ->when($vendorSearch, fn ($q, $vendorSearch) => $q->whereLike('first_name', "%$vendorSearch%")->orWhereLike('last_name', "%$vendorSearch%"))
+            ->cursorPaginate(10)
+            ->withQueryString();
+
+        return [$suppliers, $vendors];
     }
 }

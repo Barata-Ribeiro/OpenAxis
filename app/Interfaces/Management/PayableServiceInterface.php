@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\QueryRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface PayableServiceInterface
@@ -18,4 +19,14 @@ interface PayableServiceInterface
      * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Payable models matching the criteria.
      */
     public function getPaginatedPayables(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Prepare and return data required to render the "create" form for a payable.
+     *
+     * @param  QueryRequest  $request  Query parameters and contextual information used to build the form data.
+     * @return array Associative array of form data (e.g. ['defaults' => ..., 'options' => ..., 'meta' => ...]).
+     *
+     * @throws \InvalidArgumentException If the provided request is invalid.
+     */
+    public function getCreateFormData(QueryRequest $request): array;
 }
