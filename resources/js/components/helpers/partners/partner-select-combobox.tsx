@@ -33,7 +33,7 @@ export default function PartnerSelectCombobox({ value, setValue, route }: Readon
         router.visit(route, {
             data: normalizedQ ? { search: `partner:${normalizedQ}` } : {},
             replace: true,
-            preserveState: true,
+            preserveState: Boolean(normalizedQ),
             preserveScroll: true,
             only: ['suppliers'],
             reset: ['suppliers'],

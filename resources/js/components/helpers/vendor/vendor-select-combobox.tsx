@@ -33,7 +33,7 @@ export default function VendorSelectCombobox({ value, setValue, route }: Readonl
         router.visit(route, {
             data: normalizedQ ? { search: `vendor:${normalizedQ}` } : {},
             replace: true,
-            preserveState: true,
+            preserveState: Boolean(normalizedQ),
             preserveScroll: true,
             only: ['vendors'],
             reset: ['vendors'],
