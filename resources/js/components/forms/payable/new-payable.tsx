@@ -1,17 +1,28 @@
 import InputError from '@/components/feedback/input-error';
+import CalendarDatePicker from '@/components/helpers/calendar-date-picker';
 import PartnerSelectCombobox from '@/components/helpers/partners/partner-select-combobox';
+import VendorSelectCombobox from '@/components/helpers/vendor/vendor-select-combobox';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { normalizeString } from '@/lib/utils';
 import erp from '@/routes/erp';
+import { PayableStatus, payableStatusLabel } from '@/types/erp/erp-enums';
+import type { Payable } from '@/types/erp/payable';
 import { Form, Link } from '@inertiajs/react';
+import { DollarSign } from 'lucide-react';
 import { Activity, useState } from 'react';
 
 export default function NewPayableForm() {
     const [supplierId, setSupplierId] = useState<number | null>(null);
     const [vendorId, setVendorId] = useState<number | null>(null);
+    const [dueDate, setDueDate] = useState<Date | null>(null);
+
+    const paymentMethods: Payable['payment_method'][] = ['bank_transfer', 'credit_card', 'cash', 'check'];
 
     return (
         <Form
@@ -23,6 +34,7 @@ export default function NewPayableForm() {
                 ...data,
                 supplier_id: supplierId,
                 vendor_id: vendorId,
+                due_date: dueDate?.toISOString().split('T')[0] ?? null,
             })}
         >
             {({ processing, resetAndClearErrors, errors }) => (
@@ -41,20 +53,89 @@ export default function NewPayableForm() {
                         <InputError message={errors.description} />
                     </Field>
 
-                    <Field aria-invalid={!!errors.supplier_id}>
-                        <FieldLabel htmlFor="supplier_id">Supplier</FieldLabel>
-                        <PartnerSelectCombobox
-                            value={supplierId}
-                            setValue={setSupplierId}
-                            route={erp.payables.create()}
-                        />
-                        <InputError message={errors.supplier_id} />
-                    </Field>
+                    <FieldGroup className="grid gap-4 sm:grid-cols-2">
+                        <Field aria-invalid={!!errors.supplier_id}>
+                            <FieldLabel htmlFor="supplier_id">Supplier</FieldLabel>
+                            <PartnerSelectCombobox
+                                value={supplierId}
+                                setValue={setSupplierId}
+                                route={erp.payables.create()}
+                            />
+                            <InputError message={errors.supplier_id} />
+                        </Field>
 
-                    {/* TODO: Vendor selection to be implemented in the future */}
-                    {/* TODO: Date picker to be implemented in the future */}
-                    {/* TODO: Amount field to be implemented in the future */}
-                    {/* TODO: Additional types and payment method to be implemented in the future */}
+                        <Field aria-invalid={!!errors.vendor_id}>
+                            <FieldLabel htmlFor="vendor_id">Vendor</FieldLabel>
+                            <VendorSelectCombobox
+                                value={vendorId}
+                                setValue={setVendorId}
+                                route={erp.payables.create()}
+                            />
+                            <InputError message={errors.vendor_id} />
+                        </Field>
+                    </FieldGroup>
+
+                    <FieldGroup className="grid gap-4 sm:grid-cols-2">
+                        <Field aria-invalid={!!errors.amount}>
+                            <FieldLabel htmlFor="amount">Amount</FieldLabel>
+                            <InputGroup>
+                                <InputGroupInput
+                                    id="amount"
+                                    name="amount"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    aria-invalid={!!errors.amount}
+                                    required
+                                    aria-required
+                                />
+                                <InputGroupAddon align="inline-end">
+                                    <DollarSign aria-hidden />
+                                </InputGroupAddon>
+                            </InputGroup>
+
+                            <InputError message={errors.amount} />
+                        </Field>
+
+                        <Field aria-invalid={!!errors.due_date}>
+                            <FieldLabel htmlFor="due_date">Due Date</FieldLabel>
+                            <CalendarDatePicker value={dueDate} setValue={setDueDate} />
+                            <InputError message={errors.due_date} />
+                        </Field>
+                    </FieldGroup>
+
+                    <FieldGroup className="grid gap-4 sm:grid-cols-2">
+                        <Field data-invalid={!!errors.payment_method}>
+                            <FieldLabel htmlFor="payment_method">Payment Method</FieldLabel>
+                            <Select name="payment_method" required aria-required>
+                                <SelectTrigger className="w-full" aria-invalid={!!errors.payment_method}>
+                                    <SelectValue placeholder="Select a payment method" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {paymentMethods.map((method) => (
+                                        <SelectItem key={method} value={method}>
+                                            {normalizeString(method)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </Field>
+                        <Field data-invalid={!!errors.status}>
+                            <FieldLabel htmlFor="status">Payable Status</FieldLabel>
+                            <Select name="status" required aria-required>
+                                <SelectTrigger className="w-full" aria-invalid={!!errors.status}>
+                                    <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.values(PayableStatus).map((status) => (
+                                        <SelectItem key={status} value={status}>
+                                            {payableStatusLabel(status)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </Field>
+                    </FieldGroup>
 
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
