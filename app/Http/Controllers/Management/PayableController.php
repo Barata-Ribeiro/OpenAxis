@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
-use App\Models\Partner;
-use App\Models\Vendor;
 use App\Services\Management\PayableService;
 use Auth;
 use Inertia\Inertia;
@@ -45,24 +43,15 @@ class PayableController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(QueryRequest $request)
     {
         Log::info('Payable: Accessed payable creation page.', ['action_user_id' => Auth::id()]);
 
-        $suppliers = Partner::select(['id', 'name'])
-            ->whereType('supplier')
-            ->whereIsActive(true)
-            ->cursorPaginate(10)
-            ->withQueryString();
-
-        $vendors = Vendor::select(['id', 'first_name', 'last_name'])
-            ->whereIsActive(true)
-            ->cursorPaginate(10)
-            ->withQueryString();
+        [$suppliers, $vendors] = $this->payableService->getCreateFormData($request);
 
         return Inertia::render('erp/payables/create', [
-            'suppliers' => Inertia::defer(fn () => $suppliers),
-            'vendors' => Inertia::defer(fn () => $vendors),
+            'suppliers' => Inertia::scroll(fn () => $suppliers),
+            'vendors' => Inertia::scroll(fn () => $vendors),
         ]);
     }
 }
