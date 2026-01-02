@@ -5,16 +5,23 @@ import VendorSelectCombobox from '@/components/helpers/vendor/vendor-select-comb
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButton,
+    InputGroupInput,
+    InputGroupText,
+} from '@/components/ui/input-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { normalizeString } from '@/lib/utils';
 import erp from '@/routes/erp';
 import { PayableStatus, payableStatusLabel } from '@/types/erp/erp-enums';
 import type { Payable } from '@/types/erp/payable';
 import { Form, Link } from '@inertiajs/react';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, HashIcon, InfoIcon } from 'lucide-react';
 import { Activity, useState } from 'react';
 
 export default function NewPayableForm() {
@@ -79,6 +86,11 @@ export default function NewPayableForm() {
                         <Field aria-invalid={!!errors.amount}>
                             <FieldLabel htmlFor="amount">Amount</FieldLabel>
                             <InputGroup>
+                                <InputGroupAddon>
+                                    <InputGroupText>
+                                        <DollarSign aria-hidden />
+                                    </InputGroupText>
+                                </InputGroupAddon>
                                 <InputGroupInput
                                     id="amount"
                                     name="amount"
@@ -89,9 +101,6 @@ export default function NewPayableForm() {
                                     required
                                     aria-required
                                 />
-                                <InputGroupAddon align="inline-end">
-                                    <DollarSign aria-hidden />
-                                </InputGroupAddon>
                             </InputGroup>
 
                             <InputError message={errors.amount} />
@@ -136,6 +145,37 @@ export default function NewPayableForm() {
                             </Select>
                         </Field>
                     </FieldGroup>
+
+                    <Field aria-invalid={!!errors.reference_number}>
+                        <FieldLabel htmlFor="reference_number">Reference Number</FieldLabel>
+                        <InputGroup>
+                            <InputGroupAddon>
+                                <InputGroupText>
+                                    <HashIcon aria-hidden />
+                                </InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
+                                type="text"
+                                id="reference_number"
+                                name="reference_number"
+                                maxLength={50}
+                                aria-invalid={!!errors.reference_number}
+                            />
+                            <InputGroupAddon align="inline-end">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <InputGroupButton className="rounded-full" size="icon-xs">
+                                            <InfoIcon aria-hidden />
+                                        </InputGroupButton>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        A unique reference number to help identify the payable.
+                                    </TooltipContent>
+                                </Tooltip>
+                            </InputGroupAddon>
+                        </InputGroup>
+                        <InputError message={errors.reference_number} />
+                    </Field>
 
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
