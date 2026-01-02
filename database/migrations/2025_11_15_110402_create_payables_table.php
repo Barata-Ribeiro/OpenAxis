@@ -23,8 +23,8 @@ return new class extends Migration
             $table->date('payment_date')->nullable();
             $table->enum('status', ['pending', 'paid', 'canceled'])->default('pending');
             $table->enum('payment_method', ['bank_transfer', 'credit_card', 'cash', 'check']);
-            $table->foreignId('bank_account_id')->constrained('bank_accounts')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('sales_order_id')->constrained('sales_orders')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('bank_account_id')->nullable()->constrained('bank_accounts')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('sales_order_id')->nullable()->constrained('sales_orders')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('reference_number', 50)->nullable();
             $table->text('notes')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
