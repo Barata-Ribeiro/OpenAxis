@@ -115,3 +115,22 @@ export const RECEIVABLE_STATUS_LABELS: Record<ReceivableStatus, string> = {
 export function receivableStatusLabel(status: ReceivableStatus): string {
     return RECEIVABLE_STATUS_LABELS[status] ?? status;
 }
+
+// Bank Account Type
+export enum BankAccountType {
+    CASH = 'cash',
+    CHECKING_ACCOUNT = 'checking_account',
+    SAVINGS_ACCOUNT = 'savings_account',
+    INVESTMENT_ACCOUNT = 'investment_account',
+}
+
+export const BANK_ACCOUNT_TYPE_LABELS: Record<BankAccountType, string> = {
+    [BankAccountType.CASH]: 'Cash',
+    [BankAccountType.CHECKING_ACCOUNT]: 'Checking Account',
+    [BankAccountType.SAVINGS_ACCOUNT]: 'Savings Account',
+    [BankAccountType.INVESTMENT_ACCOUNT]: 'Investment Account',
+};
+
+export function bankAccountTypeLabel(type: BankAccountType): string {
+    return BANK_ACCOUNT_TYPE_LABELS[type] ?? type;
+}
