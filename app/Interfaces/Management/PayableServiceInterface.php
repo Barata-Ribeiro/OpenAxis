@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -21,12 +22,26 @@ interface PayableServiceInterface
     public function getPaginatedPayables(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
 
     /**
-     * Prepare and return data required to render the "create" form for a payable.
+     * Prepare and return the data required to render the "create" form for a payable.
      *
-     * @param  QueryRequest  $request  Query parameters and contextual information used to build the form data.
-     * @return array Associative array of form data (e.g. ['defaults' => ..., 'options' => ..., 'meta' => ...]).
+     * This should gather defaults, selectable option lists, related entity data,
+     * validation rules and any UI metadata based on the provided query/request context.
      *
-     * @throws \InvalidArgumentException If the provided request is invalid.
+     * @param  QueryRequest  $request  Request containing query parameters, user/context info and localization
+     * @return array<string,mixed> Associative array of form data keys to their values
      */
     public function getCreateFormData(QueryRequest $request): array;
+
+    /**
+     * Store a new payable using the provided request data.
+     *
+     * Persists a payable entity using the information contained in the given
+     * PayableRequest. Implementations should validate and map request data to
+     * a domain model and save it to the repository or other persistent storage.
+     *
+     * @param  PayableRequest  $request  The validated request containing payable data.
+     *
+     * @throws \Throwable If an error occurs while storing the payable.
+     */
+    public function storePayable(PayableRequest $request): void;
 }

@@ -3,12 +3,15 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\PayableServiceInterface;
 use App\Models\Partner;
 use App\Models\Payable;
 use App\Models\Vendor;
+use Auth;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Str;
 
 class PayableService implements PayableServiceInterface
 {
@@ -68,5 +71,18 @@ class PayableService implements PayableServiceInterface
             ->withQueryString();
 
         return [$suppliers, $vendors];
+    }
+
+    public function storePayable(PayableRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $payableCount = Payable::count() + 1;
+        $createdById = Auth::id();
+
+        $shortUuid = substr((string) Str::uuid7(), 0, 8);
+        $code = 'PYB-'.$shortUuid.'-'.str_pad((string) $payableCount, 6, '0', STR_PAD_LEFT);
+
+        Payable::insert($validated + ['code' => $code, 'user_id' => $createdById]);
     }
 }
