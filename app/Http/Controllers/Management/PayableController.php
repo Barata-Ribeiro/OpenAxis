@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\Management\PayableService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -53,5 +55,23 @@ class PayableController extends Controller
             'suppliers' => Inertia::scroll(fn () => $suppliers),
             'vendors' => Inertia::scroll(fn () => $vendors),
         ]);
+    }
+
+    public function store(PayableRequest $request)
+    {
+        try {
+            $this->payableService->storePayable($request);
+
+            Log::info('Payable: Successfully stored new payable.', ['action_user_id' => Auth::id()]);
+
+            return to_route('erp.payables.index')->with('success', 'Payable created successfully.');
+        } catch (Exception $e) {
+            Log::error('Payable: Error storing payable.', [
+                'action_user_id' => Auth::id(),
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->with('error', 'An error occurred while storing the payable. Please try again.');
+        }
     }
 }
