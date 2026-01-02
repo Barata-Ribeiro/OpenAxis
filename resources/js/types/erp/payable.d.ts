@@ -3,6 +3,7 @@ import type { PayableStatus } from '@/types/erp/erp-enums';
 import type { Partner } from '@/types/erp/partner';
 import type { SaleOrder } from '@/types/erp/sale-order';
 import type { Vendor } from '@/types/erp/vendor';
+import type { BankAccount } from '@types/erp/bank-account';
 
 type PaymentMethod = 'bank_transfer' | 'credit_card' | 'cash' | 'check';
 
@@ -30,7 +31,7 @@ export interface Payable {
 export interface PayableWithRelations extends Payable {
     supplier: Partner;
     vendor: Vendor;
-    bank_account: unknown; // TODO: Replace 'unknown' with actual BankAccount type when available
-    sales_order: SaleOrder;
+    bank_account?: BankAccount;
+    sales_order?: SaleOrder;
     user: User;
 }
