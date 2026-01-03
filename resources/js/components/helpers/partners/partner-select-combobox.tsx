@@ -44,13 +44,13 @@ export default function PartnerSelectCombobox({ value, setValue, route }: Readon
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
+                <Button variant="outline" role="combobox" aria-expanded={open} className="flex-1 justify-between">
                     {selectedLabel}
                     <ChevronsUpDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-full p-0">
+            <PopoverContent className="w-auto p-0" align="start">
                 <Command shouldFilter={false}>
                     <CommandInput
                         placeholder="Search suppliers..."
