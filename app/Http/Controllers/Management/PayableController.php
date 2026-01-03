@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Management;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\Payable;
 use App\Services\Management\PayableService;
 use Auth;
 use Exception;
@@ -73,5 +74,19 @@ class PayableController extends Controller
 
             return redirect()->back()->with('error', 'An error occurred while storing the payable. Please try again.');
         }
+    }
+
+    public function show(Payable $payable)
+    {
+        Log::info('Purchase Orders: Accessed view purchase order page', [
+            'action_user_id' => Auth::id(),
+            'purchase_id' => $payable,
+        ]);
+
+        $payable = $this->payableService->getPayableDetails($payable);
+
+        return Inertia::render('erp/payables/show', [
+            'payable' => $payable,
+        ]);
     }
 }

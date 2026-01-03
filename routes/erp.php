@@ -160,10 +160,10 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('destroy', 'permission:supplier.destroy');
 
     Route::resource('payables', PayableController::class)
-        ->except('show')
         ->parameters(['payables' => 'payable'])
         ->names([
             'index' => 'erp.payables.index',
+            'show' => 'erp.payables.show',
             'create' => 'erp.payables.create',
             'store' => 'erp.payables.store',
             'edit' => 'erp.payables.edit',
@@ -171,6 +171,7 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
             'destroy' => 'erp.payables.destroy',
         ])
         ->middlewareFor('index', 'permission:finance.index')
+        ->middlewareFor('show', 'permission:finance.show')
         ->middlewareFor(['create', 'store'], 'permission:finance.create')
         ->middlewareFor(['edit', 'update'], 'permission:finance.edit')
         ->middlewareFor('destroy', 'permission:finance.destroy');
