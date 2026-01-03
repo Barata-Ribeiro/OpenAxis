@@ -67,8 +67,8 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
     {
         $isSql = $this->isSqlDriver;
 
-        $supplierSearch = explode('supplier_', (string) $search)[1] ?? null;
-        $productSearch = explode('product_', (string) $search)[1] ?? null;
+        $supplierSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+        $productSearch = $search && str_starts_with($search, 'product:') ? substr($search, 8) : null;
 
         $suppliers = Partner::query()
             ->select(['id', 'name'])
@@ -77,7 +77,7 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
             ->whereIsActive(true)
             ->when($supplierSearch, fn ($qr) => $qr->whereLike('name', "%$supplierSearch%")
                 ->orWhereLike('email', "%$supplierSearch%")->orWhereLike('identification', "%$supplierSearch%"))
-            ->cursorPaginate(10)
+            ->cursorPaginate(10, ['id', 'name'], 'suppliers_cursor')
             ->withQueryString();
 
         $products = Product::query()
@@ -95,7 +95,7 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
                     });
                 }
             })
-            ->cursorPaginate(10)
+            ->cursorPaginate(10, ['id', 'name', 'sku', 'description', 'selling_price'], 'products_cursor')
             ->withQueryString();
 
         foreach ($products->items() as $item) {
