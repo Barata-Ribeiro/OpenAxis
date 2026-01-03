@@ -4,6 +4,7 @@ namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\Payable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface PayableServiceInterface
@@ -44,4 +45,15 @@ interface PayableServiceInterface
      * @throws \Throwable If an error occurs while storing the payable.
      */
     public function storePayable(PayableRequest $request): void;
+
+    /**
+     * Populate and return a Payable with its detailed information.
+     *
+     * Loads related entities and computed fields required for processing or display
+     * (for example: supplier, related invoices, taxes, totals, and current status).
+     *
+     * @param  Payable  $payable  The Payable instance to hydrate with details.
+     * @return Payable The hydrated Payable instance containing populated details.
+     */
+    public function getPayableDetails(Payable $payable): Payable;
 }

@@ -88,4 +88,9 @@ class PayableService implements PayableServiceInterface
 
         Payable::insert($validated + ['code' => $code, 'user_id' => $createdById]);
     }
+
+    public function getPayableDetails(Payable $payable): Payable
+    {
+        return $payable->load(['supplier', 'vendor', 'bankAccount', 'salesOrder', 'user']);
+    }
 }
