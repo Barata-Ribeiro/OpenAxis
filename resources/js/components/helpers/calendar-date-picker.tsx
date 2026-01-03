@@ -8,9 +8,14 @@ import { useState } from 'react';
 interface CalendarDatePickerProps {
     value: Date | null;
     setValue: Dispatch<SetStateAction<Date | null>>;
+    limitToCurrentYearAndFuture?: boolean;
 }
 
-export default function CalendarDatePicker({ value, setValue }: Readonly<CalendarDatePickerProps>) {
+export default function CalendarDatePicker({
+    value,
+    setValue,
+    limitToCurrentYearAndFuture = true,
+}: Readonly<CalendarDatePickerProps>) {
     const [open, setOpen] = useState(false);
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -31,9 +36,9 @@ export default function CalendarDatePicker({ value, setValue }: Readonly<Calenda
                     selected={value ?? undefined}
                     captionLayout="dropdown"
                     showOutsideDays={false}
-                    startMonth={new Date(currentYear, 0)}
+                    startMonth={limitToCurrentYearAndFuture ? new Date(currentYear, 0) : undefined}
                     endMonth={new Date(currentYear + 5, 11)}
-                    disabled={(date) => date < minDate || date > maxDate}
+                    disabled={(date) => limitToCurrentYearAndFuture && (date < minDate || date > maxDate)}
                     onSelect={(date) => {
                         setValue(date ?? null);
                         setOpen(false);
