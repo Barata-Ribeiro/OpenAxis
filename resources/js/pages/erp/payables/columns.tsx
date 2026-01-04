@@ -37,6 +37,17 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
     {
         accessorKey: 'supplier.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Supplier" />,
+        cell: function Cell({ row }) {
+            const payable = row.original;
+            console.log(payable);
+
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{payable.supplier.name}</span>
+                    <span className="text-xs text-muted-foreground">{payable.supplier.email}</span>
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
@@ -48,7 +59,22 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
     {
         accessorKey: 'due_date',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Due Date" />,
-        cell: ({ row }) => format(row.original.due_date, 'PPpp'),
+        cell: function Cell({ row }) {
+            const payable = row.original;
+
+            return (
+                <div className="flex flex-col">
+                    <time dateTime={new Date(payable.due_date).toISOString()} className="text-sm">
+                        {format(payable.due_date, 'PPpp')}
+                    </time>
+                    {payable.payment_date && (
+                        <span className="text-xs text-muted-foreground">
+                            Paid: {format(payable.payment_date, 'PPpp')}
+                        </span>
+                    )}
+                </div>
+            );
+        },
         meta: {
             label: 'Due Date',
             variant: 'dateRange',
