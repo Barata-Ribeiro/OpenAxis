@@ -3905,10 +3905,10 @@ namespace PHPSTORM_META {
 'erp.vendors.create','erp.vendors.store','erp.vendors.show','erp.vendors.edit','erp.vendors.update',
 'erp.vendors.destroy','erp.suppliers.force-destroy','erp.suppliers.index','erp.suppliers.create','erp.suppliers.store',
 'erp.suppliers.show','erp.suppliers.edit','erp.suppliers.update','erp.suppliers.destroy','erp.payables.index',
-'erp.payables.create','erp.payables.store','erp.payables.edit','erp.payables.update','erp.payables.destroy',
-'erp.receivables.index','erp.receivables.create','erp.receivables.store','erp.receivables.edit','erp.receivables.update',
-'erp.receivables.destroy','erp.payment-conditions.index','erp.payment-conditions.create','erp.payment-conditions.store','erp.payment-conditions.edit',
-'erp.payment-conditions.update','erp.payment-conditions.destroy','storage.local',);
+'erp.payables.create','erp.payables.store','erp.payables.show','erp.payables.edit','erp.payables.update',
+'erp.payables.destroy','erp.receivables.index','erp.receivables.create','erp.receivables.store','erp.receivables.edit',
+'erp.receivables.update','erp.receivables.destroy','erp.payment-conditions.index','erp.payment-conditions.create','erp.payment-conditions.store',
+'erp.payment-conditions.edit','erp.payment-conditions.update','erp.payment-conditions.destroy','storage.local',);
         registerArgumentsSet('views', 
 'app','emails.new_account','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line',
 'laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method',
