@@ -33,7 +33,7 @@ class PayableService implements PayableServiceInterface
 
         return Payable::query()
             ->select(['payables.id', 'payables.code', 'payables.amount', 'payables.due_date', 'payables.status', 'payables.supplier_id', 'payables.vendor_id', 'payables.created_at', 'payables.updated_at'])
-            ->with(['supplier:id,name', 'vendor:id,first_name,last_name'])
+            ->with(['supplier:id,name,email', 'vendor:id,first_name,last_name'])
             ->when($search, fn ($q, $search) => $q->whereLike('payables.code', "%$search%")
                 ->orWhereLike('payables.description', "%$search%")->orWhereLike('payables.amount', "%$search%")
                 ->orWhereHas('supplier', fn ($supplierQuery) => $supplierQuery->whereLike('partners.name', "%$search%")->orWhereLike('partners.email', "%$search%"))
@@ -91,6 +91,6 @@ class PayableService implements PayableServiceInterface
 
     public function getPayableDetails(Payable $payable): Payable
     {
-        return $payable->load(['supplier', 'vendor', 'bankAccount', 'salesOrder', 'user']);
+        return $payable->load(['supplier', 'vendor', 'vendor.user', 'vendor.user.media', 'bankAccount', 'salesOrder', 'user:id,name,email', 'user.media']);
     }
 }
