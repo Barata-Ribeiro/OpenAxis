@@ -1,11 +1,15 @@
 import InputError from '@/components/feedback/input-error';
 import CalendarDatePicker from '@/components/helpers/calendar-date-picker';
 import PartnerSelectCombobox from '@/components/helpers/partners/partner-select-combobox';
+import ItemsForPurchaseOrder, {
+    type SelectedProduct,
+} from '@/components/helpers/purchase-order/items-for-purchase-order';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { formatCurrency } from '@/lib/utils';
 import erp from '@/routes/erp';
 import { Form, Link } from '@inertiajs/react';
 import { PlusCircleIcon } from 'lucide-react';
@@ -13,7 +17,7 @@ import { Activity, useState } from 'react';
 
 export default function NewPurchaseOrderForm() {
     const [supplierId, setSupplierId] = useState<number | null>(null);
-    const [productIds, setProductIds] = useState<number[]>([]);
+    const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
     const [orderDate, setOrderDate] = useState<Date | null>(null);
     const [forecastDate, setForecastDate] = useState<Date | null>(null);
 
@@ -26,7 +30,10 @@ export default function NewPurchaseOrderForm() {
             transform={(data) => ({
                 ...data,
                 supplier_id: supplierId,
-                product_ids: productIds,
+                products: selectedProducts.map((product) => ({
+                    id: product.id,
+                    quantity: product.quantity,
+                })),
                 order_date: orderDate ? orderDate.toISOString().split('T')[0] : null,
                 forecast_date: forecastDate ? forecastDate.toISOString().split('T')[0] : null,
             })}
@@ -74,13 +81,30 @@ export default function NewPurchaseOrderForm() {
                         </Field>
                     </FieldGroup>
 
-                    {/* TODO: Insert product selection and item order list here. */}
-
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
                         <Textarea id="notes" name="notes" rows={4} maxLength={255} />
                         <InputError message={errors.notes} />
                     </Field>
+
+                    <ItemsForPurchaseOrder
+                        value={selectedProducts}
+                        setValue={setSelectedProducts}
+                        route={erp.purchaseOrders.create()}
+                    />
+
+                    <p className="text-right text-3xl">
+                        Total:{' '}
+                        <span className="font-mono font-semibold">
+                            {formatCurrency(
+                                selectedProducts.reduce(
+                                    (total, product) =>
+                                        total + Number(product.selling_price) * Number(product.quantity),
+                                    0,
+                                ),
+                            )}
+                        </span>
+                    </p>
 
                     <ButtonGroup>
                         <Button type="button" variant="outline" disabled={processing} asChild>
@@ -98,7 +122,13 @@ export default function NewPurchaseOrderForm() {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => resetAndClearErrors()}
+                                onClick={() => {
+                                    resetAndClearErrors();
+                                    setSupplierId(null);
+                                    setSelectedProducts([]);
+                                    setOrderDate(null);
+                                    setForecastDate(null);
+                                }}
                                 disabled={processing}
                             >
                                 Reset
