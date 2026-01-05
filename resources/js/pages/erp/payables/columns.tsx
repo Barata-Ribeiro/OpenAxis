@@ -39,7 +39,6 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Supplier" />,
         cell: function Cell({ row }) {
             const payable = row.original;
-            console.log(payable);
 
             return (
                 <div className="flex flex-col">
