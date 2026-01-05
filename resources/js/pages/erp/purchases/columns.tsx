@@ -1,5 +1,7 @@
 import DataTableColumnHeader from '@/components/table/data-table-column-header';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useInitials } from '@/hooks/use-initials';
 import { formatCurrency } from '@/lib/utils';
 import { PurchaseOrderStatus, purchaseOrderStatusLabel } from '@/types/erp/erp-enums';
 import type { PurchaseOrderWithRelations } from '@/types/erp/purchase-order';
@@ -18,6 +20,16 @@ export const columns: ColumnDef<PurchaseOrderWithRelations>[] = [
     {
         accessorKey: 'supplier.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Supplier" />,
+        cell: function Cell({ row }) {
+            const purchaseOrder = row.original;
+
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{purchaseOrder.supplier.name}</span>
+                    <span className="text-xs text-muted-foreground">{purchaseOrder.supplier.email}</span>
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
@@ -60,6 +72,30 @@ export const columns: ColumnDef<PurchaseOrderWithRelations>[] = [
     {
         accessorKey: 'user.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Purchaser" />,
+        cell: function Cell({ row }) {
+            const getInitials = useInitials();
+            const createdByUser = row.original.user;
+
+            return (
+                <div className="inline-flex items-center gap-x-2">
+                    <Avatar className="size-6 overflow-hidden rounded-full">
+                        <AvatarImage
+                            src={createdByUser.avatar.src ?? ''}
+                            srcSet={createdByUser.avatar.srcSet ?? ''}
+                            alt={createdByUser.name}
+                            className="object-cover"
+                        />
+                        <AvatarFallback className="rounded-lg bg-neutral-200 text-xs text-black select-none dark:bg-neutral-700 dark:text-white">
+                            {getInitials(createdByUser.name)}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                        <p className="truncate font-medium">{createdByUser.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">{createdByUser.email}</p>
+                    </div>
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
