@@ -340,15 +340,15 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $payment_date
  * @property string $status
  * @property string $payment_method
- * @property int $bank_account_id
- * @property int $sales_order_id
+ * @property int|null $bank_account_id
+ * @property int|null $sales_order_id
  * @property string|null $reference_number
  * @property string|null $notes
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\BankAccount $bankAccount
- * @property-read \App\Models\SalesOrder $salesOrder
+ * @property-read \App\Models\BankAccount|null $bankAccount
+ * @property-read \App\Models\SalesOrder|null $salesOrder
  * @property-read \App\Models\Partner $supplier
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
