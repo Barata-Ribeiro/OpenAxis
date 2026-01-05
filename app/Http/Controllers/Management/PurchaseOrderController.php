@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\PurchaseOrderRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\Management\PurchaseOrderService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -57,5 +59,23 @@ class PurchaseOrderController extends Controller
             'suppliers' => Inertia::scroll(fn () => $suppliers),
             'products' => Inertia::scroll(fn () => $products),
         ]);
+    }
+
+    public function store(PurchaseOrderRequest $request)
+    {
+        try {
+            $this->purchaseOrderService->createPurchaseOrder($request);
+
+            Log::info('Purchase Orders: Successfully created a new purchase order', ['action_user_id' => Auth::id()]);
+
+            return to_route('erp.purchase-orders.index')->with(['success' => 'A new purchase has been registered successfully.']);
+        } catch (Exception $e) {
+            Log::error('Purchase Orders: Error creating purchase order', [
+                'action_user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with(['error', 'An error occurred while creating the purchase order. Please try again.']);
+        }
     }
 }
