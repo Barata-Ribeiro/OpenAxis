@@ -4,14 +4,17 @@ namespace App\Services\Management;
 
 use App\Common\Helpers;
 use App\Enums\RoleEnum;
+use App\Http\Requests\Management\PurchaseOrderRequest;
 use App\Interfaces\Management\PurchaseOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\User;
+use Arr;
 use Auth;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Str;
 
 class PurchaseOrderService implements PurchaseOrderServiceInterface
 {
@@ -22,6 +25,9 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
         $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedPurchaseOrders(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $requestingUser = Auth::user();
@@ -47,14 +53,14 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
 
         return PurchaseOrder::query()
             ->select('purchase_orders.*')
-            ->with(['user:id,name,email', 'user.media', 'supplier:id,name'])
+            ->with(['user:id,name,email', 'user.media', 'supplier:id,name,email'])
             ->when($buyerId, fn ($q, $bId) => $q->where('purchase_orders.user_id', $bId))
             ->when($search, fn ($query, $search) => $query->whereLike('purchase_orders.order_number', "%$search%")->orWhereLike('purchase_orders.notes', "%$search%")
                 ->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('users.name', "%$search%")->orWhereLike('users.email', "%$search%"))
                 ->orWhereHas('supplier', fn ($supplierQuery) => $supplierQuery->whereLike('partners.name', "%$search%")))
             ->when($supplierName, fn ($q) => $q->whereHas('supplier', fn ($q2) => $q2->whereIn('partners.name', $supplierName)))
             ->when($purchaserName, fn ($q) => $q->whereHas('user', fn ($q2) => $q2->whereIn('users.name', $purchaserName)))
-            ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
+            ->when($createdAtRange, fn ($q) => $q->whereBetween('purchase_orders.created_at', [$start, $end]))
             ->when($status, fn ($q) => $q->whereIn('purchase_orders.status', $status))
             ->leftJoin((new User)->getTable(), 'purchase_orders.user_id', '=', 'users.id')
             ->leftJoin((new Partner)->getTable(), 'purchase_orders.supplier_id', '=', 'partners.id')
@@ -63,6 +69,9 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
             ->withQueryString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getCreateDataForSelect(?string $search): array
     {
         $isSql = $this->isSqlDriver;
@@ -103,5 +112,32 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
         }
 
         return [$suppliers, $products];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createPurchaseOrder(PurchaseOrderRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $purchaseOrder = Arr::only($validated, [
+            'supplier_id', 'order_date', 'forecast_date', 'status', 'notes',
+        ]);
+
+        $items = Arr::get($validated, 'items', []);
+
+        DB::transaction(function () use ($purchaseOrder, $items) {
+            $orderNumber = 'PO-'.Str::random(8).str_pad((string) PurchaseOrder::count() + 1, 6, '0', STR_PAD_LEFT);
+
+            $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
+
+            $purchaseOrder['total_cost'] = $totalCost;
+            $purchaseOrder['order_number'] = $orderNumber;
+            $purchaseOrder['user_id'] = Auth::id();
+
+            $po = PurchaseOrder::create($purchaseOrder);
+            $po->purchaseOrderItems()->createMany($items);
+        });
     }
 }

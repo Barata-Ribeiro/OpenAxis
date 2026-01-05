@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\PurchaseOrderRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface PurchaseOrderServiceInterface
@@ -33,4 +34,15 @@ interface PurchaseOrderServiceInterface
      * @return array Associative array of select data keyed by select name.
      */
     public function getCreateDataForSelect(?string $search): array;
+
+    /**
+     * Create a new purchase order using data from the provided request.
+     *
+     * Implementations should validate the request and persist the resulting
+     * purchase order entity. Domain-specific errors (validation, persistence, etc.)
+     * may be thrown by the implementation.
+     *
+     * @param  PurchaseOrderRequest  $request  The request DTO containing purchase order data.
+     */
+    public function createPurchaseOrder(PurchaseOrderRequest $request): void;
 }
