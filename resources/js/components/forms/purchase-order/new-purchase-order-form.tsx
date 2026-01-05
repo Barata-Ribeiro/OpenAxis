@@ -7,10 +7,12 @@ import ItemsForPurchaseOrder, {
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency } from '@/lib/utils';
 import erp from '@/routes/erp';
+import { PurchaseOrderStatus, purchaseOrderStatusLabel } from '@/types/erp/erp-enums';
 import { Form, Link } from '@inertiajs/react';
 import { PlusCircleIcon } from 'lucide-react';
 import { Activity, useState } from 'react';
@@ -30,9 +32,11 @@ export default function NewPurchaseOrderForm() {
             transform={(data) => ({
                 ...data,
                 supplier_id: supplierId,
-                products: selectedProducts.map((product) => ({
-                    id: product.id,
+                items: selectedProducts.map((product) => ({
+                    product_id: product.id,
                     quantity: product.quantity,
+                    unit_price: product.selling_price,
+                    subtotal_price: Number(product.selling_price) * Number(product.quantity),
                 })),
                 order_date: orderDate ? orderDate.toISOString().split('T')[0] : null,
                 forecast_date: forecastDate ? forecastDate.toISOString().split('T')[0] : null,
@@ -81,9 +85,25 @@ export default function NewPurchaseOrderForm() {
                         </Field>
                     </FieldGroup>
 
+                    <Field data-invalid={!!errors.status}>
+                        <FieldLabel htmlFor="status">Purchase Status</FieldLabel>
+                        <Select name="status" required aria-required>
+                            <SelectTrigger className="w-full" aria-invalid={!!errors.status}>
+                                <SelectValue placeholder="Select a status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.values(PurchaseOrderStatus).map((status) => (
+                                    <SelectItem key={status} value={status}>
+                                        {purchaseOrderStatusLabel(status)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </Field>
+
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
-                        <Textarea id="notes" name="notes" rows={4} maxLength={255} />
+                        <Textarea id="notes" name="notes" rows={4} />
                         <InputError message={errors.notes} />
                     </Field>
 
@@ -91,6 +111,7 @@ export default function NewPurchaseOrderForm() {
                         value={selectedProducts}
                         setValue={setSelectedProducts}
                         route={erp.purchaseOrders.create()}
+                        errors={errors.items}
                     />
 
                     <p className="text-right text-3xl">
