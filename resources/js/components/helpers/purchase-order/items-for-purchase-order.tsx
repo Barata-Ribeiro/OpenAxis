@@ -3,16 +3,17 @@ import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Field } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDebounceCallback } from '@/hooks/use-debounce-callback';
 import { formatCurrency } from '@/lib/utils';
 import type { ScrollMeta } from '@/types';
 import type { Product } from '@/types/erp/product';
 import type { RouteDefinition } from '@/wayfinder';
 import { InfiniteScroll, router, usePage } from '@inertiajs/react';
-import { Check, ChevronsUpDown, Trash2 } from 'lucide-react';
+import { Check, ChevronsUpDown, HelpCircle, Trash2 } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { Activity, useMemo, useState } from 'react';
 
@@ -90,7 +91,7 @@ export default function ItemsForPurchaseOrder({
                             className="w-full justify-between"
                         >
                             {selectedLabel}
-                            <ChevronsUpDown className="opacity-50" />
+                            <ChevronsUpDown aria-hidden className="opacity-50" />
                         </Button>
                     </PopoverTrigger>
 
@@ -136,17 +137,31 @@ export default function ItemsForPurchaseOrder({
                 </Popover>
 
                 <ButtonGroup>
-                    <Input
-                        type="number"
-                        inputMode="numeric"
-                        min={1}
-                        step={1}
-                        value={Number.isFinite(quantity) ? quantity : 1}
-                        onChange={(e) => setQuantity(Number.parseInt(e.target.value || '1', 10))}
-                        aria-label="Quantity"
-                        aria-invalid={!!errors}
-                        disabled={!selectedProduct}
-                    />
+                    <InputGroup>
+                        <InputGroupInput
+                            type="number"
+                            inputMode="numeric"
+                            min={1}
+                            step={1}
+                            value={Number.isFinite(quantity) ? quantity : 1}
+                            onChange={(e) => setQuantity(Number.parseInt(e.target.value || '1', 10))}
+                            aria-label="Initial quantity of the chosen product"
+                            aria-invalid={!!errors}
+                            disabled={!selectedProduct}
+                        />
+                        <InputGroupAddon align="inline-end">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <InputGroupButton variant="ghost" aria-label="Help" size="icon-xs">
+                                        <HelpCircle aria-hidden />
+                                    </InputGroupButton>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Adjust the initial quantity of the chosen product.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </InputGroupAddon>
+                    </InputGroup>
 
                     <Button type="button" onClick={addSelectedProduct} disabled={!selectedProduct}>
                         Add
@@ -160,34 +175,49 @@ export default function ItemsForPurchaseOrder({
                 <div className="space-y-2">
                     {value.map((item) => (
                         <Item key={item.id} variant="outline">
-                            <ItemContent className="min-w-0">
-                                <ItemTitle className="truncate font-medium">{item.name}</ItemTitle>
-                                <ItemDescription className="text-sm text-muted-foreground">
-                                    {formatCurrency(item.selling_price)} per unit
+                            <ItemContent>
+                                <ItemTitle className="truncate text-lg font-medium">{item.name}</ItemTitle>
+                                <ItemDescription className="text-sm text-balance text-muted-foreground">
+                                    {formatCurrency(item.selling_price)} per unit,{' '}
+                                    {formatCurrency(item.quantity * Number(item.selling_price))} subtotal
                                 </ItemDescription>
                             </ItemContent>
 
                             <ItemActions>
                                 <ButtonGroup>
-                                    <Input
-                                        type="number"
-                                        inputMode="numeric"
-                                        min={1}
-                                        step={1}
-                                        value={item.quantity}
-                                        onChange={(e) => {
-                                            const nextQuantity = Math.max(
-                                                1,
-                                                Number.parseInt(e.target.value || '1', 10),
-                                            );
-                                            setValue((current) =>
-                                                current.map((p) =>
-                                                    p.id === item.id ? { ...p, quantity: nextQuantity } : p,
-                                                ),
-                                            );
-                                        }}
-                                        aria-label={`Quantity for '${item.name}'`}
-                                    />
+                                    <InputGroup>
+                                        <InputGroupInput
+                                            type="number"
+                                            inputMode="numeric"
+                                            min={1}
+                                            step={1}
+                                            value={item.quantity}
+                                            onChange={(e) => {
+                                                const nextQuantity = Math.max(
+                                                    1,
+                                                    Number.parseInt(e.target.value || '1', 10),
+                                                );
+                                                setValue((current) =>
+                                                    current.map((p) =>
+                                                        p.id === item.id ? { ...p, quantity: nextQuantity } : p,
+                                                    ),
+                                                );
+                                            }}
+                                            aria-label={`Quantity for '${item.name}'`}
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <InputGroupButton variant="ghost" aria-label="Help" size="icon-xs">
+                                                        <HelpCircle aria-hidden />
+                                                    </InputGroupButton>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Adjust the quantity of the chosen product.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </InputGroupAddon>
+                                    </InputGroup>
 
                                     <Button
                                         type="button"
