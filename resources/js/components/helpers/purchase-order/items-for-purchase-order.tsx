@@ -1,6 +1,8 @@
+import InputError from '@/components/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -20,9 +22,15 @@ interface ItemsForPurchaseOrderProps {
     value: SelectedProduct[];
     setValue: Dispatch<SetStateAction<SelectedProduct[]>>;
     route: RouteDefinition<'get'>;
+    errors?: string;
 }
 
-export default function ItemsForPurchaseOrder({ value, setValue, route }: Readonly<ItemsForPurchaseOrderProps>) {
+export default function ItemsForPurchaseOrder({
+    value,
+    setValue,
+    route,
+    errors,
+}: Readonly<ItemsForPurchaseOrderProps>) {
     const { products } = usePage<{ products: ScrollMeta<Pick<Product, 'id' | 'name' | 'selling_price'>[]> }>().props;
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -72,7 +80,7 @@ export default function ItemsForPurchaseOrder({ value, setValue, route }: Readon
 
     return (
         <div className="space-y-4 border-y py-4">
-            <div className="grid gap-3 sm:grid-cols-[1fr_140px_auto]">
+            <Field data-invalid={!!errors} className="grid gap-3 sm:grid-cols-[1fr_auto]">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
@@ -136,6 +144,7 @@ export default function ItemsForPurchaseOrder({ value, setValue, route }: Readon
                         value={Number.isFinite(quantity) ? quantity : 1}
                         onChange={(e) => setQuantity(Number.parseInt(e.target.value || '1', 10))}
                         aria-label="Quantity"
+                        aria-invalid={!!errors}
                         disabled={!selectedProduct}
                     />
 
@@ -143,7 +152,9 @@ export default function ItemsForPurchaseOrder({ value, setValue, route }: Readon
                         Add
                     </Button>
                 </ButtonGroup>
-            </div>
+
+                <InputError message={errors} />
+            </Field>
 
             {value.length > 0 ? (
                 <div className="space-y-2">
