@@ -4,6 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Script Element for Page Data
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, the @inertia Blade directive will output the initial page
+    | data inside a <script type="application/json"> tag instead of a data-page
+    | attribute on the root element.
+    |
+    */
+
+    'use_script_element_for_initial_page' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Server Side Rendering
     |--------------------------------------------------------------------------
     |
