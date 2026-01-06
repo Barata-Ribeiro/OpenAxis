@@ -14,5 +14,11 @@ createServer((page) =>
         setup: ({ App, props }) => {
             return <App {...props} />;
         },
+        defaults: {
+            future: {
+                useScriptElementForInitialPage: true,
+                useDataInertiaHeadAttribute: true,
+            },
+        },
     }),
 );

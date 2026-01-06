@@ -27,6 +27,12 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+    defaults: {
+        future: {
+            useScriptElementForInitialPage: true,
+            useDataInertiaHeadAttribute: true,
+        },
+    },
 });
 
 // This will set light / dark mode on load...
