@@ -8,9 +8,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import profile from '@/routes/profile';
 import type { SharedData } from '@/types';
 import type { Notification } from '@/types/application/notification';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useEchoNotification } from '@laravel/echo-react';
 import { BellIcon, MailsIcon } from 'lucide-react';
 import { Activity } from 'react';
@@ -54,10 +55,11 @@ export default function AppNotificationButton() {
                     </Activity>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                {/* TODO: Link to the all notifications page once implemented */}
-                <DropdownMenuItem>
-                    <MailsIcon aria-hidden size={16} />
-                    All notifications ({auth.notifications.total_count})
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={profile.notifications()} as="button">
+                        <MailsIcon aria-hidden size={16} />
+                        All notifications ({auth.notifications.total_count})
+                    </Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
