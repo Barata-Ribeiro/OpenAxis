@@ -10,6 +10,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ReceivableService implements ReceivableServiceInterface
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedReceivables(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $status = $filters['status'] ?? null;
@@ -39,5 +42,13 @@ class ReceivableService implements ReceivableServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getReceivableDetail(Receivable $receivable): Receivable
+    {
+        return $receivable->load(['client:id,name,email', 'bankAccount', 'salesOrder', 'user:id,name,email', 'user.media']);
     }
 }

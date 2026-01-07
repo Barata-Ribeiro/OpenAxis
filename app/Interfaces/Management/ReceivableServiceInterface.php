@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Models\Receivable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ReceivableServiceInterface
@@ -17,4 +18,15 @@ interface ReceivableServiceInterface
      * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of receivables.
      */
     public function getPaginatedReceivables(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator;
+
+    /**
+     * Get detailed information for a given receivable.
+     *
+     * Accepts a Receivable instance (usually containing identifying information)
+     * and returns a fully populated Receivable with all relevant details.
+     *
+     * @param Receivable $receivable The receivable to fetch details for.
+     * @return Receivable The detailed receivable instance.
+     */
+    public function getReceivableDetail(Receivable $receivable): Receivable;
 }
