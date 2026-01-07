@@ -10,6 +10,7 @@ use App\Models\Partner;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\User;
+use App\Notifications\NewPurchaseOrder;
 use Arr;
 use Auth;
 use DB;
@@ -138,6 +139,11 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
 
             $po = PurchaseOrder::create($purchaseOrder);
             $po->purchaseOrderItems()->createMany($items);
+
+            User::query()->whereHas('roles', fn ($q) => $q->whereIn('name', [RoleEnum::BUYER->value, RoleEnum::FINANCE->value]))
+                ->each(function (User $user) use ($po) {
+                    $user->notify(new NewPurchaseOrder($po));
+                });
         });
     }
 }
