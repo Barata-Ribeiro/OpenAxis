@@ -177,10 +177,10 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor('destroy', 'permission:finance.destroy');
 
     Route::resource('receivables', ReceivableController::class)
-        ->except('show')
         ->parameters(['receivables' => 'receivable'])
         ->names([
             'index' => 'erp.receivables.index',
+            'show' => 'erp.receivables.show',
             'create' => 'erp.receivables.create',
             'store' => 'erp.receivables.store',
             'edit' => 'erp.receivables.edit',
@@ -188,6 +188,7 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
             'destroy' => 'erp.receivables.destroy',
         ])
         ->middlewareFor('index', 'permission:finance.index')
+        ->middlewareFor('show', 'permission:finance.show')
         ->middlewareFor(['create', 'store'], 'permission:finance.create')
         ->middlewareFor(['edit', 'update'], 'permission:finance.edit')
         ->middlewareFor('destroy', 'permission:finance.destroy');
