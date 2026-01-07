@@ -1,11 +1,25 @@
+import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
 import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import { formatCurrency } from '@/lib/utils';
+import erp from '@/routes/erp';
 import { ReceivableStatus, receivableStatusLabel } from '@/types/erp/erp-enums';
 import type { ReceivableWithRelations } from '@/types/erp/receivable';
+import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CalendarIcon, CircleDashed } from 'lucide-react';
+import { CalendarIcon, CircleDashed, Ellipsis, EyeIcon } from 'lucide-react';
 
 export const columns: ColumnDef<ReceivableWithRelations>[] = [
     {
@@ -23,6 +37,16 @@ export const columns: ColumnDef<ReceivableWithRelations>[] = [
     {
         accessorKey: 'client.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Client" />,
+        cell: function Cell({ row }) {
+            const receivable = row.original;
+
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{receivable.client.name}</span>
+                    <span className="text-xs text-muted-foreground">{receivable.client.email}</span>
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
@@ -79,6 +103,56 @@ export const columns: ColumnDef<ReceivableWithRelations>[] = [
         cell: ({ row }) => format(row.original.updated_at, 'PPpp'),
         enableSorting: true,
     },
+    {
+        id: 'actions',
+        cell: function Cell({ row }) {
+            const { can } = usePermission();
 
-    // TODO: Add actions column here in the future
+            const receivable = row.original;
+
+            const codeToCopy = receivable.code;
+            const clientNameToCopy = receivable.client.name;
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            aria-label="Open menu"
+                            variant="ghost"
+                            className="flex size-8 p-0 data-[state=open]:bg-muted"
+                        >
+                            <Ellipsis aria-hidden size={16} />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={codeToCopy}>Copy Code</DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <DropdownMenuCopyButton content={clientNameToCopy}>Copy Client</DropdownMenuCopyButton>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem disabled={!can('finance.show')} asChild>
+                                <Link className="block w-full" href={erp.receivables.show(receivable.id)} as="button">
+                                    <EyeIcon aria-hidden size={14} /> View
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled={!can('finance.edit')} asChild>
+                                <Link className="block w-full" href={erp.receivables.edit(receivable.id)} as="button">
+                                    <EyeIcon aria-hidden size={14} /> Edit
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+        size: 40,
+        enableHiding: false,
+    },
 ];
