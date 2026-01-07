@@ -48,6 +48,8 @@ export const useIsMobile = (): UseIsMobileReturn => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        const controller = new AbortController();
+
         const checkIsMobile = () => {
             // Check using media query
             const mediaQuery = globalThis.window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
@@ -82,14 +84,14 @@ export const useIsMobile = (): UseIsMobileReturn => {
         const handleChange = () => checkIsMobile();
 
         if (mediaQuery.addEventListener) {
-            mediaQuery.addEventListener('change', handleChange);
+            mediaQuery.addEventListener('change', handleChange, { signal: controller.signal });
         } else {
             // Fallback for older browsers
             mediaQuery.addListener(handleChange);
         }
 
         // Listen for window resize
-        globalThis.window.addEventListener('resize', checkIsMobile);
+        globalThis.window.addEventListener('resize', checkIsMobile, { signal: controller.signal });
 
         return () => {
             if (mediaQuery.removeEventListener) {
@@ -98,6 +100,8 @@ export const useIsMobile = (): UseIsMobileReturn => {
                 mediaQuery.removeListener(handleChange);
             }
             globalThis.window.removeEventListener('resize', checkIsMobile);
+
+            controller.abort();
         };
     }, []);
 
