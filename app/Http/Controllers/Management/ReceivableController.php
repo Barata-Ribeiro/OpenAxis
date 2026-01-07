@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
+use App\Models\Receivable;
 use App\Services\Management\ReceivableService;
 use Auth;
 use Inertia\Inertia;
@@ -40,6 +41,20 @@ class ReceivableController extends Controller
 
         return Inertia::render('erp/receivables/index', [
             'receivables' => $receivables,
+        ]);
+    }
+
+    public function show(Receivable $receivable)
+    {
+        Log::info('Receivable: Accessed receivable detail page.', [
+            'action_user_id' => Auth::id(),
+            'receivable_id' => $receivable->id,
+        ]);
+
+        $receivableDetail = $this->receivableService->getReceivableDetail($receivable);
+
+        return Inertia::render('erp/receivables/show', [
+            'receivable' => $receivableDetail,
         ]);
     }
 }
