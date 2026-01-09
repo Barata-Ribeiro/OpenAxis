@@ -7,13 +7,25 @@ use App\Enums\RoleEnum;
 use App\Interfaces\Management\SalesOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\PaymentCondition;
+use App\Models\Product;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
 use Auth;
+use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class SalesOrderService implements SalesOrderServiceInterface
 {
+    private bool $isSqlDriver;
+
+    public function __construct()
+    {
+        $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedSalesOrders(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $requestingUser = Auth::user();
@@ -51,5 +63,62 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCreateDataForSelect(?string $search): array
+    {
+        $isSql = $this->isSqlDriver;
+
+        $clientSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+        $vendorSearch = $search && str_starts_with($search, 'vendor:') ? substr($search, 7) : null;
+        $productSearch = $search && str_starts_with($search, 'product:') ? substr($search, 8) : null;
+
+        $clients = Partner::query()
+            ->select(['id', 'name'])
+            ->whereType('client')
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($clientSearch, fn ($qr) => $qr->whereLike('name', "%$clientSearch%")
+                ->orWhereLike('email', "%$clientSearch%")->orWhereLike('identification', "%$clientSearch%"))
+            ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
+            ->withQueryString();
+
+        $vendors = Vendor::query()
+            ->select(['id', 'first_name', 'last_name'])
+            ->with(['user:id,name,email', 'user.media'])
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($vendorSearch, fn ($qr) => $qr->whereLike('first_name', "%$vendorSearch%")
+                ->orWhereLike('last_name', "%$vendorSearch%")->orWhereHas('user', fn ($userQr) => $userQr->whereLike('name', "%$vendorSearch%")
+                ->orWhereLike('email', "%$vendorSearch%")))
+            ->cursorPaginate(10, ['id', 'first_name', 'last_name'], 'vendors_cursor')
+            ->withQueryString();
+
+        $products = Product::query()
+            ->select(['id', 'name', 'sku', 'description', 'comission', 'selling_price'])
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($productSearch, function ($qr) use ($productSearch, $isSql) {
+                if ($isSql) {
+                    $booleanQuery = Helpers::buildBooleanQuery($productSearch);
+                    $qr->whereFullText(['sku', 'name', 'description'], $booleanQuery, ['mode' => 'boolean']);
+                } else {
+                    $qr->where(function ($q) use ($productSearch) {
+                        $q->whereLike('sku', "%$productSearch%")->orWhereLike('name', "%$productSearch%")
+                            ->orWhereLike('description', "%$productSearch%");
+                    });
+                }
+            })
+            ->cursorPaginate(10, ['id', 'name', 'sku', 'description', 'comission', 'selling_price'], 'products_cursor')
+            ->withQueryString();
+
+        foreach ($products->items() as $item) {
+            $item->makeHidden(['sku', 'description'])->setAppends([]);
+        }
+
+        return [$clients, $vendors, $products];
     }
 }
