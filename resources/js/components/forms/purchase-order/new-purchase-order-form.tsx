@@ -52,6 +52,7 @@ export default function NewPurchaseOrderForm() {
                                 value={supplierId}
                                 setValue={setSupplierId}
                                 route={erp.purchaseOrders.create()}
+                                type="supplier"
                             />
                             <Button
                                 variant="outline"
@@ -129,7 +130,7 @@ export default function NewPurchaseOrderForm() {
 
                     <ButtonGroup>
                         <Button type="button" variant="outline" disabled={processing} asChild>
-                            <Link href={erp.payables.index()} prefetch="hover" as="button">
+                            <Link href={erp.purchaseOrders.index()} prefetch="hover" as="button">
                                 Cancel
                             </Link>
                         </Button>
@@ -138,7 +139,7 @@ export default function NewPurchaseOrderForm() {
                                 <Activity mode={processing ? 'visible' : 'hidden'}>
                                     <Spinner />
                                 </Activity>
-                                Create Payable
+                                Register Purchase
                             </Button>
                             <Button
                                 type="button"
