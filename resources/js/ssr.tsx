@@ -17,7 +17,10 @@ createServer((page) =>
         defaults: {
             future: {
                 useScriptElementForInitialPage: true,
-                useDataInertiaHeadAttribute: true,
+            },
+            prefetch: {
+                cacheFor: '1m',
+                hoverDelay: 150,
             },
         },
     }),
