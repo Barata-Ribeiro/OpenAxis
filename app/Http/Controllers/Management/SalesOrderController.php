@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
+use App\Models\PaymentCondition;
 use App\Services\Management\SalesOrderService;
+use Auth;
 use Inertia\Inertia;
+use Log;
 
 class SalesOrderController extends Controller
 {
@@ -36,6 +39,28 @@ class SalesOrderController extends Controller
 
         return Inertia::render('erp/sales/index', [
             'sales' => $sales,
+        ]);
+    }
+
+    public function create(QueryRequest $request)
+    {
+        Log::info('Sales Orders: Accessed create sales order page', ['action_user_id' => Auth::id()]);
+
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        [$clients, $vendors, $products] = $this->salesOrderService->getCreateDataForSelect($search);
+
+        $paymentConditions = PaymentCondition::whereIsActive(true)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return Inertia::render('erp/sales/create', [
+            'clients' => Inertia::scroll(fn () => $clients),
+            'vendors' => Inertia::scroll(fn () => $vendors),
+            'paymentConditions' => $paymentConditions,
+            'products' => Inertia::scroll(fn () => $products),
         ]);
     }
 }
