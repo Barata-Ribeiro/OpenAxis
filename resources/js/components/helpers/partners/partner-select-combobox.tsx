@@ -14,18 +14,30 @@ interface PartnerSelectComboboxProps {
     value: number | null;
     setValue: Dispatch<SetStateAction<number | null>>;
     route: RouteDefinition<'get'>;
+    type: 'client' | 'supplier';
 }
 
-export default function PartnerSelectCombobox({ value, setValue, route }: Readonly<PartnerSelectComboboxProps>) {
+const _EMPTY: ScrollMeta<Pick<Partner, 'id' | 'name'>[]> = {
+    data: [],
+    path: '',
+    per_page: 0,
+};
+
+export default function PartnerSelectCombobox({ value, setValue, route, type }: Readonly<PartnerSelectComboboxProps>) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
-    const { suppliers } = usePage<{ suppliers: ScrollMeta<Pick<Partner, 'id' | 'name'>[]> }>().props;
+    const pageProps = usePage<{
+        clients?: ScrollMeta<Pick<Partner, 'id' | 'name'>[]>;
+        suppliers?: ScrollMeta<Pick<Partner, 'id' | 'name'>[]>;
+    }>().props;
+
+    const partners = type === 'client' ? (pageProps.clients ?? _EMPTY) : (pageProps.suppliers ?? _EMPTY);
 
     const selectedLabel = useMemo(() => {
-        const defaultLabel = 'Select supplier...';
+        const defaultLabel = type === 'client' ? 'Select client...' : 'Select supplier...';
         if (!value) return defaultLabel;
-        return suppliers.data.find((p) => p.id === value)?.name ?? defaultLabel;
-    }, [value, suppliers.data]);
+        return partners.data.find((p) => p.id === value)?.name ?? defaultLabel;
+    }, [partners.data, type, value]);
 
     const debouncedSearch = useDebounceCallback((q: string) => {
         const normalizedQ = q.trim();
@@ -35,8 +47,8 @@ export default function PartnerSelectCombobox({ value, setValue, route }: Readon
             replace: true,
             preserveState: Boolean(normalizedQ),
             preserveScroll: true,
-            only: ['suppliers'],
-            reset: ['suppliers'],
+            only: ['clients', 'suppliers'],
+            reset: ['clients', 'suppliers'],
             preserveUrl: true,
         });
     }, 300);
@@ -53,7 +65,7 @@ export default function PartnerSelectCombobox({ value, setValue, route }: Readon
             <PopoverContent className="w-auto p-0" align="start">
                 <Command shouldFilter={false}>
                     <CommandInput
-                        placeholder="Search suppliers..."
+                        placeholder={type === 'client' ? 'Search clients...' : 'Search suppliers...'}
                         className="h-9"
                         value={search}
                         onValueChange={(next) => {
@@ -65,19 +77,19 @@ export default function PartnerSelectCombobox({ value, setValue, route }: Readon
                     <CommandList>
                         <CommandEmpty>No supplier found.</CommandEmpty>
                         <CommandGroup>
-                            <InfiniteScroll data="suppliers" buffer={500} preserveUrl>
-                                {suppliers.data.map((supplier) => (
+                            <InfiniteScroll data={type === 'client' ? 'clients' : 'suppliers'} buffer={500} preserveUrl>
+                                {partners.data.map((partner) => (
                                     <CommandItem
-                                        key={supplier.id}
-                                        value={supplier.id.toString()}
+                                        key={partner.id}
+                                        value={partner.id.toString()}
                                         onSelect={(currentValue) => {
                                             const id = Number.parseInt(currentValue, 10);
                                             setValue(id === value ? null : id);
                                             setOpen(false);
                                         }}
                                     >
-                                        {supplier.name}
-                                        <Activity mode={value === supplier.id ? 'visible' : 'hidden'}>
+                                        {partner.name}
+                                        <Activity mode={value === partner.id ? 'visible' : 'hidden'}>
                                             <Check aria-hidden className="ml-auto" />
                                         </Activity>
                                     </CommandItem>
