@@ -3,10 +3,12 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\ReceivableServiceInterface;
 use App\Models\Partner;
 use App\Models\Receivable;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ReceivableService implements ReceivableServiceInterface
 {
@@ -50,5 +52,24 @@ class ReceivableService implements ReceivableServiceInterface
     public function getReceivableDetail(Receivable $receivable): Receivable
     {
         return $receivable->load(['client:id,name,email', 'bankAccount', 'salesOrder', 'user:id,name,email', 'user.media']);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCreateFormData(QueryRequest $request): CursorPaginator
+    {
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        $clientSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+
+        return Partner::select(['id', 'name'])
+            ->whereType('client')
+            ->whereIsActive(true)
+            ->when($clientSearch, fn ($q, $clientSearch) => $q->whereLike('name', "%$clientSearch%")->orWhereLike('email', "%$clientSearch%"))
+            ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
+            ->withQueryString();
     }
 }

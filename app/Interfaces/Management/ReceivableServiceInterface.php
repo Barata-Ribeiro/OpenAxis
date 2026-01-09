@@ -2,7 +2,9 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\QueryRequest;
 use App\Models\Receivable;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ReceivableServiceInterface
@@ -25,8 +27,20 @@ interface ReceivableServiceInterface
      * Accepts a Receivable instance (usually containing identifying information)
      * and returns a fully populated Receivable with all relevant details.
      *
-     * @param Receivable $receivable The receivable to fetch details for.
+     * @param  Receivable  $receivable  The receivable to fetch details for.
      * @return Receivable The detailed receivable instance.
      */
     public function getReceivableDetail(Receivable $receivable): Receivable;
+
+    /**
+     * Prepare and return the data required to populate a "create receivable" form.
+     *
+     * Uses the provided QueryRequest to apply filters, sorting, pagination or other query
+     * options and returns a cursor-based paginator containing the form fields, related
+     * entities and any metadata needed by the client.
+     *
+     * @param  QueryRequest  $request  Query parameters and options for building the form data.
+     * @return CursorPaginator Cursor paginator with items and pagination metadata for the create form.
+     */
+    public function getCreateFormData(QueryRequest $request): CursorPaginator;
 }
