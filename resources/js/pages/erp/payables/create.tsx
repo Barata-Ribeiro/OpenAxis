@@ -1,4 +1,4 @@
-import NewPayableForm from '@/components/forms/payable/new-payable';
+import NewPayableForm from '@/components/forms/payable/new-payable-form';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';

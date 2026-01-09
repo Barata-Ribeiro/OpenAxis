@@ -67,6 +67,7 @@ export default function NewPayableForm() {
                                 value={supplierId}
                                 setValue={setSupplierId}
                                 route={erp.payables.create()}
+                                type="supplier"
                             />
                             <InputError message={errors.supplier_id} />
                         </Field>
