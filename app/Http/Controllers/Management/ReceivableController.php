@@ -57,4 +57,15 @@ class ReceivableController extends Controller
             'receivable' => $receivableDetail,
         ]);
     }
+
+    public function create(QueryRequest $request)
+    {
+        Log::info('Receivable: Accessed receivable creation page.', ['action_user_id' => Auth::id()]);
+
+        $clients = $this->receivableService->getCreateFormData($request);
+
+        return Inertia::render('erp/receivables/create', [
+            'clients' => Inertia::scroll(fn () => $clients),
+        ]);
+    }
 }
