@@ -3,7 +3,7 @@ import CalendarDatePicker from '@/components/helpers/calendar-date-picker';
 import PartnerSelectCombobox from '@/components/helpers/partners/partner-select-combobox';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
@@ -38,6 +38,7 @@ export default function NewReceivableForm() {
                 <>
                     <Field aria-invalid={!!errors.description}>
                         <FieldLabel htmlFor="description">Description</FieldLabel>
+                        <FieldDescription>A brief description of the receivable (max 255 characters).</FieldDescription>
                         <Textarea
                             id="description"
                             name="description"
@@ -127,6 +128,9 @@ export default function NewReceivableForm() {
 
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
+                        <FieldDescription>
+                            Additional information or comments about the receivable (max 255 characters).
+                        </FieldDescription>
                         <Textarea id="notes" name="notes" rows={4} maxLength={255} />
                         <InputError message={errors.notes} />
                     </Field>
