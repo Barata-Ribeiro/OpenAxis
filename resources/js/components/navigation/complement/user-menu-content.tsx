@@ -34,22 +34,23 @@ export function UserMenuContent({ user }: Readonly<UserMenuContentProps>) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={edit()} as="button" prefetch onClick={cleanup}>
-                        <Settings className="mr-2" />
+                    <Link className="block w-full" href={edit()} onClick={cleanup} as="button" prefetch viewTransition>
+                        <Settings ara-hidden className="mr-2" />
                         Settings
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem variant="destructive" asChild>
                 <Link
                     className="block w-full"
                     href={logout()}
                     as="button"
                     onClick={handleLogout}
                     data-test="logout-button"
+                    viewTransition
                 >
-                    <LogOut className="mr-2" />
+                    <LogOut aria-hidden className="mr-2" />
                     Log out
                 </Link>
             </DropdownMenuItem>
