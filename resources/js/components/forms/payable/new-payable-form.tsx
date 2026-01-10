@@ -4,7 +4,7 @@ import PartnerSelectCombobox from '@/components/helpers/partners/partner-select-
 import VendorSelectCombobox from '@/components/helpers/vendor/vendor-select-combobox';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import {
     InputGroup,
     InputGroupAddon,
@@ -48,6 +48,7 @@ export default function NewPayableForm() {
                 <>
                     <Field aria-invalid={!!errors.description}>
                         <FieldLabel htmlFor="description">Description</FieldLabel>
+                        <FieldDescription>A brief description of the payable (max 255 characters).</FieldDescription>
                         <Textarea
                             id="description"
                             name="description"
@@ -61,7 +62,7 @@ export default function NewPayableForm() {
                     </Field>
 
                     <FieldGroup className="grid gap-4 sm:grid-cols-2">
-                        <Field aria-invalid={!!errors.supplier_id}>
+                        <Field className="grid" aria-invalid={!!errors.supplier_id}>
                             <FieldLabel htmlFor="supplier_id">Supplier</FieldLabel>
                             <PartnerSelectCombobox
                                 value={supplierId}
@@ -72,7 +73,7 @@ export default function NewPayableForm() {
                             <InputError message={errors.supplier_id} />
                         </Field>
 
-                        <Field aria-invalid={!!errors.vendor_id}>
+                        <Field className="grid" aria-invalid={!!errors.vendor_id}>
                             <FieldLabel htmlFor="vendor_id">Vendor</FieldLabel>
                             <VendorSelectCombobox
                                 value={vendorId}
@@ -180,6 +181,9 @@ export default function NewPayableForm() {
 
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
+                        <FieldDescription>
+                            Additional information or comments about the payable (max 255 characters).
+                        </FieldDescription>
                         <Textarea id="notes" name="notes" rows={4} maxLength={255} />
                         <InputError message={errors.notes} />
                     </Field>
