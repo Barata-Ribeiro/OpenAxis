@@ -6,7 +6,7 @@ import VendorSelectCombobox from '@/components/helpers/vendor/vendor-select-comb
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
@@ -138,6 +138,9 @@ export default function NewSalesOrderForm() {
 
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
+                        <FieldDescription>
+                            Any additional information regarding this sale order. (optional)
+                        </FieldDescription>
                         <Textarea id="notes" name="notes" rows={4} />
                         <InputError message={errors.notes} />
                     </Field>
