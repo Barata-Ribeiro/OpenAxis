@@ -82,7 +82,7 @@ export default function SettingsLayout({ children }: Readonly<PropsWithChildren>
                                     'bg-muted': isSameUrl(currentPath, item.href),
                                 })}
                             >
-                                <Link href={item.href}>
+                                <Link href={item.href} prefetch="hover" viewTransition>
                                     {item.icon && <item.icon className="size-4" />}
                                     {item.title}
                                 </Link>
