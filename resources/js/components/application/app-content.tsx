@@ -11,7 +11,11 @@ export function AppContent({ variant = 'header', children, ...props }: Readonly<
     }
 
     return (
-        <main className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl" {...props}>
+        <main
+            data-view-transition="app-content"
+            className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl"
+            {...props}
+        >
             {children}
         </main>
     );
