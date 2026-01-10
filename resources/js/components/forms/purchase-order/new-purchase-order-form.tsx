@@ -6,7 +6,7 @@ import ItemsForPurchaseOrder, {
 } from '@/components/helpers/purchase-order/items-for-purchase-order';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
@@ -104,6 +104,9 @@ export default function NewPurchaseOrderForm() {
 
                     <Field aria-invalid={!!errors.notes}>
                         <FieldLabel htmlFor="notes">Notes</FieldLabel>
+                        <FieldDescription>
+                            Any additional information regarding this purchase order. (optional)
+                        </FieldDescription>
                         <Textarea id="notes" name="notes" rows={4} />
                         <InputError message={errors.notes} />
                     </Field>
