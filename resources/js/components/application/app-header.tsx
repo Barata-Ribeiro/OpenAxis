@@ -108,8 +108,8 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
                         </Sheet>
                     </div>
 
-                    <Link href={dashboard()} prefetch className="flex items-center space-x-2">
-                        <AppLogoSvg className="h-8 w-full" />
+                    <Link href={dashboard()} className="flex items-center space-x-2" prefetch="hover" viewTransition>
+                        <AppLogoSvg className="h-8 w-full" style={{ viewTransitionName: 'app-logo' }} />
                     </Link>
 
                     {/* Desktop Navigation */}

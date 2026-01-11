@@ -25,7 +25,9 @@ export function Breadcrumbs({ breadcrumbs }: Readonly<{ breadcrumbs: BreadcrumbI
                                         <BreadcrumbPage>{item.title}</BreadcrumbPage>
                                     ) : (
                                         <BreadcrumbLink asChild>
-                                            <Link href={item.href}>{item.title}</Link>
+                                            <Link href={item.href} prefetch="hover" viewTransition>
+                                                {item.title}
+                                            </Link>
                                         </BreadcrumbLink>
                                     )}
                                 </BreadcrumbItem>

@@ -17,7 +17,7 @@ export default function AuthCardLayout({
             <div className="flex w-full max-w-md flex-col gap-6">
                 <Link href={home()} className="flex items-center gap-2 self-center font-medium">
                     <div className="flex items-center justify-center">
-                        <AppLogoSvg aria-hidden className="h-9 w-full" />
+                        <AppLogoSvg aria-hidden className="h-9 w-full" style={{ viewTransitionName: 'app-logo' }} />
                         <span className="sr-only">OpenAxis</span>
                     </div>
                 </Link>

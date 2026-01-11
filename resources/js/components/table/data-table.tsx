@@ -267,8 +267,9 @@ export function DataTable<TData, TValue>({
                                 href={createRoute}
                                 aria-label="Create new record of this type"
                                 title="Create new record of this type"
-                                prefetch
                                 as="button"
+                                prefetch
+                                viewTransition
                             >
                                 <ClipboardPlusIcon aria-hidden size={16} />
                                 Create
