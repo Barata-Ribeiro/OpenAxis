@@ -36,13 +36,12 @@ interface PurchaseOrderServiceInterface
     public function getCreateDataForSelect(?string $search): array;
 
     /**
-     * Create a new purchase order using data from the provided request.
+     * Create a new purchase order from the provided request.
      *
-     * Implementations should validate the request and persist the resulting
-     * purchase order entity. Domain-specific errors (validation, persistence, etc.)
-     * may be thrown by the implementation.
+     * @param  PurchaseOrderRequest  $request  The request containing purchase order data.
      *
-     * @param  PurchaseOrderRequest  $request  The request DTO containing purchase order data.
+     * @throws \InvalidArgumentException If the request data is invalid.
+     * @throws \RuntimeException If the purchase order cannot be created or persisted.
      */
     public function createPurchaseOrder(PurchaseOrderRequest $request): void;
 }
