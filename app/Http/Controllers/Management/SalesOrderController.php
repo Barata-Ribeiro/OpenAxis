@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\SaleOrderRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\PaymentCondition;
 use App\Services\Management\SalesOrderService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -62,5 +64,23 @@ class SalesOrderController extends Controller
             'paymentConditions' => $paymentConditions,
             'products' => Inertia::scroll(fn () => $products),
         ]);
+    }
+
+    public function store(SaleOrderRequest $request)
+    {
+        try {
+            $this->salesOrderService->createSalesOrder($request);
+
+            Log::info('Sales Orders: Created new sales order', ['action_user_id' => Auth::id()]);
+
+            return to_route('erp.sales-orders.index')->with('success', 'Sales order created successfully.');
+        } catch (Exception $e) {
+            Log::error('Sales Orders: Error creating sales order', [
+                'action_user_id' => Auth::id(),
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with(['error', 'An error occurred while creating the sales order. Please try again.']);
+        }
     }
 }
