@@ -4,15 +4,20 @@ namespace App\Services\Management;
 
 use App\Common\Helpers;
 use App\Enums\RoleEnum;
+use App\Http\Requests\Management\SaleOrderRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\PaymentCondition;
 use App\Models\Product;
 use App\Models\SalesOrder;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\NewSalesOrder;
+use Arr;
 use Auth;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Str;
 
 class SalesOrderService implements SalesOrderServiceInterface
 {
@@ -120,5 +125,41 @@ class SalesOrderService implements SalesOrderServiceInterface
         }
 
         return [$clients, $vendors, $products];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createSalesOrder(SaleOrderRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $saleOrder = Arr::only($validated, [
+            'client_id', 'vendor_id', 'order_date', 'delivery_date', 'payment_condition_id', 'status', 'payment_method', 'notes',
+        ]);
+
+        $items = Arr::get($validated, 'items', []);
+
+        DB::transaction(function () use ($saleOrder, $items) {
+            $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count() + 1, 6, '0', STR_PAD_LEFT);
+
+            $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
+            $totalComission = array_reduce($items, fn ($carry, $item) => $carry + $item['commission_item'], 0);
+            $productValue = array_reduce($items, fn ($carry, $item) => $carry + ($item['quantity'] * $item['unit_price']), 0);
+
+            $saleOrder['total_cost'] = $totalCost;
+            $saleOrder['total_commission'] = $totalComission;
+            $saleOrder['product_value'] = $productValue;
+            $saleOrder['order_number'] = $orderNumber;
+            $saleOrder['user_id'] = Auth::id();
+
+            $so = SalesOrder::create($saleOrder);
+            $so->salesOrderItems()->createMany($items);
+
+            User::query()->whereHas('roles', fn ($q) => $q->whereIn('name', [RoleEnum::VENDOR->value, RoleEnum::FINANCE->value]))
+                ->each(function (User $user) use ($so) {
+                    $user->notify(new NewSalesOrder($so));
+                });
+        });
     }
 }

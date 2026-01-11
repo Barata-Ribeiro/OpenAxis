@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\SaleOrderRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface SalesOrderServiceInterface
@@ -31,4 +32,14 @@ interface SalesOrderServiceInterface
      * @return array<int|string, mixed> Array of select options (e.g. [['value' => ..., 'label' => ...], ...] or [id => label]).
      */
     public function getCreateDataForSelect(?string $search): array;
+
+    /**
+     * Create a new sales order from the provided request.
+     *
+     * @param  SaleOrderRequest  $request  The request containing sales order data.
+     *
+     * @throws \InvalidArgumentException If the request data is invalid.
+     * @throws \RuntimeException If the sales order cannot be created or persisted.
+     */
+    public function createSalesOrder(SaleOrderRequest $request): void;
 }
