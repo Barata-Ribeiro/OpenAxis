@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 20)->unique();
             $table->string('description');
-            $table->foreignId('supplier_id')->constrained('partners')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('supplier_id')->nullable()->constrained('partners')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
             $table->date('issue_date')->useCurrent();
@@ -31,6 +31,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['supplier_id', 'status']);
+            $table->index(['vendor_id', 'due_date']);
         });
     }
 
