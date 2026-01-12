@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Models\Product;
 use Auth;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SaleOrderRequest extends FormRequest
@@ -38,6 +40,38 @@ class SaleOrderRequest extends FormRequest
             'status' => ['required', 'in:pending,delivered,canceled'],
             'payment_method' => ['required', 'in:cash,credit_card,debit_card,bank_transfer'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'update_payables' => ['sometimes', 'boolean'],
+            'update_receivables' => ['sometimes', 'boolean'],
         ];
+    }
+
+    /**
+     * Add after-validation hook to ensure requested quantities do not exceed stock.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $items = $this->input('items', []);
+
+            foreach ($items as $index => $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantity = $item['quantity'] ?? null;
+
+                if (empty($productId) || $quantity === null) {
+                    continue;
+                }
+
+                $insufficient = Product::whereId($productId)
+                    ->where('current_stock', '<', $quantity)
+                    ->exists();
+
+                if ($insufficient) {
+                    $validator->errors()->add(
+                        "items.$index.quantity",
+                        'Requested quantity exceeds current stock.'
+                    );
+                }
+            }
+        });
     }
 }
