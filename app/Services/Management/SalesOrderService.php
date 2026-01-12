@@ -7,8 +7,10 @@ use App\Enums\RoleEnum;
 use App\Http\Requests\Management\SaleOrderRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
 use App\Models\Partner;
+use App\Models\Payable;
 use App\Models\PaymentCondition;
 use App\Models\Product;
+use App\Models\Receivable;
 use App\Models\SalesOrder;
 use App\Models\StockMovement;
 use App\Models\User;
@@ -16,6 +18,7 @@ use App\Models\Vendor;
 use App\Notifications\NewSalesOrder;
 use Arr;
 use Auth;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Str;
@@ -136,6 +139,8 @@ class SalesOrderService implements SalesOrderServiceInterface
     {
         $validated = $request->validated();
 
+        $createdBy = Auth::id();
+
         $saleOrder = Arr::only($validated, [
             'client_id', 'vendor_id', 'order_date', 'delivery_date', 'payment_condition_id', 'status', 'payment_method', 'notes',
         ]);
@@ -146,7 +151,10 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->groupBy('product_id')
             ->map(fn ($group) => $group->sum('quantity'));
 
-        DB::transaction(function () use ($saleOrder, $items, $quantities) {
+        $statusPayable = $validated['update_payables'] ?? false;
+        $statusReceivable = $validated['update_receivables'] ?? false;
+
+        DB::transaction(function () use ($saleOrder, $items, $quantities, $createdBy, $statusReceivable) {
             $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count() + 1, 6, '0', STR_PAD_LEFT);
 
             $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
@@ -157,7 +165,7 @@ class SalesOrderService implements SalesOrderServiceInterface
             $saleOrder['total_commission'] = $totalComission;
             $saleOrder['product_value'] = $productValue;
             $saleOrder['order_number'] = $orderNumber;
-            $saleOrder['user_id'] = Auth::id();
+            $saleOrder['user_id'] = $createdBy;
 
             // Create Sales Order and its items
             $so = SalesOrder::create($saleOrder);
@@ -168,13 +176,64 @@ class SalesOrderService implements SalesOrderServiceInterface
                 Product::where('id', $productId)->decrement('current_stock', (int) $qty);
                 StockMovement::create([
                     'product_id' => $productId,
-                    'user_id' => Auth::id(),
+                    'user_id' => $createdBy,
                     'movement_type' => 'outbound',
                     'quantity' => (int) $qty,
                     'reason' => "Sales Order Created: $orderNumber",
                     'reference' => $orderNumber,
                 ]);
             }
+
+            // Handle payables/receivables if needed
+            $installments = 1;
+            $daysUntilDue = 30;
+            if (isset($saleOrder['payment_condition_id'])) {
+                $paymentCondition = PaymentCondition::find($saleOrder['payment_condition_id'])->whereIsActive(true);
+                if ($paymentCondition) {
+                    $installments = $paymentCondition->installments;
+                    $daysUntilDue = $paymentCondition->days_until_due;
+                }
+            }
+
+            $receivableCount = Receivable::count() + 1;
+            $payableCount = Payable::count() + 1;
+            $yearNow = Carbon::now()->year;
+
+            foreach (range(1, $installments) as $installment) {
+                $code = 'RCV-'.$yearNow.'-'.str_pad((string) $receivableCount, 6, '0', STR_PAD_LEFT);
+                $dueDate = Carbon::now()->addDays($daysUntilDue * $installment);
+                $installmentAmount = $so->total_cost / $installments;
+                $description = "Receivable for Sales Order {$so->order_number} - Installment $installment of $installments";
+
+                Receivable::insert([
+                    'code' => $code,
+                    'description' => $description,
+                    'client_id' => $so->client_id,
+                    'amount' => $installmentAmount,
+                    'due_date' => $dueDate,
+                    'status' => $statusReceivable ? 'received' : 'pending',
+                    'sales_order_id' => $so->id,
+                    'reference_number' => $so->order_number,
+                    'user_id' => $createdBy,
+                ]);
+            }
+
+            $payableCode = 'PYB-'.$yearNow.'-'.str_pad((string) $payableCount, 6, '0', STR_PAD_LEFT);
+            $payableDueDate = Carbon::now()->addDays($daysUntilDue * $installments);
+            $payableDescription = "Payable for Products Sold in Sales Order {$so->order_number}";
+
+            Payable::insert([
+                'code' => $payableCode,
+                'description' => $payableDescription,
+                'vendor_id' => $so->vendor_id,
+                'amount' => $so->product_value,
+                'due_date' => $payableDueDate,
+                'status' => $statusReceivable ? 'paid' : 'pending',
+                'payment_method' => $so->payment_method,
+                'sales_order_id' => $so->id,
+                'reference_number' => $so->order_number,
+                'user_id' => $createdBy,
+            ]);
 
             // Notify relevant users
             User::query()->whereHas('roles', fn ($q) => $q->whereIn('name', [RoleEnum::VENDOR->value, RoleEnum::FINANCE->value]))
