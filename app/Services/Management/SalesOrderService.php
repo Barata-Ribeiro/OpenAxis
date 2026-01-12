@@ -10,6 +10,7 @@ use App\Models\Partner;
 use App\Models\PaymentCondition;
 use App\Models\Product;
 use App\Models\SalesOrder;
+use App\Models\StockMovement;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\NewSalesOrder;
@@ -104,8 +105,9 @@ class SalesOrderService implements SalesOrderServiceInterface
 
         $products = Product::query()
             ->select(['id', 'name', 'sku', 'description', 'comission', 'selling_price'])
-            ->orderByDesc('id')
+            ->whereRaw('current_stock > 0')
             ->whereIsActive(true)
+            ->orderByDesc('id')
             ->when($productSearch, function ($qr) use ($productSearch, $isSql) {
                 if ($isSql) {
                     $booleanQuery = Helpers::buildBooleanQuery($productSearch);
@@ -140,7 +142,11 @@ class SalesOrderService implements SalesOrderServiceInterface
 
         $items = Arr::get($validated, 'items', []);
 
-        DB::transaction(function () use ($saleOrder, $items) {
+        $quantities = collect($items)
+            ->groupBy('product_id')
+            ->map(fn ($group) => $group->sum('quantity'));
+
+        DB::transaction(function () use ($saleOrder, $items, $quantities) {
             $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count() + 1, 6, '0', STR_PAD_LEFT);
 
             $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
@@ -153,9 +159,24 @@ class SalesOrderService implements SalesOrderServiceInterface
             $saleOrder['order_number'] = $orderNumber;
             $saleOrder['user_id'] = Auth::id();
 
+            // Create Sales Order and its items
             $so = SalesOrder::create($saleOrder);
             $so->salesOrderItems()->createMany($items);
 
+            // Handle product stock decrementation and stock movements
+            foreach ($quantities as $productId => $qty) {
+                Product::where('id', $productId)->decrement('current_stock', (int) $qty);
+                StockMovement::create([
+                    'product_id' => $productId,
+                    'user_id' => Auth::id(),
+                    'movement_type' => 'outbound',
+                    'quantity' => (int) $qty,
+                    'reason' => "Sales Order Created: $orderNumber",
+                    'reference' => $orderNumber,
+                ]);
+            }
+
+            // Notify relevant users
             User::query()->whereHas('roles', fn ($q) => $q->whereIn('name', [RoleEnum::VENDOR->value, RoleEnum::FINANCE->value]))
                 ->each(function (User $user) use ($so) {
                     $user->notify(new NewSalesOrder($so));
