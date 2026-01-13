@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ShippedOrderStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $tracking_number
  * @property string $carrier
  * @property \Illuminate\Support\Carbon $shipped_date
- * @property string $status
+ * @property ShippedOrderStatusEnum $status
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -51,10 +53,11 @@ class ShippedOrder extends Model
     {
         return [
             'shipped_date' => 'date',
+            'status' => ShippedOrderStatusEnum::class,
         ];
     }
 
-    public function salesOrder()
+    public function salesOrder(): BelongsTo
     {
         return $this->belongsTo(SalesOrder::class, 'sales_orders_id');
     }
