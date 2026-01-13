@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\PurchaseOrderStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
  * @property string $order_number
  * @property \Illuminate\Support\Carbon $order_date
  * @property \Illuminate\Support\Carbon|null $forecast_date
- * @property string $status
+ * @property PurchaseOrderStatusEnum $status
  * @property numeric $total_cost Total cost of the purchase order
  * @property string|null $notes
  * @property int $supplier_id
@@ -62,21 +65,22 @@ class PurchaseOrder extends Model
         return [
             'order_date' => 'date',
             'forecast_date' => 'date',
+            'status' => PurchaseOrderStatusEnum::class,
             'total_cost' => 'decimal:2',
         ];
     }
 
-    public function supplier()
+    public function supplier(): BelongsTo
     {
         return $this->belongsTo(Partner::class, 'supplier_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function purchaseOrderItems()
+    public function purchaseOrderItems(): HasMany
     {
         return $this->hasMany(ItemPurchaseOrder::class);
     }
