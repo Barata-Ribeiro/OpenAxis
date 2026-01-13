@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Management;
 
+use App\Enums\PartnerTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\SupplierRequest;
 use App\Http\Requests\QueryRequest;
@@ -75,7 +76,7 @@ class SupplierController extends Controller
 
     public function show(Partner $supplier)
     {
-        if ($supplier->type === 'client') {
+        if ($supplier->type === PartnerTypeEnum::CLIENT) {
             return to_route('erp.suppliers.index')->with('error', 'The specified partner is not a supplier.');
         }
 
@@ -91,7 +92,7 @@ class SupplierController extends Controller
 
     public function edit(Partner $supplier)
     {
-        if ($supplier->type === 'client') {
+        if ($supplier->type === PartnerTypeEnum::CLIENT) {
             return to_route('erp.suppliers.index')->with('error', 'The specified partner is not a supplier.');
         }
 
