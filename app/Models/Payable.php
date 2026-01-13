@@ -2,19 +2,21 @@
 
 namespace App\Models;
 
+use App\Enums\PayableStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
  * @property string $code
  * @property string $description
- * @property int $supplier_id
+ * @property int|null $supplier_id
  * @property int $vendor_id
  * @property numeric $amount
  * @property \Illuminate\Support\Carbon $issue_date
  * @property \Illuminate\Support\Carbon $due_date
  * @property \Illuminate\Support\Carbon|null $payment_date
- * @property string $status
+ * @property PayableStatusEnum $status
  * @property string $payment_method
  * @property int|null $bank_account_id
  * @property int|null $sales_order_id
@@ -25,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankAccount|null $bankAccount
  * @property-read \App\Models\SalesOrder|null $salesOrder
- * @property-read \App\Models\Partner $supplier
+ * @property-read \App\Models\Partner|null $supplier
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
  *
@@ -86,31 +88,32 @@ class Payable extends Model
             'issue_date' => 'date',
             'due_date' => 'date',
             'payment_date' => 'date',
+            'status' => PayableStatusEnum::class,
             'amount' => 'decimal:2',
         ];
     }
 
-    public function supplier()
+    public function supplier(): BelongsTo
     {
         return $this->belongsTo(Partner::class, 'supplier_id');
     }
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 
-    public function bankAccount()
+    public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
     }
 
-    public function salesOrder()
+    public function salesOrder(): BelongsTo
     {
         return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
