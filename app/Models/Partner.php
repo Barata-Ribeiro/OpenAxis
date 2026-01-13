@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\PartnerTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
+use stdClass;
 
 /**
  * @property int $id
- * @property string $type Defines whether the partner is a client, supplier, or both.
+ * @property PartnerTypeEnum $type Defines whether the partner is a client, supplier, or both.
  * @property string $name
  * @property string $email
  * @property string|null $phone_number
@@ -71,16 +74,17 @@ class Partner extends Model implements Auditable
     protected function casts(): array
     {
         return [
+            'type' => PartnerTypeEnum::class,
             'is_active' => 'boolean',
         ];
     }
 
-    public function addresses()
+    public function addresses(): MorphMany
     {
         return $this->morphMany(Address::class, 'addressable');
     }
 
-    public function primaryAddress()
+    public function primaryAddress(): Address|stdClass|null
     {
         return $this->addresses()->where('is_primary', true)->first();
     }
