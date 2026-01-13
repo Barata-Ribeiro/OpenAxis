@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\BankAccountTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
  * @property string $name
- * @property string $type
+ * @property BankAccountTypeEnum $type
  * @property string $bank_name
  * @property string $bank_agency
  * @property string $bank_account_number
@@ -61,6 +62,7 @@ class BankAccount extends Model
     protected function casts(): array
     {
         return [
+            'type' => BankAccountTypeEnum::class,
             'initial_balance' => 'decimal:2',
             'current_balance' => 'decimal:2',
             'is_active' => 'boolean',
