@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Enums\StockMovementTypeEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
  * @property int $product_id
  * @property int $user_id
- * @property string $movement_type
+ * @property StockMovementTypeEnum $movement_type
  * @property int $quantity
  * @property string|null $reason
  * @property string|null $reference
@@ -43,12 +45,20 @@ class StockMovement extends Model
         'reference',
     ];
 
-    public function product()
+    protected function casts(): array
+    {
+        return [
+            'movement_type' => StockMovementTypeEnum::class,
+            'quantity' => 'integer',
+        ];
+    }
+
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
