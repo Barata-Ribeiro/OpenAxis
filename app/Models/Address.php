@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\AddressTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @property int $id
  * @property string $addressable_type
  * @property int $addressable_id
- * @property string $type
+ * @property AddressTypeEnum $type
  * @property string|null $label A label to identify the address, e.g., Home, Office
  * @property string $street
  * @property string $number
@@ -19,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $state
  * @property string $postal_code
  * @property string $country
- * @property int $is_primary Indicates if this is the primary address for the entity
+ * @property bool $is_primary Indicates if this is the primary address for the entity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|\Eloquent $addressable
@@ -70,7 +72,12 @@ class Address extends Model
         'is_primary',
     ];
 
-    public function addressable()
+    protected $casts = [
+        'type' => AddressTypeEnum::class,
+        'is_primary' => 'boolean',
+    ];
+
+    public function addressable(): MorphTo
     {
         return $this->morphTo();
     }
