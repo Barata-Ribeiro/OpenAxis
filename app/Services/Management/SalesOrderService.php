@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Management\SaleOrderRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
@@ -87,7 +88,7 @@ class SalesOrderService implements SalesOrderServiceInterface
 
         $clients = Partner::query()
             ->select(['id', 'name'])
-            ->whereType('client')
+            ->whereType(PartnerTypeEnum::CLIENT->value)
             ->orderByDesc('id')
             ->whereIsActive(true)
             ->when($clientSearch, fn ($qr) => $qr->whereLike('name', "%$clientSearch%")

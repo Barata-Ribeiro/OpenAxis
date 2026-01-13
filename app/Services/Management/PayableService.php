@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Enums\PartnerTypeEnum;
 use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\PayableServiceInterface;
@@ -61,7 +62,7 @@ class PayableService implements PayableServiceInterface
         $vendorSearch = $search && str_starts_with($search, 'vendor:') ? substr($search, 7) : null;
 
         $suppliers = Partner::select(['id', 'name'])
-            ->whereType('supplier')
+            ->whereType(PartnerTypeEnum::SUPPLIER->value)
             ->whereIsActive(true)
             ->when($supplierSearch, fn ($q, $supplierSearch) => $q->whereLike('name', "%$supplierSearch%"))
             ->cursorPaginate(10, ['id', 'name'], 'suppliers_cursor')

@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Management\PurchaseOrderRequest;
 use App\Interfaces\Management\PurchaseOrderServiceInterface;
@@ -82,7 +83,7 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
 
         $suppliers = Partner::query()
             ->select(['id', 'name'])
-            ->whereType('supplier')
+            ->whereType(PartnerTypeEnum::SUPPLIER->value)
             ->orderByDesc('id')
             ->whereIsActive(true)
             ->when($supplierSearch, fn ($qr) => $qr->whereLike('name', "%$supplierSearch%")

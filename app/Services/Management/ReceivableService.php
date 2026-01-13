@@ -3,6 +3,7 @@
 namespace App\Services\Management;
 
 use App\Common\Helpers;
+use App\Enums\PartnerTypeEnum;
 use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\ReceivableServiceInterface;
 use App\Models\Partner;
@@ -66,7 +67,7 @@ class ReceivableService implements ReceivableServiceInterface
         $clientSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
 
         return Partner::select(['id', 'name'])
-            ->whereType('client')
+            ->whereType(PartnerTypeEnum::CLIENT->value)
             ->whereIsActive(true)
             ->when($clientSearch, fn ($q, $clientSearch) => $q->whereLike('name', "%$clientSearch%")->orWhereLike('email', "%$clientSearch%"))
             ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
