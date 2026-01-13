@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\SalesOrderStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -11,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $order_number
  * @property \Illuminate\Support\Carbon $order_date
  * @property \Illuminate\Support\Carbon|null $delivery_date
- * @property string $status
+ * @property SalesOrderStatusEnum $status
  * @property numeric $product_cost Cost of the products in the sales order
  * @property numeric $delivery_cost Cost of delivery for the sales order
  * @property numeric $discount_cost Discount applied to the sales order
@@ -88,6 +90,7 @@ class SalesOrder extends Model
         return [
             'order_date' => 'date',
             'delivery_date' => 'date',
+            'status' => SalesOrderStatusEnum::class,
             'product_cost' => 'decimal:2',
             'delivery_cost' => 'decimal:2',
             'discount_cost' => 'decimal:2',
@@ -97,22 +100,22 @@ class SalesOrder extends Model
         ];
     }
 
-    public function client()
+    public function client(): BelongsTo
     {
         return $this->belongsTo(Partner::class, 'client_id');
     }
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 
-    public function paymentCondition()
+    public function paymentCondition(): BelongsTo
     {
         return $this->belongsTo(PaymentCondition::class, 'payment_condition_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
