@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\BalanceMovementTypeEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
  * @property int $bank_account_id
- * @property string $type
+ * @property BalanceMovementTypeEnum $type
  * @property numeric $amount
  * @property string $movement_date
  * @property string $description
@@ -56,21 +58,22 @@ class BalanceMovement extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'type' => BalanceMovementTypeEnum::class,
             'occurred_at' => 'datetime',
         ];
     }
 
-    public function bankAccount()
+    public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class);
     }
 
-    public function destinationAccount()
+    public function destinationAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class, 'destination_account_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
