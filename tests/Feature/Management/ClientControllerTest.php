@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AddressTypeEnum;
 use App\Enums\RoleEnum;
 use App\Models\Client;
 use Carbon\Carbon;
@@ -195,7 +196,7 @@ describe('tests for the "store" method of Management/ClientController', function
             'identification' => generateValidIdentification(),
             'phone_number' => '+1555550'.random_int(1000, 9999),
             'client_type' => 'individual',
-            'type' => 'billing',
+            'type' => AddressTypeEnum::BILLING->value,
             'label' => 'HQ',
             'street' => $faker->streetName(),
             'number' => (string) $faker->buildingNumber(),

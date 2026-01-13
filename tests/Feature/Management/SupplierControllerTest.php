@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\AddressTypeEnum;
+use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
 use App\Models\Partner;
 use Carbon\Carbon;
@@ -27,7 +29,7 @@ describe('tests for the "index" method of Management/SupplierController', functi
 
     test('supplier listing supports searching by identification', function () {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier', 'identification' => 'SEARCHME123']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value, 'identification' => 'SEARCHME123']);
 
         $response = $this->actingAs($authorizedUser)->get(route('erp.suppliers.index', ['search' => $targetSupplier->identification]));
 
@@ -64,7 +66,7 @@ describe('tests for the "index" method of Management/SupplierController', functi
 
     test('supplier listing supports created_at filtering', function () {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier', 'created_at' => Carbon::now()->subDays(4), 'updated_at' => Carbon::now()->subDays(4)]);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value, 'created_at' => Carbon::now()->subDays(4), 'updated_at' => Carbon::now()->subDays(4)]);
 
         $start = Carbon::parse($targetSupplier->created_at)->startOfDay()->valueOf();
         $end = Carbon::parse($targetSupplier->created_at)->endOfDay()->valueOf();
@@ -77,7 +79,7 @@ describe('tests for the "index" method of Management/SupplierController', functi
 
     test('supplier listing supports supplier_type filtering', function () {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
 
         $response = $this->actingAs($authorizedUser)->get(route('erp.suppliers.index', ['filters' => 'supplier_type:supplier']));
 
@@ -91,7 +93,7 @@ describe('tests for the "show" method of Management/SupplierController', functio
 
     test('users without supplier.show permission cannot view supplier details', function () {
         $unauthorizedUser = getUserWithRole(RoleEnum::VENDOR->value);
-        $targetSupplier = Partner::with('addresses')->whereIn('type', ['supplier', 'both'])->firstOrFail();
+        $targetSupplier = Partner::with('addresses')->whereIn('type', [PartnerTypeEnum::SUPPLIER->value, PartnerTypeEnum::BOTH->value])->firstOrFail();
 
         $this->actingAs($unauthorizedUser)
             ->get(route('erp.suppliers.show', $targetSupplier))
@@ -100,7 +102,7 @@ describe('tests for the "show" method of Management/SupplierController', functio
 
     test('authorized users can view supplier details including addresses', function () use ($componentName) {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::with('addresses')->whereIn('type', ['supplier', 'both'])->firstOrFail();
+        $targetSupplier = Partner::with('addresses')->whereIn('type', [PartnerTypeEnum::SUPPLIER->value, PartnerTypeEnum::BOTH->value])->firstOrFail();
 
         $response = $this->actingAs($authorizedUser)->get(route('erp.suppliers.show', $targetSupplier));
 
@@ -110,7 +112,7 @@ describe('tests for the "show" method of Management/SupplierController', functio
 
     test('show redirects back when the partner is not a supplier', function () {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $client = Partner::factory()->createOne(['type' => 'client']);
+        $client = Partner::factory()->createOne(['type' => PartnerTypeEnum::CLIENT->value]);
 
         $response = $this->actingAs($authorizedUser)->get(route('erp.suppliers.show', $client));
 
@@ -159,7 +161,7 @@ describe('tests for the "store" method of Management/SupplierController', functi
             'phone_number' => '+551136168946',
             'supplier_type' => 'supplier',
 
-            'type' => 'billing',
+            'type' => AddressTypeEnum::BILLING->value,
             'label' => 'HQ',
             'street' => 'Praça Doutor Adib Zaidam Addad',
             'number' => '886',
@@ -194,7 +196,7 @@ describe('tests for the "edit" & "update" methods of Management/SupplierControll
 
     test('users without supplier.edit permission cannot access edit page', function () {
         $unauthorizedUser = getUserWithRole(RoleEnum::VENDOR->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
 
         $this->actingAs($unauthorizedUser)
             ->get(route('erp.suppliers.edit', $targetSupplier))
@@ -203,7 +205,7 @@ describe('tests for the "edit" & "update" methods of Management/SupplierControll
 
     test('authorized users can access edit page', function () use ($componentName) {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
 
         $response = $this->actingAs($authorizedUser)->get(route('erp.suppliers.edit', $targetSupplier));
 
@@ -213,9 +215,9 @@ describe('tests for the "edit" & "update" methods of Management/SupplierControll
 
     test('authorized users can update suppliers and addresses', function () {
         $authorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
         $targetSupplier->addresses()->create([
-            'type' => 'billing',
+            'type' => AddressTypeEnum::BILLING->value,
             'label' => 'Old',
             'street' => 'Old St',
             'number' => '1',
@@ -235,7 +237,7 @@ describe('tests for the "edit" & "update" methods of Management/SupplierControll
             'phone_number' => '+15557654321',
             'supplier_type' => 'supplier',
 
-            'type' => 'billing',
+            'type' => AddressTypeEnum::BILLING->value,
             'label' => 'New',
             'street' => 'New St',
             'number' => '99',
@@ -268,7 +270,7 @@ describe('tests for the "edit" & "update" methods of Management/SupplierControll
 describe('tests for the "destroy" & "forceDestroy" methods of Management/SupplierController', function () {
     test('users without supplier.destroy permission cannot delete suppliers', function () {
         $unauthorizedUser = getUserWithRole(RoleEnum::BUYER->value);
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
 
         $this->actingAs($unauthorizedUser)
             ->delete(route('erp.suppliers.destroy', $targetSupplier))
@@ -277,7 +279,7 @@ describe('tests for the "destroy" & "forceDestroy" methods of Management/Supplie
 
     test('authorized users can soft delete suppliers', function () {
         $authorizedUser = getSuperAdmin();
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
 
         $this->actingAs($authorizedUser)
             ->delete(route('erp.suppliers.destroy', $targetSupplier))
@@ -297,7 +299,7 @@ describe('tests for the "destroy" & "forceDestroy" methods of Management/Supplie
 
     test('authorized users can permanently delete suppliers', function () {
         $authorizedUser = getSuperAdmin();
-        $targetSupplier = Partner::factory()->createOne(['type' => 'supplier']);
+        $targetSupplier = Partner::factory()->createOne(['type' => PartnerTypeEnum::SUPPLIER->value]);
 
         $this->actingAs($authorizedUser)
             ->delete(route('erp.suppliers.force-destroy', $targetSupplier))

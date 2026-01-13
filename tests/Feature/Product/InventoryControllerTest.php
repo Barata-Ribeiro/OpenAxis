@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\RoleEnum;
+use App\Enums\StockMovementTypeEnum;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\StockMovement;
@@ -201,7 +202,7 @@ describe('tests for the "update" method of Product/InventoryController', functio
         $this->actingAs($unauthorizedUser)
             ->patch(route('erp.inventory.update', $product), [
                 'product_id' => $product->id,
-                'movement_type' => 'adjustment',
+                'movement_type' => StockMovementTypeEnum::ADJUSTMENT->value,
                 'quantity' => 1,
                 'reason' => 'Test adjustment',
                 'reference' => 'TEST-REF-001',
@@ -227,7 +228,7 @@ describe('tests for the "update" method of Product/InventoryController', functio
 
         $payload = [
             'product_id' => $product->id,
-            'movement_type' => 'adjustment',
+            'movement_type' => StockMovementTypeEnum::ADJUSTMENT->value,
             'quantity' => 1,
             'reason' => 'Test adjustment',
             'reference' => 'TEST-REF-INV-001',
@@ -241,13 +242,13 @@ describe('tests for the "update" method of Product/InventoryController', functio
         $this->assertDatabaseHas('stock_movements', [
             'product_id' => $product->id,
             'user_id' => $authorizedUser->id,
-            'movement_type' => 'adjustment',
+            'movement_type' => StockMovementTypeEnum::ADJUSTMENT->value,
         ]);
 
         expect(StockMovement::query()
             ->where('product_id', $product->id)
             ->where('user_id', $authorizedUser->id)
-            ->where('movement_type', 'adjustment')
+            ->where('movement_type', StockMovementTypeEnum::ADJUSTMENT->value)
             ->exists())->toBeTrue();
     });
 });
