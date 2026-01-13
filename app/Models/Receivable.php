@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ReceivableStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -13,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon $issue_date
  * @property \Illuminate\Support\Carbon $due_date
  * @property \Illuminate\Support\Carbon|null $received_date
- * @property string $status
+ * @property ReceivableStatusEnum $status
  * @property string $payment_method
  * @property int $bank_account_id
  * @property int $sales_order_id
@@ -81,25 +83,26 @@ class Receivable extends Model
             'issue_date' => 'date',
             'due_date' => 'date',
             'received_date' => 'date',
+            'status' => ReceivableStatusEnum::class,
         ];
     }
 
-    public function client()
+    public function client(): BelongsTo
     {
         return $this->belongsTo(Partner::class, 'client_id');
     }
 
-    public function bankAccount()
+    public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
     }
 
-    public function salesOrder()
+    public function salesOrder(): BelongsTo
     {
         return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
