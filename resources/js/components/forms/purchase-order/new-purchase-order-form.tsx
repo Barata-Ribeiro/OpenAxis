@@ -100,6 +100,7 @@ export default function NewPurchaseOrderForm() {
                                 ))}
                             </SelectContent>
                         </Select>
+                        <InputError message={errors.status} />
                     </Field>
 
                     <Field aria-invalid={!!errors.notes}>
