@@ -3,6 +3,7 @@ import CalendarDatePicker from '@/components/helpers/calendar-date-picker';
 import PartnerSelectCombobox from '@/components/helpers/partners/partner-select-combobox';
 import PaymentConditionSelector from '@/components/helpers/payment-condition-selector';
 import VendorSelectCombobox from '@/components/helpers/vendor/vendor-select-combobox';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -16,7 +17,7 @@ import erp from '@/routes/erp';
 import { SaleOrderStatus, saleOrderStatusLabel } from '@/types/erp/erp-enums';
 import type { SaleOrder } from '@/types/erp/sale-order';
 import { Form, Link } from '@inertiajs/react';
-import { PlusCircleIcon } from 'lucide-react';
+import { AlertCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { Activity, useState } from 'react';
 
 export default function NewSalesOrderForm() {
@@ -35,6 +36,8 @@ export default function NewSalesOrderForm() {
             transform={(data) => ({
                 ...data,
                 client_id: clientId,
+                vendor_id: vendorId,
+                delivery_date: deliveryDate ? deliveryDate.toISOString().split('T')[0] : null,
             })}
         >
             {({ processing, resetAndClearErrors, errors }) => (
@@ -42,7 +45,6 @@ export default function NewSalesOrderForm() {
                     <FieldGroup className="grid gap-4 sm:grid-cols-2">
                         <Field data-invalid={!!errors.client_id}>
                             <FieldLabel htmlFor="client_id">Client</FieldLabel>
-
                             <ButtonGroup className="w-full">
                                 <PartnerSelectCombobox
                                     value={clientId}
@@ -78,7 +80,6 @@ export default function NewSalesOrderForm() {
                     <FieldGroup className="grid gap-4 sm:grid-cols-2">
                         <Field data-invalid={!!errors.vendor_id}>
                             <FieldLabel htmlFor="vendor_id">Salesperson</FieldLabel>
-
                             <ButtonGroup className="w-full">
                                 <VendorSelectCombobox
                                     value={vendorId}
@@ -97,6 +98,7 @@ export default function NewSalesOrderForm() {
                                     </Link>
                                 </Button>
                             </ButtonGroup>
+                            <InputError message={errors.vendor_id} />
                         </Field>
 
                         <PaymentConditionSelector errors={errors.payment_condition_id} />
@@ -117,6 +119,7 @@ export default function NewSalesOrderForm() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            <InputError message={errors.status} />
                         </Field>
 
                         <Field data-invalid={!!errors.payment_method}>
@@ -133,6 +136,7 @@ export default function NewSalesOrderForm() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            <InputError message={errors.payment_method} />
                         </Field>
                     </FieldGroup>
 
@@ -169,6 +173,20 @@ export default function NewSalesOrderForm() {
                                 <p className="text-sm leading-none font-medium">Update Receivables to Paid</p>
                             </Label>
                         </FieldGroup>
+
+                        {errors.update_payables ||
+                            (errors.update_receivables && (
+                                <Alert variant="destructive">
+                                    <AlertCircleIcon aria-hidden />
+                                    <AlertTitle>Unable to process your sale.</AlertTitle>
+                                    <AlertDescription>
+                                        <ul className="list-inside list-disc text-sm">
+                                            {errors.update_payables && <li>{errors.update_payables}</li>}
+                                            {errors.update_receivables && <li>{errors.update_receivables}</li>}
+                                        </ul>
+                                    </AlertDescription>
+                                </Alert>
+                            ))}
                     </FieldSet>
 
                     <ButtonGroup>
