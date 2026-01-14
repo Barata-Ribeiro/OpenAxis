@@ -1,3 +1,4 @@
+import InputError from '@/components/feedback/input-error';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { PaymentCondition } from '@/types/erp/payment-condition';
@@ -13,6 +14,7 @@ export default function PaymentConditionSelector({ errors }: Readonly<PaymentCon
     return (
         <Field data-invalid={!!errors}>
             <FieldLabel htmlFor="payment_condition_id">Payment Condition</FieldLabel>
+
             <Select name="payment_condition_id" required aria-required>
                 <SelectTrigger className="w-full" aria-invalid={!!errors}>
                     <SelectValue placeholder="Select Payment Condition" />
@@ -25,6 +27,8 @@ export default function PaymentConditionSelector({ errors }: Readonly<PaymentCon
                     ))}
                 </SelectContent>
             </Select>
+
+            <InputError message={errors} />
         </Field>
     );
 }
