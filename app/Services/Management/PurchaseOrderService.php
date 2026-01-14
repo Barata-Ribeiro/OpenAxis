@@ -15,6 +15,7 @@ use App\Notifications\NewPurchaseOrder;
 use Arr;
 use Auth;
 use DB;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Str;
 
@@ -146,5 +147,23 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
                     $user->notify(new NewPurchaseOrder($po));
                 });
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSuppliersForSelect(?string $search): CursorPaginator
+    {
+        $supplierSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+
+        return Partner::query()
+            ->select(['id', 'name'])
+            ->whereType(PartnerTypeEnum::SUPPLIER->value)
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($supplierSearch, fn ($qr) => $qr->whereLike('name', "%$supplierSearch%")
+                ->orWhereLike('email', "%$supplierSearch%")->orWhereLike('identification', "%$supplierSearch%"))
+            ->cursorPaginate(10, ['id', 'name'], 'suppliers_cursor')
+            ->withQueryString();
     }
 }

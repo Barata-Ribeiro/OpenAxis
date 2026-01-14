@@ -3,6 +3,7 @@
 namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\PurchaseOrderRequest;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface PurchaseOrderServiceInterface
@@ -44,4 +45,15 @@ interface PurchaseOrderServiceInterface
      * @throws \RuntimeException If the purchase order cannot be created or persisted.
      */
     public function createPurchaseOrder(PurchaseOrderRequest $request): void;
+
+    /**
+     * Retrieve a cursor-paginated list of suppliers suitable for populating a select control.
+     *
+     * If a search term is provided, the results will be filtered accordingly (e.g. by name or identifier).
+     * The returned CursorPaginator should contain supplier records formatted for select usage (such as id/name pairs).
+     *
+     * @param  string|null  $search  Optional search term to filter suppliers.
+     * @return CursorPaginator Cursor-paginated supplier records for use in select inputs.
+     */
+    public function getSuppliersForSelect(?string $search): CursorPaginator;
 }
