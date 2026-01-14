@@ -16,7 +16,7 @@ namespace App\Models{
  * @property int $id
  * @property string $addressable_type
  * @property int $addressable_id
- * @property string $type
+ * @property AddressTypeEnum $type
  * @property string|null $label A label to identify the address, e.g., Home, Office
  * @property string $street
  * @property string $number
@@ -26,7 +26,7 @@ namespace App\Models{
  * @property string $state
  * @property string $postal_code
  * @property string $country
- * @property int $is_primary Indicates if this is the primary address for the entity
+ * @property bool $is_primary Indicates if this is the primary address for the entity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|\Eloquent $addressable
@@ -59,7 +59,7 @@ namespace App\Models{
 /**
  * @property int $id
  * @property int $bank_account_id
- * @property string $type
+ * @property BalanceMovementTypeEnum $type
  * @property numeric $amount
  * @property string $movement_date
  * @property string $description
@@ -94,7 +94,7 @@ namespace App\Models{
 /**
  * @property int $id
  * @property string $name
- * @property string $type
+ * @property BankAccountTypeEnum $type
  * @property string $bank_name
  * @property string $bank_agency
  * @property string $bank_account_number
@@ -290,7 +290,7 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property string $type Defines whether the partner is a client, supplier, or both.
+ * @property PartnerTypeEnum $type Defines whether the partner is a client, supplier, or both.
  * @property string $name
  * @property string $email
  * @property string|null $phone_number
@@ -332,13 +332,13 @@ namespace App\Models{
  * @property int $id
  * @property string $code
  * @property string $description
- * @property int $supplier_id
+ * @property int|null $supplier_id
  * @property int $vendor_id
  * @property numeric $amount
  * @property \Illuminate\Support\Carbon $issue_date
  * @property \Illuminate\Support\Carbon $due_date
  * @property \Illuminate\Support\Carbon|null $payment_date
- * @property string $status
+ * @property PayableStatusEnum $status
  * @property string $payment_method
  * @property int|null $bank_account_id
  * @property int|null $sales_order_id
@@ -349,7 +349,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankAccount|null $bankAccount
  * @property-read \App\Models\SalesOrder|null $salesOrder
- * @property-read \App\Models\Partner $supplier
+ * @property-read \App\Models\Partner|null $supplier
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Payable newModelQuery()
@@ -494,7 +494,7 @@ namespace App\Models{
  * @property string $order_number
  * @property \Illuminate\Support\Carbon $order_date
  * @property \Illuminate\Support\Carbon|null $forecast_date
- * @property string $status
+ * @property PurchaseOrderStatusEnum $status
  * @property numeric $total_cost Total cost of the purchase order
  * @property string|null $notes
  * @property int $supplier_id
@@ -535,7 +535,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon $issue_date
  * @property \Illuminate\Support\Carbon $due_date
  * @property \Illuminate\Support\Carbon|null $received_date
- * @property string $status
+ * @property ReceivableStatusEnum $status
  * @property string $payment_method
  * @property int $bank_account_id
  * @property int $sales_order_id
@@ -581,7 +581,7 @@ namespace App\Models{
  * @property string $order_number
  * @property \Illuminate\Support\Carbon $order_date
  * @property \Illuminate\Support\Carbon|null $delivery_date
- * @property string $status
+ * @property SalesOrderStatusEnum $status
  * @property numeric $product_cost Cost of the products in the sales order
  * @property numeric $delivery_cost Cost of delivery for the sales order
  * @property numeric $discount_cost Discount applied to the sales order
@@ -635,7 +635,7 @@ namespace App\Models{
  * @property string $tracking_number
  * @property string $carrier
  * @property \Illuminate\Support\Carbon $shipped_date
- * @property string $status
+ * @property ShippedOrderStatusEnum $status
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -662,7 +662,7 @@ namespace App\Models{
  * @property int $id
  * @property int $product_id
  * @property int $user_id
- * @property string $movement_type
+ * @property StockMovementTypeEnum $movement_type
  * @property int $quantity
  * @property string|null $reason
  * @property string|null $reference
