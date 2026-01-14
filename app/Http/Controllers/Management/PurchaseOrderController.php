@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Management;
 
+use App\Enums\PurchaseOrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\PurchaseOrderRequest;
 use App\Http\Requests\QueryRequest;
+use App\Models\PurchaseOrder;
 use App\Services\Management\PurchaseOrderService;
 use Auth;
 use Exception;
@@ -77,5 +79,33 @@ class PurchaseOrderController extends Controller
 
             return redirect()->back()->withInput()->with(['error', 'An error occurred while creating the purchase order. Please try again.']);
         }
+    }
+
+    public function edit(PurchaseOrder $purchaseOrder, QueryRequest $request)
+    {
+        if ($purchaseOrder->status !== PurchaseOrderStatusEnum::PENDING) {
+            Log::warning('Purchase Orders: Attempted to edit a non-pending purchase order', [
+                'purchase_order_id' => $purchaseOrder->id,
+                'action_user_id' => Auth::id(),
+            ]);
+
+            return to_route('erp.purchase-orders.index')->with(['error' => 'Only pending purchase orders can be edited.']);
+        }
+
+        Log::info('Purchase Orders: Accessed edit purchase order page', [
+            'purchase_order_id' => $purchaseOrder->id,
+            'action_user_id' => Auth::id(),
+        ]);
+
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        $suppliers = $this->purchaseOrderService->getSuppliersForSelect($search);
+
+        return Inertia::render('erp/purchases/edit', [
+            'purchaseOrder' => $purchaseOrder->load('items.product', 'supplier'),
+            'suppliers' => Inertia::scroll(fn () => $suppliers),
+        ]);
     }
 }
