@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('payables', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 20)->unique();
+            $table->string('code', 30)->unique();
             $table->string('description');
             $table->foreignId('supplier_id')->nullable()->constrained('partners')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->cascadeOnUpdate()->cascadeOnDelete();
