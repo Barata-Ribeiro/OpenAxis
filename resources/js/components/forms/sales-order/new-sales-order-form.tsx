@@ -2,6 +2,7 @@ import InputError from '@/components/feedback/input-error';
 import CalendarDatePicker from '@/components/helpers/calendar-date-picker';
 import PartnerSelectCombobox from '@/components/helpers/partners/partner-select-combobox';
 import PaymentConditionSelector from '@/components/helpers/payment-condition-selector';
+import ItemsForSalesOrder, { type SelectedProduct } from '@/components/helpers/sales-order/items-for-sales-order';
 import VendorSelectCombobox from '@/components/helpers/vendor/vendor-select-combobox';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { normalizeString } from '@/lib/utils';
+import { formatCurrency, normalizeString } from '@/lib/utils';
 import erp from '@/routes/erp';
 import { SaleOrderStatus, saleOrderStatusLabel } from '@/types/erp/erp-enums';
 import type { SaleOrder } from '@/types/erp/sale-order';
@@ -23,6 +24,7 @@ import { Activity, useState } from 'react';
 export default function NewSalesOrderForm() {
     const [clientId, setClientId] = useState<number | null>(null);
     const [vendorId, setVendorId] = useState<number | null>(null);
+    const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
 
     const paymentMethods: SaleOrder['payment_method'][] = ['bank_transfer', 'credit_card', 'debit_card', 'cash'];
@@ -38,6 +40,23 @@ export default function NewSalesOrderForm() {
                 client_id: clientId,
                 vendor_id: vendorId,
                 delivery_date: deliveryDate ? deliveryDate.toISOString().split('T')[0] : null,
+                items: selectedProducts.map((product) => {
+                    const unitPrice = Number(product.selling_price);
+                    const quantity = Number(product.quantity);
+                    const subtotalPrice = unitPrice * quantity;
+
+                    const commissionRate = Number(product.comission);
+                    const commissionItem =
+                        subtotalPrice * ((Number.isFinite(commissionRate) ? commissionRate : 0) / 100);
+
+                    return {
+                        product_id: product.id,
+                        quantity,
+                        unit_price: unitPrice,
+                        subtotal_price: subtotalPrice,
+                        commission_item: commissionItem,
+                    };
+                }),
             })}
         >
             {({ processing, resetAndClearErrors, errors }) => (
@@ -149,7 +168,44 @@ export default function NewSalesOrderForm() {
                         <InputError message={errors.notes} />
                     </Field>
 
-                    {/* TODO: Products selection component here */}
+                    <ItemsForSalesOrder
+                        value={selectedProducts}
+                        setValue={setSelectedProducts}
+                        route={erp.salesOrders.create()}
+                        errors={errors.items}
+                    />
+
+                    <div className="grid gap-2 text-right text-3xl">
+                        <p>
+                            Total:{' '}
+                            <span className="font-mono font-semibold">
+                                {formatCurrency(
+                                    selectedProducts.reduce(
+                                        (total, product) =>
+                                            total + Number(product.selling_price) * Number(product.quantity),
+                                        0,
+                                    ),
+                                )}
+                            </span>
+                        </p>
+                        <p>
+                            Total Comission:{' '}
+                            <span className="font-mono font-semibold">
+                                {formatCurrency(
+                                    selectedProducts.reduce((total, product) => {
+                                        const unitPrice = Number(product.selling_price);
+                                        const quantity = Number(product.quantity);
+                                        const subtotal = unitPrice * quantity;
+
+                                        const commissionRate = Number(product.comission);
+                                        const commissionAmount =
+                                            subtotal * ((Number.isFinite(commissionRate) ? commissionRate : 0) / 100);
+                                        return total + commissionAmount;
+                                    }, 0),
+                                )}
+                            </span>
+                        </p>
+                    </div>
 
                     <FieldSet className="rounded-md border p-4" aria-labelledby="update-accounts-legend">
                         <FieldLegend id="update-accounts-legend">Update Accounts Automatically</FieldLegend>
@@ -208,6 +264,9 @@ export default function NewSalesOrderForm() {
                                 onClick={() => {
                                     resetAndClearErrors();
                                     setClientId(null);
+                                    setVendorId(null);
+                                    setSelectedProducts([]);
+                                    setDeliveryDate(null);
                                 }}
                                 disabled={processing}
                             >
