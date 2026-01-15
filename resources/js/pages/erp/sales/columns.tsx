@@ -21,7 +21,7 @@ export const columns: ColumnDef<SaleOrderWithRelations>[] = [
         enableSorting: true,
     },
     {
-        accessorKey: 'vendor.name',
+        accessorKey: 'vendor.full_name', // TODO: Handle vendor name correctly when sorting
         header: ({ column }) => <DataTableColumnHeader column={column} title="Vendor" />,
         enableSorting: true,
     },
