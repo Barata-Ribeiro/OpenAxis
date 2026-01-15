@@ -59,13 +59,14 @@ class SalesOrderService implements SalesOrderServiceInterface
 
         return SalesOrder::query()
             ->select('sales_orders.*')
-            ->with(['user:id,name,email', 'user.media', 'client:id,name', 'vendor:id,name', 'paymentCondition:id,code,name'])
+            ->with(['user:id,name,email', 'user.media', 'client:id,name', 'vendor:id,first_name,last_name', 'paymentCondition:id,code,name'])
             ->when($vendorId, fn ($q, $vId) => $q->whereIn('sales_orders.vendor_id', $vId))
             ->when($status, fn ($q) => $q->whereIn('sales_orders.status', $status))
             ->when($search, fn ($query, $search) => $query->whereLike('sales_orders.order_number', "%$search%")
                 ->orWhereLike('sales_orders.notes', "%$search%")->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('name', "%$search%")
-                ->orWhereLike('email', "%$search%"))->orWhereLike('partners.name', "%$search%")->orWhereLike('vendors.name', "%$search%")
-                ->orWhereLike('payment_conditions.code', "%$search%")->orWhereLike('payment_conditions.name', "%$search%"))
+                ->orWhereLike('email', "%$search%"))->orWhereLike('partners.name', "%$search%")->orWhereLike('vendors.first_name', "%$search%")
+                ->orWhereLike('vendor.last_name', "%$search%")->orWhereHas('vendor.user', fn ($vendorUserQuery) => $vendorUserQuery->whereLike('name', "%$search%")
+                ->orWhereLike('email', "%$search%"))->orWhereLike('payment_conditions.code', "%$search%")->orWhereLike('payment_conditions.name', "%$search%"))
             ->when($createdAtRange, fn ($q) => $q->whereBetween('sales_orders.created_at', [$start, $end]))
             ->leftJoin((new Partner)->getTable(), 'sales_orders.client_id', '=', 'partners.id')
             ->leftJoin((new Vendor)->getTable(), 'sales_orders.vendor_id', '=', 'vendors.id')
@@ -155,7 +156,7 @@ class SalesOrderService implements SalesOrderServiceInterface
         $statusPayable = $validated['update_payables'] ?? false;
         $statusReceivable = $validated['update_receivables'] ?? false;
 
-        DB::transaction(function () use ($saleOrder, $items, $quantities, $createdBy, $statusReceivable) {
+        DB::transaction(function () use ($saleOrder, $items, $quantities, $createdBy, $statusReceivable, $statusPayable) {
             $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count() + 1, 6, '0', STR_PAD_LEFT);
 
             $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
@@ -188,19 +189,24 @@ class SalesOrderService implements SalesOrderServiceInterface
             // Handle payables/receivables if needed
             $installments = 1;
             $daysUntilDue = 30;
-            if (isset($saleOrder['payment_condition_id'])) {
-                $paymentCondition = PaymentCondition::find($saleOrder['payment_condition_id'])->whereIsActive(true);
-                if ($paymentCondition) {
+            if (! empty($saleOrder['payment_condition_id'])) {
+                $paymentCondition = PaymentCondition::query()
+                    ->whereKey($saleOrder['payment_condition_id'])
+                    ->whereIsActive(true)
+                    ->first();
+
+                if ($paymentCondition !== null) {
                     $installments = $paymentCondition->installments;
                     $daysUntilDue = $paymentCondition->days_until_due;
                 }
             }
 
-            $receivableCount = Receivable::count() + 1;
+            $receivableCount = Receivable::count();
             $payableCount = Payable::count() + 1;
             $yearNow = Carbon::now()->year;
 
             foreach (range(1, $installments) as $installment) {
+                $receivableCount++;
                 $code = 'RCV-'.$yearNow.'-'.str_pad((string) $receivableCount, 6, '0', STR_PAD_LEFT);
                 $dueDate = Carbon::now()->addDays($daysUntilDue * $installment);
                 $installmentAmount = $so->total_cost / $installments;
@@ -229,7 +235,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                 'vendor_id' => $so->vendor_id,
                 'amount' => $so->product_value,
                 'due_date' => $payableDueDate,
-                'status' => $statusReceivable ? 'paid' : 'pending',
+                'status' => $statusPayable ? 'paid' : 'pending',
                 'payment_method' => $so->payment_method,
                 'sales_order_id' => $so->id,
                 'reference_number' => $so->order_number,
