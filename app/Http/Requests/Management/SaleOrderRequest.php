@@ -45,6 +45,14 @@ class SaleOrderRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'update_payables' => filter_var($this->input('update_payables', false), FILTER_VALIDATE_BOOLEAN),
+            'update_receivables' => filter_var($this->input('update_receivables', false), FILTER_VALIDATE_BOOLEAN),
+        ]);
+    }
+
     /**
      * Add after-validation hook to ensure requested quantities do not exceed stock.
      */
