@@ -40,6 +40,8 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
         cell: function Cell({ row }) {
             const payable = row.original;
 
+            if (!payable.supplier_id) return null; // TODO: Handle null state
+
             return (
                 <div className="flex flex-col">
                     <span className="font-medium">{payable.supplier.name}</span>
@@ -126,7 +128,7 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
             const payable = row.original;
 
             const codeToCopy = payable.code;
-            const supplierNameToCopy = payable.supplier.name;
+            const supplierNameToCopy = payable.supplier ? payable.supplier.name : null;
 
             return (
                 <DropdownMenu>
@@ -145,11 +147,13 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
                             <DropdownMenuItem asChild>
                                 <DropdownMenuCopyButton content={codeToCopy}>Copy Code</DropdownMenuCopyButton>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <DropdownMenuCopyButton content={supplierNameToCopy}>
-                                    Copy Supplier
-                                </DropdownMenuCopyButton>
-                            </DropdownMenuItem>
+                            {supplierNameToCopy && (
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={supplierNameToCopy}>
+                                        Copy Supplier
+                                    </DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
