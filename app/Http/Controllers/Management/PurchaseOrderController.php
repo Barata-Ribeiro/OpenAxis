@@ -104,7 +104,7 @@ class PurchaseOrderController extends Controller
         $suppliers = $this->purchaseOrderService->getSuppliersForSelect($search);
 
         return Inertia::render('erp/purchases/edit', [
-            'purchaseOrder' => $purchaseOrder->load('items.product', 'supplier'),
+            'purchaseOrder' => $purchaseOrder->load('supplier', 'user', 'user.media', 'purchaseOrderItems'),
             'suppliers' => Inertia::scroll(fn () => $suppliers),
         ]);
     }
