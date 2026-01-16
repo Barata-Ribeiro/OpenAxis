@@ -40,7 +40,9 @@ export const columns: ColumnDef<PayableWithRelations>[] = [
         cell: function Cell({ row }) {
             const payable = row.original;
 
-            if (!payable.supplier_id) return null; // TODO: Handle null state
+            if (!payable.supplier_id) {
+                return <Badge variant="destructive">No Supplier</Badge>;
+            }
 
             return (
                 <div className="flex flex-col">
