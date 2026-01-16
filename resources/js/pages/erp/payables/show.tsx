@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Separator } from '@/components/ui/separator';
 import { usePermission } from '@/hooks/use-permission';
 import AppLayout from '@/layouts/app-layout';
@@ -221,59 +222,74 @@ export default function PayableShowPage({ payable }: Readonly<PayableShowPagePro
                         </Card>
 
                         {/* Supplier Information */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Building2 aria-hidden size={20} className="text-blue-600" />
-                                    Supplier Information
-                                </CardTitle>
-                                <CardDescription>Partner details for this payable</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500">
-                                        Supplier Name (Company/Individual)
-                                    </dt>
-                                    <dd className="mt-1 text-lg font-semibold">{payable.supplier.name}</dd>
-                                </dl>
+                        {payable.supplier_id ? (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <Building2 aria-hidden size={20} className="text-blue-600" />
+                                        Supplier Information
+                                    </CardTitle>
+                                    <CardDescription>Partner details for this payable</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <dl>
+                                        <dt className="text-sm font-medium text-gray-500">
+                                            Supplier Name (Company/Individual)
+                                        </dt>
+                                        <dd className="mt-1 text-lg font-semibold">{payable.supplier.name}</dd>
+                                    </dl>
 
-                                <dl className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <dt className="text-sm font-medium text-gray-500">Email</dt>
-                                        <div className="mt-1 flex items-center gap-2">
-                                            <Mail aria-hidden size={16} className="text-gray-400" />
-                                            <dd className="text-sm">{payable.supplier.email}</dd>
+                                    <dl className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <dt className="text-sm font-medium text-gray-500">Email</dt>
+                                            <div className="mt-1 flex items-center gap-2">
+                                                <Mail aria-hidden size={16} className="text-gray-400" />
+                                                <dd className="text-sm">{payable.supplier.email}</dd>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                                        <div className="mt-1 flex items-center gap-2">
-                                            <Phone aria-hidden size={16} className="text-gray-400" />
-                                            <dd className="text-sm">{payable.supplier.phone_number}</dd>
+                                        <div>
+                                            <dt className="text-sm font-medium text-gray-500">Phone</dt>
+                                            <div className="mt-1 flex items-center gap-2">
+                                                <Phone aria-hidden size={16} className="text-gray-400" />
+                                                <dd className="text-sm">{payable.supplier.phone_number}</dd>
+                                            </div>
                                         </div>
-                                    </div>
-                                </dl>
+                                    </dl>
 
-                                <Separator />
+                                    <Separator />
 
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500">
-                                        Identification (CNPJ/CPF/SSN/etc.)
-                                    </dt>
-                                    <dd className="mt-1 font-mono">{payable.supplier.identification}</dd>
-                                </dl>
+                                    <dl>
+                                        <dt className="text-sm font-medium text-gray-500">
+                                            Identification (CNPJ/CPF/SSN/etc.)
+                                        </dt>
+                                        <dd className="mt-1 font-mono">{payable.supplier.identification}</dd>
+                                    </dl>
 
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500">Status</dt>
-                                    <Badge
-                                        variant={payable.supplier.is_active ? 'default' : 'secondary'}
-                                        className="mt-1"
-                                    >
-                                        {payable.supplier.is_active ? 'Active' : 'Inactive'}
-                                    </Badge>
-                                </dl>
-                            </CardContent>
-                        </Card>
+                                    <dl>
+                                        <dt className="text-sm font-medium text-gray-500">Status</dt>
+                                        <Badge
+                                            variant={payable.supplier.is_active ? 'default' : 'secondary'}
+                                            className="mt-1"
+                                        >
+                                            {payable.supplier.is_active ? 'Active' : 'Inactive'}
+                                        </Badge>
+                                    </dl>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Empty className="border border-dashed">
+                                <EmptyHeader>
+                                    <EmptyMedia variant="icon">
+                                        <AlertTriangle aria-hidden size={48} />
+                                    </EmptyMedia>
+                                    <EmptyTitle>No Supplier Assigned</EmptyTitle>
+                                    <EmptyDescription>
+                                        This payable does not have a supplier associated with it. It probably is the
+                                        vendor&apos;s commission.
+                                    </EmptyDescription>
+                                </EmptyHeader>
+                            </Empty>
+                        )}
 
                         {/* Vendor Information */}
                         <Card>
