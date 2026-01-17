@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\RoleEnum;
 use App\Models\Client;
 use App\Rules\IsValidIdentification;
 use Auth;
@@ -17,7 +18,7 @@ class UpdateClientRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('client.edit') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('client.edit') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**

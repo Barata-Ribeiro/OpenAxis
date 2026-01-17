@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\RoleEnum;
 use App\Models\Product;
 use Auth;
 use Illuminate\Contracts\Validation\Validator;
@@ -16,7 +17,7 @@ class SaleOrderRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('sale.create') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('sale.create') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**

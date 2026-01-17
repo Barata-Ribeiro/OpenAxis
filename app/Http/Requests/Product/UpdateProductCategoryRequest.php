@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\RoleEnum;
 use App\Models\ProductCategory;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
@@ -16,7 +17,7 @@ class UpdateProductCategoryRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('product.edit') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('product.edit') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**

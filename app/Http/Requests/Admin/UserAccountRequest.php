@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\RoleEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -16,11 +17,11 @@ class UserAccountRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('user.create') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('user.create') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get the validation rules that apply to this request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */

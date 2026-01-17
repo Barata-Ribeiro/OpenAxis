@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\RoleEnum;
 use App\Rules\IsValidIdentification;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,7 +16,7 @@ class ClientRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('client.create') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('client.create') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**

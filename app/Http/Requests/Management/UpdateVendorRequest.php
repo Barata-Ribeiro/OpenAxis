@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\RoleEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +15,7 @@ class UpdateVendorRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('vendor.edit') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('vendor.edit') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\RoleEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +15,7 @@ class PurchaseOrderRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('order.create') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('order.create') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\RoleEnum;
 use App\Models\User;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,7 +18,7 @@ class EditUserRequest extends FormRequest
     {
         $user = Auth::user();
 
-        return $user->hasPermissionTo('user.edit') || $user->hasRole('super-admin');
+        return $user->hasPermissionTo('user.edit') || $user->hasRole(RoleEnum::SUPER_ADMIN->value);
     }
 
     /**
