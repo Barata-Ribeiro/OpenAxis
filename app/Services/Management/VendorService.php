@@ -31,6 +31,7 @@ class VendorService implements VendorServiceInterface
             ->with(['user:id,name,email', 'user.media'])
             ->when($search, fn ($q, $search) => $q->whereLike('vendors.first_name', "%$search%")
                 ->orWhereLike('vendors.last_name', "%$search%")->orWhereLike('vendors.phone_number', "%$search%")
+                ->orWhereRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) LIKE ?", ["%$search%"])
                 ->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('users.name', "%$search%")->orWhereLike('users.email', "%$search%")))
             ->when($vendorUserEmail, fn ($q) => $q->whereHas('user', fn ($userQuery) => $userQuery->whereIn('users.email', $vendorUserEmail)))
             ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
