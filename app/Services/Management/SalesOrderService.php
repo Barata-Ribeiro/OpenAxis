@@ -6,6 +6,7 @@ use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Management\SaleOrderRequest;
+use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\Payable;
@@ -249,5 +250,37 @@ class SalesOrderService implements SalesOrderServiceInterface
                     $user->notify(new NewSalesOrder($so));
                 });
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getEditDataForSelect(QueryRequest $request, ?string $search): array
+    {
+        $clientSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+        $vendorSearch = $search && str_starts_with($search, 'vendor:') ? substr($search, 7) : null;
+
+        $clients = Partner::query()
+            ->select(['id', 'name'])
+            ->whereType(PartnerTypeEnum::CLIENT->value)
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($clientSearch, fn ($qr) => $qr->whereLike('name', "%$clientSearch%")
+                ->orWhereLike('email', "%$clientSearch%")->orWhereLike('identification', "%$clientSearch%"))
+            ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
+            ->withQueryString();
+
+        $vendors = Vendor::query()
+            ->select(['id', 'first_name', 'last_name'])
+            ->with(['user:id,name,email', 'user.media'])
+            ->orderByDesc('id')
+            ->whereIsActive(true)
+            ->when($vendorSearch, fn ($qr) => $qr->whereLike('first_name', "%$vendorSearch%")
+                ->orWhereLike('last_name', "%$vendorSearch%")->orWhereHas('user', fn ($userQr) => $userQr->whereLike('name', "%$vendorSearch%")
+                ->orWhereLike('email', "%$vendorSearch%")))
+            ->cursorPaginate(10, ['id', 'first_name', 'last_name'], 'vendors_cursor')
+            ->withQueryString();
+
+        return [$clients, $vendors];
     }
 }
