@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\SaleOrderRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\PaymentCondition;
+use App\Models\SalesOrder;
 use App\Services\Management\SalesOrderService;
 use Auth;
 use Exception;
@@ -82,5 +83,30 @@ class SalesOrderController extends Controller
 
             return redirect()->back()->withInput()->with(['error', 'An error occurred while creating the sales order. Please try again.']);
         }
+    }
+
+    public function edit(SalesOrder $salesOrder, QueryRequest $request)
+    {
+        Log::info('Sales Orders: Accessed edit sales order page', [
+            'action_user_id' => Auth::id(),
+            'sales_order_id' => $salesOrder->id,
+        ]);
+
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        [$clients, $vendors] = $this->salesOrderService->getEditDataForSelect($salesOrder, $search);
+
+        $paymentConditions = PaymentCondition::whereIsActive(true)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return Inertia::render('erp/sales/edit', [
+            'salesOrder' => $salesOrder->load(['client:id,name,email', 'vendor:id,first_name,last_name,email', 'paymentCondition', 'user:id,name,email', 'salesOrderItems']),
+            'clients' => Inertia::scroll(fn () => $clients),
+            'vendors' => Inertia::scroll(fn () => $vendors),
+            'paymentConditions' => $paymentConditions,
+        ]);
     }
 }
