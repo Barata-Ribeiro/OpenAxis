@@ -1,11 +1,27 @@
+import DropdownMenuCopyButton from '@/components/common/dropdown-menu-copy-button';
+import ActionConfirmationDialog from '@/components/feedback/action-confirmation-dialog';
 import DataTableColumnHeader from '@/components/table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { usePermission } from '@/hooks/use-permission';
 import { formatCurrency } from '@/lib/utils';
+import erp from '@/routes/erp';
 import { SaleOrderStatus, saleOrderStatusLabel } from '@/types/erp/erp-enums';
 import type { SaleOrderWithRelations } from '@/types/erp/sale-order';
+import { Link } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { CalendarIcon, CircleDashed } from 'lucide-react';
+import { CalendarIcon, CircleDashed, DeleteIcon, Ellipsis, EyeIcon } from 'lucide-react';
+import { useState } from 'react';
 
 export const columns: ColumnDef<SaleOrderWithRelations>[] = [
     {
@@ -79,6 +95,77 @@ export const columns: ColumnDef<SaleOrderWithRelations>[] = [
         cell: ({ row }) => format(row.original.updated_at, 'PPpp'),
         enableSorting: true,
     },
+    {
+        id: 'actions',
+        cell: function Cell({ row }) {
+            const [open, setOpen] = useState(false);
+            const { can } = usePermission();
 
-    //TODO: Add actions column
+            const salesOrder = row.original;
+            const clientNameToCopy = salesOrder.client.name;
+            const vendorNameToCopy = salesOrder.vendor.full_name;
+
+            return (
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Open menu"
+                                variant="ghost"
+                                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                            >
+                                <Ellipsis aria-hidden size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuLabel>Copy Fields</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={clientNameToCopy}>
+                                        Copy Client
+                                    </DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <DropdownMenuCopyButton content={vendorNameToCopy}>
+                                        Copy Vendor
+                                    </DropdownMenuCopyButton>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem disabled={!can('sale.edit')} asChild>
+                                    <Link
+                                        className="block w-full"
+                                        href={erp.salesOrders.edit(salesOrder.id)}
+                                        as="button"
+                                    >
+                                        <EyeIcon aria-hidden size={14} /> Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    disabled={!can('sale.destroy')}
+                                    onSelect={() => setOpen(true)}
+                                >
+                                    <DeleteIcon aria-hidden size={14} /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <ActionConfirmationDialog
+                        open={open}
+                        setOpen={setOpen}
+                        title="Confirm Deletion"
+                        description={`Are you sure you want to delete the sales order "${salesOrder.id}"? This action cannot be undone.`}
+                        method="delete"
+                        route={erp.salesOrders.destroy(salesOrder.id)}
+                    />
+                </>
+            );
+        },
+        size: 40,
+        enableHiding: false,
+    },
 ];
