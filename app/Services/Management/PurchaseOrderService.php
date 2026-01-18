@@ -6,6 +6,7 @@ use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Management\PurchaseOrderRequest;
+use App\Http\Requests\Management\UpdatePurchaseOrderRequest;
 use App\Interfaces\Management\PurchaseOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\Product;
@@ -165,5 +166,14 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
                 ->orWhereLike('email', "%$supplierSearch%")->orWhereLike('identification', "%$supplierSearch%"))
             ->cursorPaginate(10, ['id', 'name'], 'suppliers_cursor')
             ->withQueryString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function updatePurchaseOrder(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder): void
+    {
+        $validated = $request->validated();
+        $purchaseOrder->update($validated);
     }
 }

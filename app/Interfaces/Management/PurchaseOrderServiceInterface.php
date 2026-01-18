@@ -3,6 +3,8 @@
 namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\PurchaseOrderRequest;
+use App\Http\Requests\Management\UpdatePurchaseOrderRequest;
+use App\Models\PurchaseOrder;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -56,4 +58,15 @@ interface PurchaseOrderServiceInterface
      * @return CursorPaginator Cursor-paginated supplier records for use in select inputs.
      */
     public function getSuppliersForSelect(?string $search): CursorPaginator;
+
+    /**
+     * Update the given PurchaseOrder using data from the provided request.
+     *
+     * Applies validated input from UpdatePurchaseOrderRequest to the provided
+     * PurchaseOrder model and persists the changes.
+     *
+     * @param  UpdatePurchaseOrderRequest  $request  Validated request containing update data.
+     * @param  PurchaseOrder  $purchaseOrder  The purchase order model to update.
+     */
+    public function updatePurchaseOrder(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder): void;
 }
