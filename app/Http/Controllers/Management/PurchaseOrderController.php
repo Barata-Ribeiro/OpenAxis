@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Management;
 use App\Enums\PurchaseOrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\PurchaseOrderRequest;
+use App\Http\Requests\Management\UpdatePurchaseOrderRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\PurchaseOrder;
 use App\Services\Management\PurchaseOrderService;
@@ -107,5 +108,36 @@ class PurchaseOrderController extends Controller
             'purchaseOrder' => $purchaseOrder->load('supplier', 'user', 'user.media', 'purchaseOrderItems'),
             'suppliers' => Inertia::scroll(fn () => $suppliers),
         ]);
+    }
+
+    public function update(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder)
+    {
+        if ($purchaseOrder->status !== PurchaseOrderStatusEnum::PENDING) {
+            Log::warning('Purchase Orders: Attempted to update a non-pending purchase order', [
+                'purchase_order_id' => $purchaseOrder->id,
+                'action_user_id' => Auth::id(),
+            ]);
+
+            return to_route('erp.purchase-orders.index')->with(['error' => 'Only pending purchase orders can be updated.']);
+        }
+
+        try {
+            $this->purchaseOrderService->updatePurchaseOrder($request, $purchaseOrder);
+
+            Log::info('Purchase Orders: Successfully updated purchase order', [
+                'purchase_order_id' => $purchaseOrder->id,
+                'action_user_id' => Auth::id(),
+            ]);
+
+            return to_route('erp.purchase-orders.index')->with(['success' => 'The purchase order has been updated successfully.']);
+        } catch (Exception $e) {
+            Log::error('Purchase Orders: Error updating purchase order', [
+                'purchase_order_id' => $purchaseOrder->id,
+                'action_user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with(['error', 'An error occurred while updating the purchase order. Please try again.']);
+        }
     }
 }
