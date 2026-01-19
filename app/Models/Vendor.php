@@ -22,7 +22,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
- * @property-read string $full_name
+ * @property-read string $full_name Get Vendor's full name
  * @property-read \App\Models\User $user
  *
  * @method static \Database\Factories\VendorFactory factory($count = null, $state = [])
@@ -67,6 +67,11 @@ class Vendor extends Model implements Auditable
 
     protected $appends = ['full_name'];
 
+    protected $touches = ['user'];
+
+    /**
+     * @comment Get Vendor's full name
+     */
     public function getFullNameAttribute(): string
     {
         return ucwords("{$this->first_name} {$this->last_name}");
