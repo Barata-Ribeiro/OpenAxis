@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Management;
 
+use App\Enums\SalesOrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Management\SaleOrderRequest;
+use App\Http\Requests\Management\UpdateSaleOrderRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\PaymentCondition;
 use App\Models\SalesOrder;
@@ -96,17 +98,48 @@ class SalesOrderController extends Controller
 
         $search = trim($validated['search'] ?? '');
 
-        [$clients, $vendors] = $this->salesOrderService->getEditDataForSelect($salesOrder, $search);
+        [$clients, $vendors] = $this->salesOrderService->getEditDataForSelect($search);
 
         $paymentConditions = PaymentCondition::whereIsActive(true)
             ->orderBy('name', 'asc')
             ->get();
 
         return Inertia::render('erp/sales/edit', [
-            'salesOrder' => $salesOrder->load(['client:id,name,email', 'vendor:id,first_name,last_name,email', 'paymentCondition', 'user:id,name,email', 'salesOrderItems']),
+            'saleOrder' => $salesOrder->load(['client:id,name,email', 'vendor:id,first_name,last_name,email', 'paymentCondition', 'user:id,name,email', 'salesOrderItems']),
             'clients' => Inertia::scroll(fn () => $clients),
             'vendors' => Inertia::scroll(fn () => $vendors),
             'paymentConditions' => $paymentConditions,
         ]);
+    }
+
+    public function update(UpdateSaleOrderRequest $request, SalesOrder $salesOrder)
+    {
+        if ($salesOrder->status !== SalesOrderStatusEnum::PENDING) {
+            Log::warning('Sales Orders: Attempted to update a non-pending sales order', [
+                'sales_order_id' => $salesOrder->id,
+                'action_user_id' => Auth::id(),
+            ]);
+
+            return to_route('erp.sales-orders.index')->with(['error' => 'Only pending sales orders can be updated.']);
+        }
+
+        try {
+            $this->salesOrderService->updateSalesOrder($request, $salesOrder);
+
+            Log::info('Sales Orders: Updated sales order', [
+                'sales_order_id' => $salesOrder->id,
+                'action_user_id' => Auth::id(),
+            ]);
+
+            return to_route('erp.sales-orders.index')->with('success', 'Sales order updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Sales Orders: Error updating sales order', [
+                'sales_order_id' => $salesOrder->id,
+                'action_user_id' => Auth::id(),
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with(['error', 'An error occurred while updating the sales order. Please try again.']);
+        }
     }
 }
