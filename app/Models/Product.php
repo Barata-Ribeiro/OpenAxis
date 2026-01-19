@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -31,8 +32,8 @@ use Str;
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
  * @property-read \App\Models\ProductCategory $category
- * @property-read mixed $cover_image
- * @property-read mixed $images
+ * @property-read array{id: mixed, src: mixed, srcSet: mixed} $cover_image Get Product's cover image
+ * @property-read \Illuminate\Support\Collection<int, array{id: mixed, src: string, srcSet: string}> $images Get Product's images
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
@@ -110,6 +111,8 @@ class Product extends Model implements Auditable, HasMedia
         ];
     }
 
+    protected $touches = ['category'];
+
     public function getRouteKeyName()
     {
         return 'slug';
@@ -128,7 +131,12 @@ class Product extends Model implements Auditable, HasMedia
         });
     }
 
-    public function getCoverImageAttribute()
+    /**
+     * @comment Get Product's cover image
+     *
+     * @return array{id: mixed, src: mixed, srcSet: mixed}
+     */
+    public function getCoverImageAttribute(): array
     {
         $media = $this->getFirstMedia('products_images');
 
@@ -139,7 +147,12 @@ class Product extends Model implements Auditable, HasMedia
         ];
     }
 
-    public function getImagesAttribute()
+    /**
+     * @comment Get Product's images
+     *
+     * @return \Illuminate\Support\Collection<int, array{id: mixed, src: string, srcSet: string>}
+     */
+    public function getImagesAttribute(): Collection
     {
         return $this->getMedia('products_images')
             ->filter(fn (Media $m) => $m->getKey() !== ($this->getFirstMedia('products_images')->getKey() ?? null))
@@ -165,7 +178,7 @@ class Product extends Model implements Auditable, HasMedia
 
     private static function ensureUniqueSlug($product)
     {
-        $base = Str::slug($product->name.'-'.$product->sku);
+        $base = Str::slug("{$product->name}-{$product->sku}");
         $slug = $base;
         $i = 1;
 
