@@ -3,7 +3,6 @@
 namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\SaleOrderRequest;
-use App\Http\Requests\QueryRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface SalesOrderServiceInterface
@@ -45,15 +44,13 @@ interface SalesOrderServiceInterface
     public function createSalesOrder(SaleOrderRequest $request): void;
 
     /**
-     * Prepare and return data needed to populate a select input when editing a sales order.
+     * Retrieve option data for populating a select input on the sales-order edit form.
      *
-     * Retrieves and formats selectable options based on the provided query request and optional search term.
-     * The returned array should contain option entries (e.g., id/label pairs) and any additional metadata
-     * required by the frontend (such as pagination cursors or total counts).
+     * If $search is provided, the returned options SHOULD be filtered by the term.
+     * If $search is null, return the default/initial option set for the edit view.
      *
-     * @param  QueryRequest  $request  Query parameters (filters, pagination, sorting) to fetch select options.
-     * @param  string|null  $search  Optional search string to filter the select results.
-     * @return array Array of select options and related metadata.
+     * @param  string|null  $search  Optional search/filter term.
+     * @return array<int, array{id: int|string, text: string}> Array of option arrays (may be empty if no matches).
      */
-    public function getEditDataForSelect(QueryRequest $request, ?string $search): array;
+    public function getEditDataForSelect(?string $search): array;
 }

@@ -6,7 +6,6 @@ use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Management\SaleOrderRequest;
-use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\Payable;
@@ -255,7 +254,7 @@ class SalesOrderService implements SalesOrderServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function getEditDataForSelect(QueryRequest $request, ?string $search): array
+    public function getEditDataForSelect(?string $search): array
     {
         $clientSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
         $vendorSearch = $search && str_starts_with($search, 'vendor:') ? substr($search, 7) : null;
