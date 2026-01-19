@@ -33,7 +33,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
- * @property-read mixed $avatar
+ * @property-read array{id: mixed, src: mixed, srcSet: mixed} $avatar Get User's avatar
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
@@ -126,7 +126,12 @@ class User extends Authenticatable implements Auditable, HasMedia, MustVerifyEma
 
     protected $appends = ['avatar'];
 
-    public function getAvatarAttribute()
+    /**
+     * @comment Get User's avatar
+     *
+     * @return array{id: int|null, src: string|null, srcSet: string|null}
+     */
+    public function getAvatarAttribute(): array
     {
         $media = $this->getFirstMedia('avatar');
 
