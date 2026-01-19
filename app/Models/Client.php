@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ClientTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +14,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property string $email
  * @property string|null $phone_number
  * @property string $identification Social Security Number/Employer Identification Number of the client. If Brazilian, follow the CPF format or CNPJ for companies.
- * @property string $client_type Type of client: individual or company. In Brazil would be Pessoa Física or Pessoa Jurídica.
+ * @property ClientTypeEnum $client_type Type of client: individual or company. In Brazil would be Pessoa Física or Pessoa Jurídica.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -59,6 +60,18 @@ class Client extends Model implements Auditable
         'identification',
         'client_type',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'client_type' => ClientTypeEnum::class,
+        ];
+    }
 
     public function addresses()
     {
