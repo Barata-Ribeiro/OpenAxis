@@ -32,8 +32,8 @@ use Str;
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
  * @property-read \App\Models\ProductCategory $category
- * @property-read array{id: mixed, src: mixed, srcSet: mixed} $cover_image Get Product's cover image
- * @property-read \Illuminate\Support\Collection<int, array{id: mixed, src: string, srcSet: string}> $images Get Product's images
+ * @property-read array $cover_image Get Product's cover image
+ * @property-read \Illuminate\Support\Collection<int, array{id: string|null, src: string|null, srcSet: string|null}> $images Get Product's images
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
@@ -133,8 +133,6 @@ class Product extends Model implements Auditable, HasMedia
 
     /**
      * @comment Get Product's cover image
-     *
-     * @return array{id: mixed, src: mixed, srcSet: mixed}
      */
     public function getCoverImageAttribute(): array
     {
@@ -150,7 +148,7 @@ class Product extends Model implements Auditable, HasMedia
     /**
      * @comment Get Product's images
      *
-     * @return \Illuminate\Support\Collection<int, array{id: mixed, src: string, srcSet: string>}
+     * @return \Illuminate\Support\Collection<int, array{id: string|null, src: string|null, srcSet: string|null}> $images
      */
     public function getImagesAttribute(): Collection
     {
