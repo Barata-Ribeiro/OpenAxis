@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\PurchaseOrderStatusEnum;
 use App\Enums\RoleEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePurchaseOrderRequest extends FormRequest
 {
@@ -29,7 +31,7 @@ class UpdatePurchaseOrderRequest extends FormRequest
             'supplier_id' => ['sometimes', 'exists:partners,id'],
             'order_date' => ['sometimes', 'date', 'before_or_equal:forecast_date'],
             'forecast_date' => ['sometimes', 'nullable', 'date', 'after_or_equal:order_date'],
-            'status' => ['sometimes', 'in:pending,approved,received,canceled'],
+            'status' => ['sometimes', Rule::in(array_map(fn (PurchaseOrderStatusEnum $s) => $s->value, PurchaseOrderStatusEnum::cases()))],
             'notes' => ['sometimes', 'nullable', 'string', 'max:1000'],
         ];
     }

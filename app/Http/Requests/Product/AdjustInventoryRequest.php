@@ -3,8 +3,10 @@
 namespace App\Http\Requests\Product;
 
 use App\Enums\RoleEnum;
+use App\Enums\StockMovementTypeEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AdjustInventoryRequest extends FormRequest
 {
@@ -27,7 +29,7 @@ class AdjustInventoryRequest extends FormRequest
     {
         return [
             'product_id' => ['required', 'exists:products,id'],
-            'movement_type' => ['required', 'in:inbound,outbound,adjustment'],
+            'movement_type' => ['required', Rule::in(array_map(fn (StockMovementTypeEnum $m) => $m->value, StockMovementTypeEnum::cases()))],
             'quantity' => ['required', 'integer', 'min:1'],
             'reason' => ['nullable', 'string', 'max:100'],
             'reference' => ['nullable', 'string', 'max:50'],

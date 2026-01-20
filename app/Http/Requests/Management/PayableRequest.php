@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\PayableStatusEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PayableRequest extends FormRequest
 {
@@ -36,7 +38,7 @@ class PayableRequest extends FormRequest
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'amount' => ['required', 'numeric', 'min:0'],
             'due_date' => ['required', 'date', 'after_or_equal:today'],
-            'status' => ['required', 'in:pending,paid,canceled'],
+            'status' => ['required', Rule::in(array_map(fn (PayableStatusEnum $s) => $s->value, PayableStatusEnum::cases()))],
             'payment_method' => ['required', 'in:bank_transfer,cash,credit_card,check'],
             'reference_number' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],

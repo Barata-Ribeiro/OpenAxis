@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\PurchaseOrderStatusEnum;
 use App\Enums\RoleEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PurchaseOrderRequest extends FormRequest
 {
@@ -34,7 +36,7 @@ class PurchaseOrderRequest extends FormRequest
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.subtotal_price' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'in:pending,approved,received,canceled'],
+            'status' => ['required', Rule::in(array_map(fn (PurchaseOrderStatusEnum $s) => $s->value, PurchaseOrderStatusEnum::cases()))],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

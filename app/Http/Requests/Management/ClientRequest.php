@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\AddressTypeEnum;
+use App\Enums\ClientTypeEnum;
 use App\Enums\RoleEnum;
 use App\Rules\IsValidIdentification;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ClientRequest extends FormRequest
 {
@@ -31,9 +34,13 @@ class ClientRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:320', 'unique:users,email'],
             'identification' => ['required', 'string', 'max:50', new IsValidIdentification],
             'phone_number' => ['required', 'string', 'max:20', 'regex:/^\+?(\d{1,3})?[-.\s]?(\(?\d{3}\)?[-.\s]?)?(\d[-.\s]?){6,9}\d$/'],
-            'client_type' => ['required', 'string', 'in:individual,company'],
+            'client_type' => [
+                'required',
+                'string',
+                Rule::in(array_map(fn (ClientTypeEnum $c) => $c->value, ClientTypeEnum::cases())),
+            ],
 
-            'type' => ['required', 'in:billing,shipping,billing_and_shipping,other'],
+            'type' => ['required', Rule::in(array_map(fn (AddressTypeEnum $a) => $a->value, AddressTypeEnum::cases()))],
             'label' => ['nullable', 'string', 'max:100'],
             'street' => ['required', 'string', 'max:150'],
             'number' => ['required', 'string', 'max:20'],

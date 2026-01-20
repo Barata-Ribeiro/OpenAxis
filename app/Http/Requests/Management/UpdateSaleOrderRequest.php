@@ -3,8 +3,10 @@
 namespace App\Http\Requests\Management;
 
 use App\Enums\RoleEnum;
+use App\Enums\SalesOrderStatusEnum;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSaleOrderRequest extends FormRequest
 {
@@ -30,7 +32,7 @@ class UpdateSaleOrderRequest extends FormRequest
             'vendor_id' => ['sometimes', 'exists:vendors,id'],
             'payment_condition_id' => ['sometimes', 'nullable', 'exists:payment_conditions,id'],
             'delivery_date' => ['sometimes', 'nullable', 'date', 'after_or_equal:order_date'],
-            'status' => ['sometimes', 'in:pending,delivered,canceled'],
+            'status' => ['sometimes', Rule::in(array_map(fn (SalesOrderStatusEnum $s) => $s->value, SalesOrderStatusEnum::cases()))],
             'discount_cost' => ['sometimes', 'numeric', 'min:0'],
             'delivery_cost' => ['sometimes', 'numeric', 'min:0'],
             'payment_method' => ['sometimes', 'in:cash,credit_card,debit_card,bank_transfer'],

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Settings;
 
+use App\Enums\AddressTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AddressRequest extends FormRequest
 {
@@ -22,7 +24,7 @@ class AddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'in:billing,shipping,billing_and_shipping,other'],
+            'type' => ['required', Rule::in(array_map(fn (AddressTypeEnum $a) => $a->value, AddressTypeEnum::cases()))],
             'label' => ['nullable', 'string', 'max:100'],
             'street' => ['required', 'string', 'max:150'],
             'number' => ['required', 'string', 'max:20'],

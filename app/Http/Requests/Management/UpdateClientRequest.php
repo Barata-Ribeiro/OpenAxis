@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Management;
 
+use App\Enums\ClientTypeEnum;
 use App\Enums\RoleEnum;
 use App\Models\Client;
 use App\Rules\IsValidIdentification;
@@ -33,7 +34,7 @@ class UpdateClientRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:320', Rule::unique(Client::class)->ignore($this->route('client')->id ?? $this->route('client'))],
             'identification' => ['required', 'string', 'max:50', new IsValidIdentification],
             'phone_number' => ['required', 'string', 'max:20', 'regex:/^\+?(\d{1,3})?[-.\s]?(\(?\d{3}\)?[-.\s]?)?(\d[-.\s]?){6,9}\d$/'],
-            'client_type' => ['required', 'string', 'in:individual,company'],
+            'client_type' => ['required', 'string', Rule::in(array_map(fn (ClientTypeEnum $c) => $c->value, ClientTypeEnum::cases()))],
         ];
     }
 

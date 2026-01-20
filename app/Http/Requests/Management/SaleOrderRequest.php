@@ -3,10 +3,12 @@
 namespace App\Http\Requests\Management;
 
 use App\Enums\RoleEnum;
+use App\Enums\SalesOrderStatusEnum;
 use App\Models\Product;
 use Auth;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SaleOrderRequest extends FormRequest
 {
@@ -38,7 +40,7 @@ class SaleOrderRequest extends FormRequest
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.subtotal_price' => ['required', 'numeric', 'min:0'],
             'items.*.commission_item' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'in:pending,delivered,canceled'],
+            'status' => ['required', Rule::in(array_map(fn (SalesOrderStatusEnum $s) => $s->value, SalesOrderStatusEnum::cases()))],
             'payment_method' => ['required', 'in:cash,credit_card,debit_card,bank_transfer'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'update_payables' => ['sometimes', 'boolean'],
