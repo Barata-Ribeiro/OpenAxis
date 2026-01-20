@@ -3,6 +3,8 @@
 namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\SaleOrderRequest;
+use App\Http\Requests\Management\UpdateSaleOrderRequest;
+use App\Models\SalesOrder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface SalesOrderServiceInterface
@@ -53,4 +55,17 @@ interface SalesOrderServiceInterface
      * @return array<int, array{id: int|string, text: string}> Array of option arrays (may be empty if no matches).
      */
     public function getEditDataForSelect(?string $search): array;
+
+    /**
+     * Update the given sales order using data from the provided request.
+     *
+     * @param  UpdateSaleOrderRequest  $request  Validated request containing the update payload.
+     * @param  SalesOrder  $salesOrder  The existing sales order instance to update and persist.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException If the caller is not authorized to perform the update.
+     * @throws \Illuminate\Validation\ValidationException If additional validation rules fail.
+     * @throws \RuntimeException If persisting the update or related side effects fail.
+     * @throws \Throwable For other unexpected errors.
+     */
+    public function updateSalesOrder(UpdateSaleOrderRequest $request, SalesOrder $salesOrder): void;
 }

@@ -5,7 +5,9 @@ namespace App\Services\Management;
 use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
 use App\Enums\RoleEnum;
+use App\Enums\SalesOrderStatusEnum;
 use App\Http\Requests\Management\SaleOrderRequest;
+use App\Http\Requests\Management\UpdateSaleOrderRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
 use App\Models\Partner;
 use App\Models\Payable;
@@ -23,6 +25,8 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Str;
+
+use function array_key_exists;
 
 class SalesOrderService implements SalesOrderServiceInterface
 {
@@ -281,5 +285,74 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->withQueryString();
 
         return [$clients, $vendors];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function updateSalesOrder(UpdateSaleOrderRequest $request, SalesOrder $salesOrder): void
+    {
+        $validated = $request->validated();
+
+        $previousStatus = $salesOrder->status instanceof SalesOrderStatusEnum
+            ? $salesOrder->status->value
+            : (string) $salesOrder->status;
+
+        $shouldRestock = array_key_exists('status', $validated)
+            && $validated['status'] === SalesOrderStatusEnum::CANCELED->value
+            && $previousStatus !== SalesOrderStatusEnum::CANCELED->value;
+
+        DB::transaction(function () use ($validated, $salesOrder, $shouldRestock) {
+            $updates = $validated;
+
+            $deliveryCost = array_key_exists('delivery_cost', $updates)
+                ? (float) $updates['delivery_cost']
+                : (float) $salesOrder->delivery_cost;
+
+            $discountCost = array_key_exists('discount_cost', $updates)
+                ? (float) $updates['discount_cost']
+                : (float) $salesOrder->discount_cost;
+
+            $deliveryCostChanged = array_key_exists('delivery_cost', $updates)
+                && $deliveryCost !== (float) $salesOrder->delivery_cost;
+
+            $discountCostChanged = array_key_exists('discount_cost', $updates)
+                && $discountCost !== (float) $salesOrder->discount_cost;
+
+            if ($deliveryCostChanged || $discountCostChanged) {
+                $productValue = (float) $salesOrder->product_value;
+                $updates['total_cost'] = (float) ($productValue + $deliveryCost - $discountCost);
+            }
+
+            foreach (['delivery_cost', 'discount_cost', 'total_cost', 'product_cost', 'product_value', 'total_commission'] as $field) {
+                if (array_key_exists($field, $updates)) {
+                    $updates[$field] = (float) $updates[$field];
+                }
+            }
+
+            $salesOrder->update($updates);
+
+            if (! $shouldRestock) {
+                return;
+            }
+
+            $items = $salesOrder->salesOrderItems()->get(['product_id', 'quantity']);
+            $quantities = $items->groupBy('product_id')->map(fn ($group) => $group->sum('quantity'));
+
+            $actionUserId = Auth::id() ?? $salesOrder->user_id;
+
+            foreach ($quantities as $productId => $qty) {
+                Product::whereKey($productId)->increment('current_stock', (int) $qty);
+
+                StockMovement::create([
+                    'product_id' => $productId,
+                    'user_id' => $actionUserId,
+                    'movement_type' => 'inbound',
+                    'quantity' => (int) $qty,
+                    'reason' => "Sales Order Canceled: {$salesOrder->order_number}",
+                    'reference' => $salesOrder->order_number,
+                ]);
+            }
+        });
     }
 }
