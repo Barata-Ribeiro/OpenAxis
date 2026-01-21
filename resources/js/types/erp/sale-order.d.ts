@@ -1,8 +1,7 @@
-import type { User } from '@/types/application/user';
 import type { SaleOrderStatus } from '@/types/erp/erp-enums';
 import type { Partner } from '@/types/erp/partner';
 import type { PaymentCondition } from '@/types/erp/payment-condition';
-import type { Vendor } from '@/types/erp/vendor';
+import type { VendorWithRelations } from '@/types/erp/vendor';
 
 type PaymentMethod = 'cash' | 'credit_card' | 'debit_card' | 'bank_transfer';
 
@@ -30,7 +29,7 @@ export interface SaleOrder {
 
 export interface SaleOrderWithRelations extends SaleOrder {
     client: Partner;
-    vendor: Vendor;
-    user: User;
+    vendor: VendorWithRelations;
+    user: Use;
     payment_condition: PaymentCondition;
 }
