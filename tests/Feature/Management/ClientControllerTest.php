@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AddressTypeEnum;
+use App\Enums\ClientTypeEnum;
 use App\Enums\RoleEnum;
 use App\Models\Client;
 use Carbon\Carbon;
@@ -116,13 +117,13 @@ describe('tests for the "index" method of Management/ClientController', function
 
         $response = $this->actingAs($authorizedUser)
             ->get(route('erp.clients.index', [
-                'filters' => "client_type:{$targetClient->client_type}",
+                'filters' => "client_type:{$targetClient->client_type->value}",
             ]));
 
         $response->assertOk();
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component($componentName)
-            ->where('clients.data.0.client_type', $targetClient->client_type)
+            ->where('clients.data.0.client_type', $targetClient->client_type->value)
         );
     });
 });
@@ -195,7 +196,7 @@ describe('tests for the "store" method of Management/ClientController', function
             'email' => Str::uuid().'@clients.test',
             'identification' => generateValidIdentification(),
             'phone_number' => '+1555550'.random_int(1000, 9999),
-            'client_type' => 'individual',
+            'client_type' => ClientTypeEnum::INDIVIDUAL->value,
             'type' => AddressTypeEnum::BILLING->value,
             'label' => 'HQ',
             'street' => $faker->streetName(),
@@ -274,7 +275,7 @@ describe('tests for the "update" method of Management/ClientController', functio
             'email' => Str::uuid().'@clients.test',
             'identification' => generateValidIdentification(),
             'phone_number' => '+1666660'.random_int(1000, 9999),
-            'client_type' => 'company',
+            'client_type' => ClientTypeEnum::COMPANY->value,
         ];
 
         $this->actingAs($authorizedUser)
