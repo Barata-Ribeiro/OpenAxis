@@ -4,8 +4,11 @@ namespace App\Services\Management;
 
 use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
+use App\Enums\PayableStatusEnum;
+use App\Enums\ReceivableStatusEnum;
 use App\Enums\RoleEnum;
 use App\Enums\SalesOrderStatusEnum;
+use App\Enums\StockMovementTypeEnum;
 use App\Http\Requests\Management\SaleOrderRequest;
 use App\Http\Requests\Management\UpdateSaleOrderRequest;
 use App\Interfaces\Management\SalesOrderServiceInterface;
@@ -57,13 +60,9 @@ class SalesOrderService implements SalesOrderServiceInterface
             $sortBy = str_replace('client_name', 'partners.name', $sortBy);
         }
 
-        if (! empty($sortBy) && $sortByStartsWithVendor) {
-            $sortBy = str_replace('vendor_name', 'vendors.name', $sortBy);
-        }
-
         return SalesOrder::query()
-            ->select('sales_orders.*')
-            ->with(['user:id,name,email', 'user.media', 'client:id,name', 'vendor:id,first_name,last_name', 'paymentCondition:id,code,name'])
+            ->select(['sales_orders.*'])
+            ->withOnly(['client:id,name,email', 'vendor:id,first_name,last_name' => ['user'], 'paymentCondition:id,code,name'])
             ->when($vendorId, fn ($q, $vId) => $q->whereIn('sales_orders.vendor_id', $vId))
             ->when($status, fn ($q) => $q->whereIn('sales_orders.status', $status))
             ->when($search, fn ($query, $search) => $query->whereLike('sales_orders.order_number', "%$search%")
@@ -73,10 +72,8 @@ class SalesOrderService implements SalesOrderServiceInterface
                 ->orWhereHas('vendor.user', fn ($vendorUserQuery) => $vendorUserQuery->whereLike('name', "%$search%")
                     ->orWhereLike('email', "%$search%"))->orWhereLike('payment_conditions.code', "%$search%")->orWhereLike('payment_conditions.name', "%$search%"))
             ->when($createdAtRange, fn ($q) => $q->whereBetween('sales_orders.created_at', [$start, $end]))
-            ->leftJoin((new Partner)->getTable(), 'sales_orders.client_id', '=', 'partners.id')
-            ->leftJoin((new Vendor)->getTable(), 'sales_orders.vendor_id', '=', 'vendors.id')
-            ->leftJoin((new PaymentCondition)->getTable(), 'sales_orders.payment_condition_id', '=', 'payment_conditions.id')
-            ->orderBy($sortBy, $sortDir)
+            ->when(! empty($sortBy) && $sortByStartsWithVendor, fn ($q) => $q->orderByRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) $sortDir"))
+            ->when(! empty($sortBy) && ! $sortByStartsWithVendor, fn ($q) => $q->orderBy($sortBy, $sortDir))
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -162,7 +159,7 @@ class SalesOrderService implements SalesOrderServiceInterface
         $statusReceivable = $validated['update_receivables'] ?? false;
 
         DB::transaction(function () use ($saleOrder, $items, $quantities, $createdBy, $statusReceivable, $statusPayable) {
-            $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count() + 1, 6, '0', STR_PAD_LEFT);
+            $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count('id') + 1, 6, '0', STR_PAD_LEFT);
 
             $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
             $totalComission = array_reduce($items, fn ($carry, $item) => $carry + $item['commission_item'], 0);
@@ -180,7 +177,7 @@ class SalesOrderService implements SalesOrderServiceInterface
 
             // Handle product stock decrementation and stock movements
             foreach ($quantities as $productId => $qty) {
-                Product::where('id', $productId)->decrement('current_stock', (int) $qty);
+                Product::whereId($productId)->decrement('current_stock', (int) $qty);
                 StockMovement::create([
                     'product_id' => $productId,
                     'user_id' => $createdBy,
@@ -206,8 +203,8 @@ class SalesOrderService implements SalesOrderServiceInterface
                 }
             }
 
-            $receivableCount = Receivable::count();
-            $payableCount = Payable::count() + 1;
+            $receivableCount = Receivable::count('id');
+            $payableCount = Payable::count('id') + 1;
             $yearNow = Carbon::now()->year;
 
             foreach (range(1, $installments) as $installment) {
@@ -223,7 +220,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                     'client_id' => $so->client_id,
                     'amount' => $installmentAmount,
                     'due_date' => $dueDate,
-                    'status' => $statusReceivable ? 'received' : 'pending',
+                    'status' => $statusReceivable ? ReceivableStatusEnum::RECEIVED : ReceivableStatusEnum::PENDING,
                     'sales_order_id' => $so->id,
                     'reference_number' => $so->order_number,
                     'user_id' => $createdBy,
@@ -240,7 +237,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                 'vendor_id' => $so->vendor_id,
                 'amount' => $so->product_value,
                 'due_date' => $payableDueDate,
-                'status' => $statusPayable ? 'paid' : 'pending',
+                'status' => $statusPayable ? PayableStatusEnum::PAID : PayableStatusEnum::PENDING,
                 'payment_method' => $so->payment_method,
                 'sales_order_id' => $so->id,
                 'reference_number' => $so->order_number,
@@ -347,7 +344,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                 StockMovement::create([
                     'product_id' => $productId,
                     'user_id' => $actionUserId,
-                    'movement_type' => 'inbound',
+                    'movement_type' => StockMovementTypeEnum::INBOUND,
                     'quantity' => (int) $qty,
                     'reason' => "Sales Order Canceled: {$salesOrder->order_number}",
                     'reference' => $salesOrder->order_number,
