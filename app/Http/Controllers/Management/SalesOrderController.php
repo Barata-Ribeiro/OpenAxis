@@ -105,7 +105,7 @@ class SalesOrderController extends Controller
             ->get();
 
         return Inertia::render('erp/sales/edit', [
-            'saleOrder' => $salesOrder->load(['client:id,name,email', 'vendor:id,first_name,last_name,email', 'paymentCondition', 'user:id,name,email', 'salesOrderItems']),
+            'saleOrder' => $salesOrder->load('user:id,name,email'),
             'clients' => Inertia::scroll(fn () => $clients),
             'vendors' => Inertia::scroll(fn () => $vendors),
             'paymentConditions' => $paymentConditions,
