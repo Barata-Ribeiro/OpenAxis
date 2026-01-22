@@ -1,4 +1,5 @@
 import HeadingSmall from '@/components/common/heading-small';
+import EditSalesOrderForm from '@/components/forms/sales-order/edit-sales-order-form';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
@@ -26,7 +27,7 @@ export default function EditSalesOrderPage({ saleOrder }: Readonly<EditSalesOrde
                     <Card>
                         <CardContent className="grid gap-2">
                             <HeadingSmall
-                                title={`Editing Sale Order #${saleOrder.id}`}
+                                title={`Editing Sale Order #${saleOrder.order_number}`}
                                 description="Update the informations below. No products can be modified after creation."
                             />
 
