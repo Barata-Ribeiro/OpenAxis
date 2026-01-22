@@ -37,8 +37,19 @@ export const columns: ColumnDef<SaleOrderWithRelations>[] = [
         enableSorting: true,
     },
     {
-        accessorKey: 'vendor.full_name', // TODO: Handle vendor name correctly when sorting
+        id: 'vendor_name',
+        accessorKey: 'vendor.full_name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Vendor" />,
+        cell: function Cell({ row }) {
+            const vendor = row.original.vendor;
+
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{vendor.full_name}</span>
+                    {vendor.user?.email && <span className="text-xs text-muted-foreground">{vendor.user.email}</span>}
+                </div>
+            );
+        },
         enableSorting: true,
     },
     {
