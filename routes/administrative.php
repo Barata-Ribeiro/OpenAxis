@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\NotifierController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Mail\NewUserMail;
@@ -41,6 +42,11 @@ Route::middleware(['auth', 'verified'])->prefix('administrative')->group(functio
         ->middlewareFor('show', 'permission:user.show')
         ->middlewareFor(['edit', 'update'], 'permission:user.edit')
         ->middlewareFor('destroy', 'permission:user.destroy');
+
+    Route::prefix('notifier')->group(function () {
+        Route::get('/create', [NotifierController::class, 'create'])->name('administrative.notifier.create');
+        Route::post('/notify', [NotifierController::class, 'notify'])->name('administrative.notifier.notify');
+    });
 
     Route::prefix('mailable')->group(function () {
         Route::get('/new-account', function () {
