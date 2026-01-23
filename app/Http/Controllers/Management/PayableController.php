@@ -89,4 +89,20 @@ class PayableController extends Controller
             'payable' => $payable,
         ]);
     }
+
+    public function edit(QueryRequest $request, Payable $payable)
+    {
+        Log::info('Payable: Accessed payable edit page.', [
+            'action_user_id' => Auth::id(),
+            'payable_id' => $payable->id,
+        ]);
+
+        [$suppliers, $vendors] = $this->payableService->getCreateFormData($request);
+
+        return Inertia::render('erp/payables/edit', [
+            'payable' => $payable,
+            'suppliers' => Inertia::scroll(fn () => $suppliers),
+            'vendors' => Inertia::scroll(fn () => $vendors),
+        ]);
+    }
 }
