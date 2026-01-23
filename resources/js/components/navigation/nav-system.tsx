@@ -112,6 +112,11 @@ export function NavSystem() {
         icon: UserStarIcon,
         items: [
             {
+                title: 'Notifier',
+                href: administrative.notifier.create().url,
+                canView: isSuperAdmin,
+            },
+            {
                 title: 'Users',
                 href: administrative.users.index().url,
                 canView: can('user.index'),
