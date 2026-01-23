@@ -4,6 +4,7 @@ export enum RoleNames {
     VENDOR = 'vendor',
     BUYER = 'buyer',
     FINANCE = 'finance',
+    USER = 'user',
 }
 
 const ROLE_LABELS: Record<RoleNames, string> = {
@@ -11,6 +12,7 @@ const ROLE_LABELS: Record<RoleNames, string> = {
     [RoleNames.VENDOR]: 'Vendors',
     [RoleNames.BUYER]: 'Buyers',
     [RoleNames.FINANCE]: 'Finance Team',
+    [RoleNames.USER]: 'Users',
 };
 
 export function roleLabel(role: RoleNames): string {
