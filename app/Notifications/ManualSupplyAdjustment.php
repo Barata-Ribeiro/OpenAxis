@@ -4,10 +4,12 @@ namespace App\Notifications;
 
 use App\Models\StockMovement;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class ManualSupplyAdjustment extends Notification
+class ManualSupplyAdjustment extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
@@ -26,7 +28,7 @@ class ManualSupplyAdjustment extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**

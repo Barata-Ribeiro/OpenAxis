@@ -4,10 +4,12 @@ namespace App\Notifications;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class WrittenNotification extends Notification
+class WrittenNotification extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
@@ -20,13 +22,21 @@ class WrittenNotification extends Notification
     }
 
     /**
+     * Get the type of the notification being broadcast.
+     */
+    public function broadcastType(): string
+    {
+        return 'broadcast.message';
+    }
+
+    /**
      * Get the notification's delivery channels.
      *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**

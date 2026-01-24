@@ -4,11 +4,12 @@ namespace App\Notifications;
 
 use App\Models\PurchaseOrder;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class NewPurchaseOrder extends Notification implements ShouldQueue
+class NewPurchaseOrder extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
@@ -27,7 +28,7 @@ class NewPurchaseOrder extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
