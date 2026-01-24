@@ -90,6 +90,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\Management\ReceivableServiceInterface::class,
             \App\Services\Management\ReceivableService::class
         );
+
+        $this->app->bind(
+            \App\Interfaces\Admin\NotifierServiceInterface::class,
+            \App\Services\Admin\NotifierService::class
+        );
     }
 
     /**
