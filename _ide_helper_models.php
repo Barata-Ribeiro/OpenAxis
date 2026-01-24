@@ -133,7 +133,7 @@ namespace App\Models{
  * @property string $email
  * @property string|null $phone_number
  * @property string $identification Social Security Number/Employer Identification Number of the client. If Brazilian, follow the CPF format or CNPJ for companies.
- * @property string $client_type Type of client: individual or company. In Brazil would be Pessoa Física or Pessoa Jurídica.
+ * @property ClientTypeEnum $client_type Type of client: individual or company. In Brazil would be Pessoa Física or Pessoa Jurídica.
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -425,8 +425,8 @@ namespace App\Models{
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
  * @property-read \App\Models\ProductCategory $category
- * @property-read mixed $cover_image
- * @property-read mixed $images
+ * @property-read array $cover_image Get Product's cover image
+ * @property-read \Illuminate\Support\Collection<int, array{id: string|null, src: string|null, srcSet: string|null}> $images Get Product's images
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
@@ -707,7 +707,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
- * @property-read mixed $avatar
+ * @property-read array $avatar Get User's avatar
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read bool|null $media_exists
@@ -764,7 +764,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read bool|null $audits_exists
- * @property-read string $full_name
+ * @property-read string $full_name Get Vendor's full name
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\VendorFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vendor newModelQuery()
