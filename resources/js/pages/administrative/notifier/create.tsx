@@ -4,15 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import PageLayout from '@/layouts/page/layout';
 import administrative from '@/routes/administrative';
 import type { BreadcrumbItem } from '@/types';
-import type { Role } from '@/types/application/role-permission';
 import { Head } from '@inertiajs/react';
-
-interface NotifierCreatePageProps {
-    roles: {
-        value: Role['name'];
-        label: string;
-    }[];
-}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function NotifierCreatePage({ roles }: Readonly<NotifierCreatePageProps>) {
+export default function NotifierCreatePage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Notifier" />
@@ -37,7 +29,7 @@ export default function NotifierCreatePage({ roles }: Readonly<NotifierCreatePag
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <NotifierForm roles={roles} />
+                            <NotifierForm />
                         </CardContent>
                     </Card>
                 </div>
