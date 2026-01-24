@@ -3,25 +3,25 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
+import { Field, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { dashboard } from '@/routes';
 import administrative from '@/routes/administrative';
 import type { Role } from '@/types/application/role-permission';
-import { Form, Link } from '@inertiajs/react';
+import { Form, Link, usePage } from '@inertiajs/react';
 import { InfoIcon } from 'lucide-react';
 import { Activity, useMemo, useState } from 'react';
 
-interface NotifierFormProps {
-    roles: {
-        value: Role['name'];
-        label: string;
-    }[];
+interface RoleOption {
+    value: Role['name'];
+    label: string;
 }
 
-export default function NotifierForm({ roles }: Readonly<NotifierFormProps>) {
+export default function NotifierForm() {
+    const pageProps = usePage<{ roleOptions: RoleOption[] }>().props;
+
     const [email, setEmail] = useState('');
     const [selectedRoles, setSelectedRoles] = useState<Record<string, boolean>>({});
     const [message, setMessage] = useState('');
@@ -97,21 +97,26 @@ export default function NotifierForm({ roles }: Readonly<NotifierFormProps>) {
                     <FieldSet>
                         <FieldLegend>Roles</FieldLegend>
 
-                        <FieldGroup className="grid gap-2">
-                            {roles.map((r) => (
-                                <Field data-invalid={!!errors.roles} key={r.value} orientation="horizontal">
-                                    <Checkbox
-                                        id={`role-${r.value}`}
-                                        name="roles[]"
-                                        value={r.value}
-                                        checked={!!selectedRoles[r.value]}
-                                        onCheckedChange={(v) => handleCheckboxChange(r.value, !!v)}
-                                        disabled={emailTyped}
-                                    />
-                                    <FieldLabel htmlFor={`role-${r.value}`}>{r.label}</FieldLabel>
-                                </Field>
-                            ))}
-                        </FieldGroup>
+                        <div className="grid gap-2">
+                            {pageProps.roleOptions.map((r, idx) => {
+                                const uniqueKey = `role-${r.value}-${idx}`;
+
+                                return (
+                                    <Field data-invalid={!!errors.roles} key={uniqueKey} orientation="horizontal">
+                                        <Checkbox
+                                            id={uniqueKey}
+                                            name="roles[]"
+                                            value={r.value}
+                                            checked={!!selectedRoles[r.value]}
+                                            onCheckedChange={(v) => handleCheckboxChange(r.value, !!v)}
+                                            disabled={emailTyped}
+                                        />
+
+                                        <FieldLabel htmlFor={uniqueKey}>{r.label}</FieldLabel>
+                                    </Field>
+                                );
+                            })}
+                        </div>
 
                         <InputError message={errors.roles} />
                     </FieldSet>
@@ -148,9 +153,10 @@ export default function NotifierForm({ roles }: Readonly<NotifierFormProps>) {
                                 type="button"
                                 variant="outline"
                                 onClick={() => {
-                                    resetAndClearErrors();
                                     setEmail('');
+                                    setMessage('');
                                     setSelectedRoles({});
+                                    resetAndClearErrors();
                                 }}
                                 disabled={processing}
                             >
