@@ -5,7 +5,7 @@ export interface Notification<T = Record<string, unknown>> {
     type: string;
     notifiable_type: string;
     notifiable_id: number;
-    data: { message: string } & T;
+    data: { message: string; type: string } & T;
     read_at: string | null;
     created_at: string;
     updated_at: string;
