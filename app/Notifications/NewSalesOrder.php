@@ -40,6 +40,7 @@ class NewSalesOrder extends Notification implements ShouldBroadcast, ShouldQueue
     {
         return [
             'message' => 'A new sales order has been created.',
+            'type' => 'New Sales Order',
             'sales_order_id' => $this->salesOrder->id,
             'order_number' => $this->salesOrder->order_number,
             'order_date' => $this->salesOrder->order_date,

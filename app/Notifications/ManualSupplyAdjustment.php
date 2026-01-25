@@ -40,6 +40,7 @@ class ManualSupplyAdjustment extends Notification implements ShouldBroadcast, Sh
     {
         return [
             'message' => 'Manual supply adjustment recorded.',
+            'type' => 'Manual Supply Adjustment',
             'product' => $this->stockMovement->product->name,
             'movement_type' => $this->stockMovement->movement_type,
             'quantity' => $this->stockMovement->quantity,

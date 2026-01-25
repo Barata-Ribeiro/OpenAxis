@@ -40,6 +40,7 @@ class NewPurchaseOrder extends Notification implements ShouldBroadcast, ShouldQu
     {
         return [
             'message' => 'A new purchase order has been created.',
+            'type' => 'New Purchase Order',
             'purchase_order_id' => $this->purchaseOrder->id,
             'order_number' => $this->purchaseOrder->order_number,
             'order_date' => $this->purchaseOrder->order_date,

@@ -48,6 +48,7 @@ class WrittenNotification extends Notification implements ShouldBroadcast, Shoul
     {
         return [
             'message' => $this->content,
+            'type' => 'Admin Sent Message',
             'from_user_id' => $this->from->id,
             'from_user_name' => $this->from->name,
             'from_user_role' => $this->from->roles->pluck('name')->join(', '),
