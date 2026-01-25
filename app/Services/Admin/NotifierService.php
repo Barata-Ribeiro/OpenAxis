@@ -24,7 +24,7 @@ class NotifierService implements NotifierServiceInterface
         $roles = ! isset($validated['roles']) ? [] : $validated['roles'];
 
         if ($toUser) {
-            Notification::sendNow([$toUser], new WrittenNotification($message, $sendingUser));
+            $toUser->notifyNow(new WrittenNotification($message, $sendingUser));
 
             return;
         }
