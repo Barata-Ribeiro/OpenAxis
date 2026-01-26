@@ -162,11 +162,11 @@ class SalesOrderService implements SalesOrderServiceInterface
             $orderNumber = 'SO-'.Str::random(8).str_pad((string) SalesOrder::count('id') + 1, 6, '0', STR_PAD_LEFT);
 
             $totalCost = array_reduce($items, fn ($carry, $item) => $carry + $item['subtotal_price'], 0);
-            $totalComission = array_reduce($items, fn ($carry, $item) => $carry + $item['commission_item'], 0);
+            $totalCommission = array_reduce($items, fn ($carry, $item) => $carry + $item['commission_item'], 0);
             $productValue = array_reduce($items, fn ($carry, $item) => $carry + ($item['quantity'] * $item['unit_price']), 0);
 
             $saleOrder['total_cost'] = $totalCost;
-            $saleOrder['total_commission'] = $totalComission;
+            $saleOrder['total_commission'] = $totalCommission;
             $saleOrder['product_value'] = $productValue;
             $saleOrder['order_number'] = $orderNumber;
             $saleOrder['user_id'] = $createdBy;
@@ -209,7 +209,7 @@ class SalesOrderService implements SalesOrderServiceInterface
 
             foreach (range(1, $installments) as $installment) {
                 $receivableCount++;
-                $code = 'RCV-'.$yearNow.'-'.str_pad((string) $receivableCount, 6, '0', STR_PAD_LEFT);
+                $code = "RCV-$yearNow-".str_pad((string) $receivableCount, 6, '0', STR_PAD_LEFT);
                 $dueDate = Carbon::now()->addDays($daysUntilDue * $installment);
                 $installmentAmount = $so->total_cost / $installments;
                 $description = "Receivable for Sales Order {$so->order_number} - Installment $installment of $installments";
@@ -220,6 +220,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                     'client_id' => $so->client_id,
                     'amount' => $installmentAmount,
                     'due_date' => $dueDate,
+                    'received_date' => $statusReceivable ? Carbon::now() : null,
                     'status' => $statusReceivable ? ReceivableStatusEnum::RECEIVED : ReceivableStatusEnum::PENDING,
                     'sales_order_id' => $so->id,
                     'reference_number' => $so->order_number,
@@ -227,7 +228,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                 ]);
             }
 
-            $payableCode = 'PYB-'.$yearNow.'-'.str_pad((string) $payableCount, 6, '0', STR_PAD_LEFT);
+            $payableCode = "PYB-$yearNow-".str_pad((string) $payableCount, 6, '0', STR_PAD_LEFT);
             $payableDueDate = Carbon::now()->addDays($daysUntilDue * $installments);
             $payableDescription = "Payable for Products Sold in Sales Order {$so->order_number}";
 
