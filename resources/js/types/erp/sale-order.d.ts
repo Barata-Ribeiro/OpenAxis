@@ -18,7 +18,7 @@ export interface SaleOrder {
     discount_cost: number;
     total_cost: number;
     product_value: number;
-    total_comission: number;
+    total_commission: number;
     payment_method: PaymentMethod;
     notes: string | null;
     user_id: number;
