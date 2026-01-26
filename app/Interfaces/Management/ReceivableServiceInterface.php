@@ -43,4 +43,17 @@ interface ReceivableServiceInterface
      * @return CursorPaginator Cursor paginator with items and pagination metadata for the create form.
      */
     public function getCreateFormData(QueryRequest $request): CursorPaginator;
+
+    /**
+     * Prepare and return the data required to render the edit form for a receivable.
+     *
+     * This includes form field values, related entities, select/options data and any
+     * contextual information derived from the provided query request (e.g. filters,
+     * eager-loaded relations or other request parameters) necessary for the edit view.
+     *
+     * @param  Receivable  $receivable  The receivable instance being edited.
+     * @param  QueryRequest  $request  Contextual query/request parameters affecting the returned data.
+     * @return array<string, mixed> Associative array of data to be consumed by the edit form/view.
+     */
+    public function getEditFormData(Receivable $receivable, QueryRequest $request): array;
 }

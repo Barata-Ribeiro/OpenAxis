@@ -73,4 +73,27 @@ class ReceivableService implements ReceivableServiceInterface
             ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
             ->withQueryString();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getEditFormData(Receivable $receivable, QueryRequest $request): array
+    {
+        $validated = $request->validated();
+
+        $search = trim($validated['search'] ?? '');
+
+        $clientSearch = $search && str_starts_with($search, 'partner:') ? substr($search, 8) : null;
+
+        $clients = Partner::select(['id', 'name'])
+            ->whereType(PartnerTypeEnum::CLIENT->value)
+            ->whereIsActive(true)
+            ->when($clientSearch, fn ($q, $clientSearch) => $q->whereLike('name', "%$clientSearch%")->orWhereLike('email', "%$clientSearch%"))
+            ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
+            ->withQueryString();
+
+        $receivableDetail = $this->getReceivableDetail($receivable);
+
+        return [$receivableDetail, $clients];
+    }
 }
