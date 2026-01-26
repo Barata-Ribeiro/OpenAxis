@@ -68,4 +68,19 @@ class ReceivableController extends Controller
             'clients' => Inertia::scroll(fn () => $clients),
         ]);
     }
+
+    public function edit(Receivable $receivable, QueryRequest $request)
+    {
+        Log::info('Receivable: Accessed receivable edit page.', [
+            'action_user_id' => Auth::id(),
+            'receivable_id' => $receivable->id,
+        ]);
+
+        [$receivable, $clients] = $this->receivableService->getEditFormData($receivable, $request);
+
+        return Inertia::render('erp/receivables/edit', [
+            'receivable' => $receivable,
+            'clients' => Inertia::scroll(fn () => $clients),
+        ]);
+    }
 }
