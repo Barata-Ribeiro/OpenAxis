@@ -35,8 +35,8 @@ class NotificationRequest extends FormRequest
     {
         return [
             'message' => ['required', 'string', 'max:1200'],
-            'email' => ['required_without:roles', 'email', 'exists:users,email'],
-            'roles' => ['required_without:email', 'array'],
+            'email' => ['required_without:roles', 'email', 'exists:users,email', 'prohibits:roles'],
+            'roles' => ['required_without:email', 'array', 'prohibits:email'],
             'roles.*' => ['string', Rule::in(array_map(fn (RoleEnum $r) => $r->value, RoleEnum::cases()))],
         ];
     }
