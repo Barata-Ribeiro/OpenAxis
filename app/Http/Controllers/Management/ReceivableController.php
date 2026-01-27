@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Management\ReceivableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Receivable;
 use App\Services\Management\ReceivableService;
 use Auth;
+use Exception;
 use Inertia\Inertia;
 use Log;
 
@@ -82,5 +84,27 @@ class ReceivableController extends Controller
             'receivable' => $receivable,
             'clients' => Inertia::scroll(fn () => $clients),
         ]);
+    }
+
+    public function update(Receivable $receivable, ReceivableRequest $request)
+    {
+        try {
+            $this->receivableService->updateReceivable($receivable, $request);
+
+            Log::info('Receivable: Successfully updated receivable.', [
+                'action_user_id' => Auth::id(),
+                'receivable_id' => $receivable->id,
+            ]);
+
+            return to_route('erp.receivables.index')->with('success', 'Receivable updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Receivable: Error updating receivable.', [
+                'action_user_id' => Auth::id(),
+                'receivable_id' => $receivable->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with('error', 'An error occurred while updating the receivable. Please try again.');
+        }
     }
 }
