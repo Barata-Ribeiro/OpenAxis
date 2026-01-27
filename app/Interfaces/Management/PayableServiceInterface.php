@@ -56,4 +56,18 @@ interface PayableServiceInterface
      * @return Payable The hydrated Payable instance containing populated details.
      */
     public function getPayableDetails(Payable $payable): Payable;
+
+    /**
+     * Update the given payable using validated data from the request.
+     *
+     * Applies changes from the provided PayableRequest to the Payable model and
+     * persists the updated entity.
+     *
+     * @param  Payable  $payable  The payable instance to update.
+     * @param  PayableRequest  $request  Validated input for updating the payable.
+     *
+     * @throws \Illuminate\Validation\ValidationException If request validation fails.
+     * @throws \Throwable If the update cannot be persisted.
+     */
+    public function updatePayable(Payable $payable, PayableRequest $request): void;
 }

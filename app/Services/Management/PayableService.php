@@ -16,6 +16,9 @@ use Str;
 
 class PayableService implements PayableServiceInterface
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedPayables(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $status = $filters['status'] ?? null;
@@ -51,6 +54,9 @@ class PayableService implements PayableServiceInterface
             ->withQueryString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getCreateFormData(QueryRequest $request): array
     {
         $validated = $request->validated();
@@ -76,6 +82,9 @@ class PayableService implements PayableServiceInterface
         return [$suppliers, $vendors];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function storePayable(PayableRequest $request): void
     {
         $validated = $request->validated();
@@ -92,5 +101,15 @@ class PayableService implements PayableServiceInterface
     public function getPayableDetails(Payable $payable): Payable
     {
         return $payable->load(['supplier', 'vendor', 'vendor.user', 'vendor.user.media', 'bankAccount', 'salesOrder', 'user:id,name,email', 'user.media']);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function updatePayable(Payable $payable, PayableRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $payable->update($validated);
     }
 }
