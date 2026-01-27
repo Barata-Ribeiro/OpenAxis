@@ -72,7 +72,7 @@ class PayableController extends Controller
                 'error_message' => $e->getMessage(),
             ]);
 
-            return redirect()->back()->with('error', 'An error occurred while storing the payable. Please try again.');
+            return redirect()->back()->withInput()->with('error', 'An error occurred while storing the payable. Please try again.');
         }
     }
 
@@ -104,5 +104,27 @@ class PayableController extends Controller
             'suppliers' => Inertia::scroll(fn () => $suppliers),
             'vendors' => Inertia::scroll(fn () => $vendors),
         ]);
+    }
+
+    public function update(Payable $payable, PayableRequest $request)
+    {
+        try {
+            $this->payableService->updatePayable($payable, $request);
+
+            Log::info('Payable: Successfully updated payable.', [
+                'action_user_id' => Auth::id(),
+                'payable_id' => $payable->id,
+            ]);
+
+            return to_route('erp.payables.index')->with('success', 'Payable updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Payable: Error updating payable.', [
+                'action_user_id' => Auth::id(),
+                'payable_id' => $payable->id,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with('error', 'An error occurred while updating the payable. Please try again.');
+        }
     }
 }
