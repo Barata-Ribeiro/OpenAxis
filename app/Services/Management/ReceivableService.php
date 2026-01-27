@@ -4,6 +4,7 @@ namespace App\Services\Management;
 
 use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
+use App\Http\Requests\Management\ReceivableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\ReceivableServiceInterface;
 use App\Models\Partner;
@@ -95,5 +96,15 @@ class ReceivableService implements ReceivableServiceInterface
         $receivableDetail = $this->getReceivableDetail($receivable);
 
         return [$receivableDetail, $clients];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function updateReceivable(Receivable $receivable, ReceivableRequest $request): void
+    {
+        $validated = $request->validated();
+
+        $receivable->update($validated);
     }
 }

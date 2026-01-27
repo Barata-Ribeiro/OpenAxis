@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Management;
 
+use App\Http\Requests\Management\ReceivableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Receivable;
 use Illuminate\Contracts\Pagination\CursorPaginator;
@@ -56,4 +57,15 @@ interface ReceivableServiceInterface
      * @return array<string, mixed> Associative array of data to be consumed by the edit form/view.
      */
     public function getEditFormData(Receivable $receivable, QueryRequest $request): array;
+
+    /**
+     * Update the given receivable using data from the provided request.
+     *
+     * Applies validated values from the ReceivableRequest to the supplied
+     * Receivable entity and persists any changes.
+     *
+     * @param  Receivable  $receivable  The receivable entity to update.
+     * @param  ReceivableRequest  $request  The validated request containing update data.
+     */
+    public function updateReceivable(Receivable $receivable, ReceivableRequest $request): void;
 }
