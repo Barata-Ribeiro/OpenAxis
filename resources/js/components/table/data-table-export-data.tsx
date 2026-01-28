@@ -8,7 +8,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { RouteDefinition } from '@/wayfinder';
-import { Link } from '@inertiajs/react';
 import { FileDownIcon, FileSpreadsheet, FileTextIcon } from 'lucide-react';
 
 interface DataTableExportDataProps {
@@ -30,18 +29,18 @@ export default function DataTableExportData({ csv, pdf }: Readonly<DataTableExpo
                 <DropdownMenuSeparator />
                 {csv && (
                     <DropdownMenuItem className="w-full" disabled={!csv} asChild>
-                        <Link href={csv} as="button" target="_blank" aria-label="Export as CSV" title="Export as CSV">
+                        <a href={csv.url} aria-label="Export as CSV" title="Export as CSV" rel="noopener noreferrer">
                             <FileSpreadsheet aria-hidden />
                             CSV
-                        </Link>
+                        </a>
                     </DropdownMenuItem>
                 )}
 
                 {pdf && (
                     <DropdownMenuItem className="w-full" disabled={!pdf} asChild>
-                        <Link href={pdf} as="button" target="_blank" aria-label="Export as PDF" title="Export as PDF">
+                        <a href={pdf.url} aria-label="Export as PDF" title="Export as PDF" rel="noopener noreferrer">
                             <FileTextIcon aria-hidden /> PDF
-                        </Link>
+                        </a>
                     </DropdownMenuItem>
                 )}
             </DropdownMenuContent>
