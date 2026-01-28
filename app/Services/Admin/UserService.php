@@ -3,17 +3,26 @@
 namespace App\Services\Admin;
 
 use App\Common\Helpers;
+use App\Enums\RoleEnum;
 use App\Http\Requests\Admin\EditUserRequest;
 use App\Http\Requests\Admin\UserAccountRequest;
 use App\Interfaces\Admin\UserServiceInterface;
 use App\Mail\NewUserMail;
 use App\Models\User;
+use Auth;
+use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Log;
+use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class UserService implements UserServiceInterface
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedUsers(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $roles = $filters['roles'] ?? [];
@@ -45,6 +54,9 @@ class UserService implements UserServiceInterface
         return $users->paginate($perPage)->withQueryString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function createUser(UserAccountRequest $request): User
     {
         $validated = $request->validated();
@@ -60,6 +72,9 @@ class UserService implements UserServiceInterface
         return $user;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function updateUser(User $user, EditUserRequest $data): User
     {
 
@@ -74,5 +89,49 @@ class UserService implements UserServiceInterface
         $user->syncRoles($validated['role']);
 
         return $user;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsvExport(LengthAwarePaginator $users): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_users_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = ['ID', 'Name', 'Email', 'Roles', 'Created At', 'Updated At', 'Deleted At'];
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($users as $user) {
+            $roles = $user->roles->pluck('name')->map(fn (string $name): string => RoleEnum::tryFrom($name)?->label() ?? $name)->join(', ');
+
+            $row = [
+                $user->id,
+                $user->name,
+                $user->email,
+                $roles,
+                $user->created_at,
+                $user->updated_at,
+                $user->deleted_at,
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+
+        fclose($openFile);
+
+        Log::info('User: CSV Export Generated', ['action_user_id' => Auth::id()]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
     }
 }

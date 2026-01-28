@@ -6,6 +6,7 @@ use App\Http\Requests\Admin\EditUserRequest;
 use App\Http\Requests\Admin\UserAccountRequest;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface UserServiceInterface
 {
@@ -42,4 +43,17 @@ interface UserServiceInterface
      * @return User The updated user instance.
      */
     public function updateUser(User $user, EditUserRequest $data): User;
+
+    /**
+     * Generate a streamed CSV export from a paginated collection of users.
+     *
+     * Iterates the provided LengthAwarePaginator and streams CSV rows directly to the HTTP response
+     * to minimize memory usage. The response will include appropriate CSV headers (including
+     * Content-Disposition for file download) and write rows for each user item.
+     *
+     * @param  \Illuminate\Pagination\LengthAwarePaginator  $users  Paginated users to include in the export.
+     *
+     * @throws \Throwable If an error occurs during CSV generation or streaming.
+     */
+    public function generateCsvExport(LengthAwarePaginator $users): BinaryFileResponse;
 }
