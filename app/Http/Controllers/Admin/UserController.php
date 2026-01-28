@@ -10,8 +10,11 @@ use App\Models\User;
 use App\Services\Admin\UserService;
 use Auth;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
 use Log;
+
+use function in_array;
 
 class UserController extends Controller
 {
@@ -22,26 +25,7 @@ class UserController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'name', 'email', 'roles', 'created_at', 'updated_at', 'deleted_at'];
-        if (! in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $users = $this->userService->getPaginatedUsers(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $users = $this->getPaginatedUsersFromRequest($request);
 
         return Inertia::render('administrative/users/index', [
             'users' => $users,
@@ -150,5 +134,63 @@ class UserController extends Controller
 
             return back()->with('error', 'An unknown error occurred while permanently deleting the user.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $users = $this->getPaginatedUsersFromRequest($request);
+
+            if ($users->isEmpty()) {
+                return back()->with('error', 'No users found to export.');
+            }
+
+            return $this->userService->generateCsvExport($users);
+        } catch (Exception $e) {
+            Log::error('User: A CSV Generation Error Occurred', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of users based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of User models.
+     */
+    private function getPaginatedUsersFromRequest(QueryRequest $request): LengthAwarePaginator
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'name', 'email', 'roles', 'created_at', 'updated_at', 'deleted_at'];
+        if (! in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->userService->getPaginatedUsers(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
