@@ -19,11 +19,11 @@ export default function EditPayablePage({ payable }: Readonly<EditPayablePagePro
             href: erp.payables.index().url,
         },
         {
-            title: `Payable #${payable.id}`,
+            title: `#${payable.code}`,
             href: erp.payables.show(payable.id).url,
         },
         {
-            title: `Editing #${payable.id}`,
+            title: `Editing Payable #${payable.code}`,
             href: erp.payables.edit(payable.id).url,
         },
     ];
@@ -37,7 +37,7 @@ export default function EditPayablePage({ payable }: Readonly<EditPayablePagePro
                     <Card>
                         <CardContent className="grid gap-2">
                             <HeadingSmall
-                                title={`Editing Payable #${payable.id}`}
+                                title={`Editing Payable #${payable.code}`}
                                 description="Update the informations below. Some fields may be restricted at the editing stage."
                             />
 
