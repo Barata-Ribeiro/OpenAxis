@@ -26,6 +26,9 @@ Route::middleware(['auth', 'verified'])->prefix('administrative')->group(functio
     Route::delete('users/{user}/force', [UserController::class, 'forceDestroy'])
         ->name('administrative.users.force-destroy')
         ->middleware('permission:user.destroy');
+    Route::get('users/generate-csv', [UserController::class, 'generateCsv'])
+        ->name('administrative.users.generate-csv')
+        ->middleware('permission:user.index');
 
     Route::resource('users', UserController::class)
         ->names([
