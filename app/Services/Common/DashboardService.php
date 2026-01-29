@@ -818,6 +818,6 @@ class DashboardService implements DashboardServiceInterface
      */
     private function shouldBypassConcurrency(): bool
     {
-        return app()->environment('testing') || $this->isSqlDriver === false;
+        return config('app.bypass_concurrency.dashboard') || app()->environment('testing') || $this->isSqlDriver === false;
     }
 }
