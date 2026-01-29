@@ -7,9 +7,14 @@ use App\Http\Requests\Product\ProductRequest;
 use App\Interfaces\Product\ProductServiceInterface;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Auth;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Log;
+use Number;
 use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductService implements ProductServiceInterface
 {
@@ -20,6 +25,9 @@ class ProductService implements ProductServiceInterface
         $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedProducts(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $isSql = $this->isSqlDriver;
@@ -61,6 +69,9 @@ class ProductService implements ProductServiceInterface
             ->withQueryString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function createProduct(ProductRequest $request): void
     {
         $validatedData = $request->validated();
@@ -85,6 +96,9 @@ class ProductService implements ProductServiceInterface
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function updateProduct(ProductRequest $request, Product $product): void
     {
         $validatedData = $request->validated();
@@ -109,11 +123,75 @@ class ProductService implements ProductServiceInterface
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function forceDeleteProduct(Product $product): void
     {
         DB::transaction(function () use ($product) {
             $product->clearMediaCollection('products_images');
             $product->forceDelete();
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsvExport(LengthAwarePaginator $products): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_products_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = [
+            'ID',
+            'SKU',
+            'Name',
+            'Description',
+            'Category',
+            'Cost Price',
+            'Selling Price',
+            'Current Stock',
+            'Comission',
+            'Is Active',
+            'Created At',
+            'Updated At',
+        ];
+
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($products as $product) {
+            $row = [
+                $product->id,
+                $product->sku,
+                $product->name,
+                $product->description,
+                $product->category->name ?? '',
+                Number::currency($product->cost_price),
+                Number::currency($product->selling_price),
+                $product->current_stock,
+                Number::percentage($product->comission ?? 0),
+                $product->is_active ? 'Yes' : 'No',
+                $product->created_at,
+                $product->updated_at,
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+
+        fclose($openFile);
+
+        Log::info('Product: CSV export generated.', ['action_user_id' => Auth::id()]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Interfaces\Product;
 use App\Http\Requests\Product\ProductRequest;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface ProductServiceInterface
 {
@@ -63,4 +64,17 @@ interface ProductServiceInterface
      * @param  Product  $product  The product instance to permanently delete.
      */
     public function forceDeleteProduct(Product $product): void;
+
+    /**
+     * Generate a CSV export from a paginated list of products.
+     *
+     * Accepts a LengthAwarePaginator of product entities and produces CSV-formatted output
+     * including header row and one row per product.
+     *
+     * @param  LengthAwarePaginator  $products  Paginated collection of products to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsvExport(LengthAwarePaginator $products): BinaryFileResponse;
 }
