@@ -77,8 +77,23 @@
 ### Prerequisites
 
 - PHP 8.4 or higher
+- The following PHP extensions:
+    - bz2
+    - curl
+    - fileinfo
+    - gd
+    - gettext
+    - intl
+    - mbstring
+    - exif
+    - mysqli
+    - pdo_mysql
+    - pdo_sqlite
+    - zip
+    - php_openssl.dll
+    - php_ftp.dll
 - Composer 2.x
-- Node.js 20.x or higher
+- Node.js 22.x or higher
 - npm or yarn
 - SQLite (default) or MySQL/PostgreSQL
 
