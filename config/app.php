@@ -151,4 +151,8 @@ return [
     |--------------------------------------------------------------------------*/
     Asika\Agent\AgentServiceProvider::class,
     'Agent' => Asika\Agent\Facades\Agent::class,
+
+    'bypass_concurrency' => [
+        'dashboard' => env('APP_BYPASS_CONCURRENCY_DASHBOARD', false),
+    ],
 ];
