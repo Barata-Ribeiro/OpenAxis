@@ -10,6 +10,7 @@ use App\Models\ProductCategory;
 use App\Services\Product\ProductService;
 use Auth;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
 use Log;
 
@@ -19,26 +20,7 @@ class ProductController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'sku', 'name', 'category_name', 'cost_price', 'selling_price', 'current_stock',  'comission', 'is_active', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $products = $this->productService->getPaginatedProducts(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $products = $this->getPaginatedProductsFromRequest($request);
 
         return Inertia::render('erp/products/index', [
             'products' => $products,
@@ -139,5 +121,62 @@ class ProductController extends Controller
 
             return back()->with(['error' => 'Failed to permanently delete product.']);
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+        try {
+            $products = $this->getPaginatedProductsFromRequest($request);
+
+            if ($products->isEmpty()) {
+                return back()->with(['error' => 'No products found for the given criteria.']);
+            }
+
+            return $this->productService->generateCsvExport($products);
+        } catch (Exception $e) {
+            Log::error('Product: Failed to generate CSV export.', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of products based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of User models.
+     */
+    private function getPaginatedProductsFromRequest(QueryRequest $request): LengthAwarePaginator
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'sku', 'name', 'category_name', 'cost_price', 'selling_price', 'current_stock',  'comission', 'is_active', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->productService->getPaginatedProducts(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
