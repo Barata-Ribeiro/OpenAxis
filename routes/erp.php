@@ -33,6 +33,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
     Route::delete('products/{product}/force', [ProductController::class, 'forceDestroy'])
         ->name('erp.products.force-destroy')
         ->middleware('permission:product.destroy');
+    Route::get('products/generate-csv', [ProductController::class, 'generateCsv'])
+        ->name('erp.products.generate-csv')
+        ->middleware('permission:product.index');
 
     Route::resource('products', ProductController::class)
         ->names([
