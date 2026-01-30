@@ -105,6 +105,7 @@ class ProductController extends Controller
     public function forceDestroy($productRouteKey)
     {
         $userId = Auth::id();
+
         try {
 
             $routeKeyName = (new Product)->getRouteKeyName();
@@ -126,6 +127,7 @@ class ProductController extends Controller
     public function generateCsv(QueryRequest $request)
     {
         $userId = Auth::id();
+
         try {
             $products = $this->getPaginatedProductsFromRequest($request);
 
@@ -154,7 +156,7 @@ class ProductController extends Controller
      *  - with: relations to eager-load
      *
      * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
-     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of User models.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Product models.
      */
     private function getPaginatedProductsFromRequest(QueryRequest $request): LengthAwarePaginator
     {
