@@ -175,7 +175,7 @@ class ProductService implements ProductServiceInterface
                 $product->sku,
                 $product->name,
                 $product->description,
-                $product->category->name ?? '',
+                $product->category->name ?? 'Uncategorized',
                 Number::currency($product->cost_price),
                 Number::currency($product->selling_price),
                 $product->current_stock,
