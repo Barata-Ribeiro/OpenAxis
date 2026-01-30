@@ -6,6 +6,7 @@ use App\Http\Requests\Product\AdjustInventoryRequest;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface InventoryServiceInterface
 {
@@ -62,4 +63,18 @@ interface InventoryServiceInterface
      * @return CursorPaginator Cursor-paginated collection of products for use in select controls.
      */
     public function getProductsForSelect(?string $search): CursorPaginator;
+
+    /**
+     * Generate a CSV export from the provided inventory paginator and return it as a downloadable file response.
+     *
+     * The implementation should iterate through all items provided by the LengthAwarePaginator,
+     * serialize them into CSV format, write the CSV to a temporary/streamable file, and return a
+     * BinaryFileResponse that triggers a file download (with appropriate headers and filename).
+     *
+     * @param  LengthAwarePaginator  $inventory  Paginator containing inventory items to include in the CSV.
+     * @return BinaryFileResponse Binary response that serves the generated CSV for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated, written, or if a temporary file cannot be created.
+     */
+    public function generateCsvExport(LengthAwarePaginator $inventory): BinaryFileResponse;
 }

@@ -11,10 +11,15 @@ use App\Models\StockMovement;
 use App\Models\User;
 use App\Notifications\ManualSupplyAdjustment;
 use Auth;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
+use Log;
+use Number;
+use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class InventoryService implements InventoryServiceInterface
 {
@@ -25,6 +30,9 @@ class InventoryService implements InventoryServiceInterface
         $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedInventory(?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $isSql = $this->isSqlDriver;
@@ -52,7 +60,7 @@ class InventoryService implements InventoryServiceInterface
                             ->orWhereLike('products.description', "%$search%");
                     });
                 }
-            })->when($categories, fn ($q) => $q->whereHas('category', fn ($q2) => $q2->whereIn('name', $categories)))
+            })->when($categories, fn (Product $q) => $q->whereHas('category', fn ($q2) => $q2->whereIn('name', $categories)))
             ->when($stock_status, function ($query) use ($stock_status) {
                 switch ($stock_status) {
                     case 'in_stock':
@@ -76,6 +84,9 @@ class InventoryService implements InventoryServiceInterface
             ->withQueryString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function adjustInventory(AdjustInventoryRequest $request, Product $product): void
     {
         $userId = Auth::id();
@@ -109,6 +120,9 @@ class InventoryService implements InventoryServiceInterface
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getPaginatedStockMovements(?int $productId, ?int $perPage, ?string $sortBy, ?string $sortDir, ?string $search, $filters): LengthAwarePaginator
     {
         $userId = Auth::id();
@@ -130,6 +144,9 @@ class InventoryService implements InventoryServiceInterface
             ->withQueryString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getProductsForSelect(?string $search): CursorPaginator
     {
         $isSql = $this->isSqlDriver;
@@ -158,5 +175,64 @@ class InventoryService implements InventoryServiceInterface
         }
 
         return $paginator;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsvExport(LengthAwarePaginator $inventory): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_inventory_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = [
+            'ID',
+            'SKU',
+            'Name',
+            'Category',
+            'Current Stock',
+            'Minimum Stock',
+            'Comission',
+            'Selling Price',
+            'Is Active',
+        ];
+
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($inventory->items() as $product) {
+            $row = [
+                $product->id,
+                $product->sku,
+                $product->name,
+                $product->category->name ?? 'Uncategorized',
+                $product->current_stock,
+                $product->minimum_stock,
+                Number::percentage($product->comission),
+                Number::currency($product->selling_price),
+                $product->is_active ? 'Yes' : 'No',
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+
+        fclose($openFile);
+
+        Log::info('Inventory: Generated inventory CSV export.', [
+            'action_user_id' => Auth::id(),
+            'record_count' => $inventory->total(),
+        ]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
+
     }
 }
