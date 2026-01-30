@@ -19,26 +19,7 @@ class InventoryController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'sku', 'name', 'category_name', 'current_stock', 'minimum_stock', 'comission', 'selling_price', 'is_active'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $inventory = $this->inventoryService->getPaginatedInventory(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $inventory = $this->getPaginatedInventoryFromRequest($request);
 
         Log::info('Inventory: Viewed inventory list.', ['action_user_id' => Auth::id()]);
 
@@ -107,6 +88,7 @@ class InventoryController extends Controller
     public function update(AdjustInventoryRequest $request, Product $product)
     {
         $userId = Auth::id();
+
         Log::info('Inventory: Updating product inventory.', ['action_user_id' => $userId, 'product_id' => $product->id]);
 
         try {
@@ -124,5 +106,66 @@ class InventoryController extends Controller
 
             return back()->withInput()->with('error', 'Failed to adjust inventory. Try again later.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $inventory = $this->getPaginatedInventoryFromRequest($request);
+
+            if ($inventory->isEmpty()) {
+                return back()->with('error', 'No inventory data available to generate CSV.');
+            }
+
+            return $this->inventoryService->generateCsvExport($inventory);
+        } catch (Exception $e) {
+            Log::error('Inventory: Failed to generate inventory CSV.', [
+                'action_user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Failed to generate inventory CSV. Try again later.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of the inventory based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of inventory items.
+     */
+    private function getPaginatedInventoryFromRequest(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'sku', 'name', 'category_name', 'current_stock', 'minimum_stock', 'comission', 'selling_price', 'is_active'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->inventoryService->getPaginatedInventory(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
