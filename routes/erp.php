@@ -36,7 +36,6 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
     Route::get('products/generate-csv', [ProductController::class, 'generateCsv'])
         ->name('erp.products.generate-csv')
         ->middleware('permission:product.index');
-
     Route::resource('products', ProductController::class)
         ->names([
             'index' => 'erp.products.index',
@@ -53,6 +52,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor(['edit', 'update'], 'permission:product.edit')
         ->middlewareFor('destroy', 'permission:product.destroy');
 
+    Route::get('inventory/generate-csv', [InventoryController::class, 'generateCsv'])
+        ->name('erp.inventory.generate-csv')
+        ->middleware('permission:supply.index');
     Route::resource('inventory', InventoryController::class)
         ->parameters(['inventory' => 'product'])
         ->names([
@@ -125,7 +127,6 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
     Route::delete('vendors/{vendor}/force', [VendorController::class, 'forceDestroy'])
         ->name('erp.vendors.force-destroy')
         ->middleware('permission:vendor.destroy');
-
     Route::resource('vendors', VendorController::class)
         ->names([
             'index' => 'erp.vendors.index',
@@ -145,7 +146,6 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
     Route::delete('suppliers/{supplier}/force', [SupplierController::class, 'forceDestroy'])
         ->name('erp.suppliers.force-destroy')
         ->middleware('permission:supplier.destroy');
-
     Route::resource('suppliers', SupplierController::class)
         ->names([
             'index' => 'erp.suppliers.index',
