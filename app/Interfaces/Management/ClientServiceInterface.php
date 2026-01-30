@@ -4,6 +4,7 @@ namespace App\Interfaces\Management;
 
 use App\Http\Requests\Management\ClientRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface ClientServiceInterface
 {
@@ -35,4 +36,17 @@ interface ClientServiceInterface
      * @throws \RuntimeException If the client could not be created due to persistence or runtime errors.
      */
     public function createClient(ClientRequest $request): void;
+
+    /**
+     * Generate a CSV export from a paginated list of clients.
+     *
+     * Accepts a LengthAwarePaginator of client entities and produces CSV-formatted output
+     * including header row and one row per client.
+     *
+     * @param  LengthAwarePaginator  $clients  Paginated collection of clients to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsvExport(LengthAwarePaginator $clients): BinaryFileResponse;
 }
