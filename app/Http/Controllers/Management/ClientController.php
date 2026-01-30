@@ -19,26 +19,7 @@ class ClientController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'name', 'email', 'identification', 'client_type', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $clients = $this->clientService->getPaginatedClients(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $clients = $this->getPaginatedClientsFromRequest($request);
 
         Log::info('Client: Accessed client list.', ['action_user_id' => Auth::id()]);
 
@@ -151,5 +132,48 @@ class ClientController extends Controller
 
             return back()->with('error', 'An unknown error occurred while permanently deleting the client.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $clients = $this->getPaginatedClientsFromRequest($request);
+
+            if ($clients->isEmpty()) {
+                return back()->with('error', 'No clients found to generate CSV.');
+            }
+
+            return $this->clientService->generateCsvExport($clients);
+        } catch (Exception $e) {
+            Log::error('Client: Error generating clients CSV.', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    private function getPaginatedClientsFromRequest(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'name', 'email', 'identification', 'client_type', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->clientService->getPaginatedClients(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
