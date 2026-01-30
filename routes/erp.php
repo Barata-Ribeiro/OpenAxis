@@ -75,7 +75,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
     Route::delete('clients/{client}/force', [ClientController::class, 'forceDestroy'])
         ->name('erp.clients.force-destroy')
         ->middleware('permission:client.destroy');
-
+    Route::get('clients/generate-csv', [ClientController::class, 'generateCsv'])
+        ->name('erp.clients.generate-csv')
+        ->middleware('permission:client.index');
     Route::resource('clients', ClientController::class)
         ->names([
             'index' => 'erp.clients.index',
