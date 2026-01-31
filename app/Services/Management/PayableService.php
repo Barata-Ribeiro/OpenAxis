@@ -74,13 +74,13 @@ class PayableService implements PayableServiceInterface
         $suppliers = Partner::select(['id', 'name'])
             ->whereType(PartnerTypeEnum::SUPPLIER->value)
             ->whereIsActive(true)
-            ->when($supplierSearch, fn ($q, $supplierSearch) => $q->whereLike('name', "%$supplierSearch%"))
+            ->when($supplierSearch, fn (Builder $q, $supplierSearch) => $q->whereLike('name', "%$supplierSearch%"))
             ->cursorPaginate(10, ['id', 'name'], 'suppliers_cursor')
             ->withQueryString();
 
         $vendors = Vendor::select(['id', 'first_name', 'last_name'])
             ->whereIsActive(true)
-            ->when($vendorSearch, fn ($q, $vendorSearch) => $q->whereLike('first_name', "%$vendorSearch%")->orWhereLike('last_name', "%$vendorSearch%"))
+            ->when($vendorSearch, fn (Builder $q, $vendorSearch) => $q->whereLike('first_name', "%$vendorSearch%")->orWhereLike('last_name', "%$vendorSearch%"))
             ->cursorPaginate(10, ['id', 'first_name', 'last_name'], 'vendors_cursor')
             ->withQueryString();
 
@@ -98,9 +98,9 @@ class PayableService implements PayableServiceInterface
         $createdById = Auth::id();
 
         $shortUuid = substr((string) Str::uuid7(), 0, 8);
-        $code = 'PYB-'.$shortUuid.'-'.str_pad((string) $payableCount, 6, '0', STR_PAD_LEFT);
+        $code = "PYB-$shortUuid-".str_pad((string) $payableCount, 6, '0', STR_PAD_LEFT);
 
-        Payable::insert($validated + ['code' => $code, 'user_id' => $createdById]);
+        Payable::create($validated + ['code' => $code, 'user_id' => $createdById]);
     }
 
     public function getPayableDetails(Payable $payable): Payable
