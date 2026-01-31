@@ -11,8 +11,13 @@ use App\Models\Partner;
 use App\Models\Payable;
 use App\Models\Vendor;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Log;
+use Number;
 use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PayableService implements PayableServiceInterface
 {
@@ -38,15 +43,15 @@ class PayableService implements PayableServiceInterface
         return Payable::query()
             ->select(['payables.id', 'payables.code', 'payables.amount', 'payables.due_date', 'payables.status', 'payables.supplier_id', 'payables.vendor_id', 'payables.created_at', 'payables.updated_at'])
             ->with(['supplier:id,name,email', 'vendor:id,first_name,last_name'])
-            ->when($search, fn ($q, $search) => $q->whereLike('payables.code', "%$search%")
+            ->when($search, fn (Builder $q, $search) => $q->whereLike('payables.code', "%$search%")
                 ->orWhereLike('payables.description', "%$search%")->orWhereLike('payables.amount', "%$search%")
                 ->orWhereHas('supplier', fn ($supplierQuery) => $supplierQuery->whereLike('partners.name', "%$search%")->orWhereLike('partners.email', "%$search%"))
                 ->orWhereHas('vendor', fn ($vendorQuery) => $vendorQuery->whereLike('vendors.first_name', "%$search%")
                     ->orWhereLike('vendors.last_name', "%$search%")->orWhereRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) LIKE ?", ["%$search%"])
                     ->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('users.name', "%$search%")->orWhereLike('users.email', "%$search%"))))
-            ->when($status, fn ($q, $status) => $q->whereIn('payables.status', (array) $status))
-            ->when($createdAtRange, fn ($q) => $q->whereBetween('created_at', [$start, $end]))
-            ->when($dueDateRange, fn ($q) => $q->whereBetween('due_date', [$dueStart, $dueEnd]))
+            ->when($status, fn (Builder $q, $status) => $q->whereIn('payables.status', (array) $status))
+            ->when($createdAtRange, fn (Builder $q) => $q->whereBetween('created_at', [$start, $end]))
+            ->when($dueDateRange, fn (Builder $q) => $q->whereBetween('due_date', [$dueStart, $dueEnd]))
             ->leftJoin(new Partner()->getTable(), 'payables.supplier_id', '=', 'partners.id')
             ->leftJoin(new Vendor()->getTable(), 'payables.vendor_id', '=', 'vendors.id')
             ->orderBy($sortBy, $sortDir)
@@ -111,5 +116,48 @@ class PayableService implements PayableServiceInterface
         $validated = $request->validated();
 
         $payable->update($validated);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsvExport(LengthAwarePaginator $payables): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_payables_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = ['ID', 'Code', 'Supplier', 'Amount', 'Due Date', 'Status', 'Vendor', 'Created At', 'Updated At'];
+
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($payables as $payable) {
+            $row = [
+                $payable->id,
+                $payable->code,
+                $payable->supplier->name ?? 'No Supplier',
+                Number::currency($payable->amount),
+                $payable->due_date->format('Y-m-d'),
+                $payable->status->label(),
+                $payable->vendor?->full_name,
+                $payable->created_at,
+                $payable->updated_at,
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+
+        Log::info('Payable: CSV export generated.', ['action_user_id' => Auth::id()]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
     }
 }

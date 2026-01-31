@@ -6,6 +6,7 @@ use App\Http\Requests\Management\PayableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Payable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface PayableServiceInterface
 {
@@ -70,4 +71,17 @@ interface PayableServiceInterface
      * @throws \Throwable If the update cannot be persisted.
      */
     public function updatePayable(Payable $payable, PayableRequest $request): void;
+
+    /**
+     * Generate a CSV export from a paginated list of payables.
+     *
+     * Accepts a LengthAwarePaginator of payable entities and produces CSV-formatted output
+     * including header row and one row per payable.
+     *
+     * @param  LengthAwarePaginator  $payables  Paginated collection of payables to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsvExport(LengthAwarePaginator $payables): BinaryFileResponse;
 }
