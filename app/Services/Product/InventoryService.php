@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use InvalidArgumentException;
 use Log;
 use Number;
@@ -49,7 +50,7 @@ class InventoryService implements InventoryServiceInterface
 
         return Product::query()
             ->select('products.*')
-            ->when($search, function ($qr) use ($search, $isSql) {
+            ->when($search, function (Builder $qr) use ($search, $isSql) {
                 if ($isSql) {
                     $booleanQuery = Helpers::buildBooleanQuery($search);
                     $qr->whereFullText(['products.sku', 'products.name', 'products.description'], $booleanQuery, ['mode' => 'boolean']);
@@ -60,8 +61,8 @@ class InventoryService implements InventoryServiceInterface
                             ->orWhereLike('products.description', "%$search%");
                     });
                 }
-            })->when($categories, fn (Product $q) => $q->whereHas('category', fn ($q2) => $q2->whereIn('name', $categories)))
-            ->when($stock_status, function ($query) use ($stock_status) {
+            })->when($categories, fn (Builder $query) => $query->whereHas('category', fn ($q2) => $q2->whereIn('name', $categories)))
+            ->when($stock_status, function (Builder $query) use ($stock_status) {
                 switch ($stock_status) {
                     case 'in_stock':
                         $query->where('products.current_stock', '>', 0);
@@ -76,8 +77,8 @@ class InventoryService implements InventoryServiceInterface
                         break;
                 }
             })
-            ->when($is_active, fn ($query) => $query->where('products.is_active', filter_var($is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
-            ->when($sortByStartsWithCategory, fn ($qr) => $qr->leftJoin('product_categories', 'products.product_category_id', '=', 'product_categories.id'))
+            ->when($is_active, fn (Builder $query) => $query->where('products.is_active', filter_var($is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)))
+            ->when($sortByStartsWithCategory, fn (Builder $qr) => $qr->leftJoin('product_categories', 'products.product_category_id', '=', 'product_categories.id'))
             ->with('category:id,name,slug', 'media')
             ->orderBy($sortBy, $sortDir)
             ->paginate($perPage)
