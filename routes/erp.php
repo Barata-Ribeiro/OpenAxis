@@ -164,6 +164,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor(['edit', 'update'], 'permission:supplier.edit')
         ->middlewareFor('destroy', 'permission:supplier.destroy');
 
+    Route::get('/payables/generate-csv', [PayableController::class, 'generateCsv'])
+        ->name('erp.payables.generate-csv')
+        ->middleware('permission:finance.index');
     Route::resource('payables', PayableController::class)
         ->parameters(['payables' => 'payable'])
         ->names([
