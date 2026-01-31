@@ -18,26 +18,7 @@ class PayableController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'code', 'supplier_name', 'amount', 'due_date', 'status', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $payables = $this->payableService->getPaginatedPayables(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $payables = $this->getPaginatedPayablesFromRequest($request);
 
         Log::info('Payable: Accessed payable list.', ['action_user_id' => Auth::id()]);
 
@@ -126,5 +107,63 @@ class PayableController extends Controller
 
             return redirect()->back()->withInput()->with('error', 'An error occurred while updating the payable. Please try again.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $payables = $this->getPaginatedPayablesFromRequest($request);
+
+            if ($payables->isEmpty()) {
+                return redirect()->back()->with('error', 'No payables found to generate CSV.');
+            }
+
+            return $this->payableService->generateCsvExport($payables);
+        } catch (Exception $e) {
+            Log::error('Payable: Failed to generate CSV export.', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of payables based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Payable models.
+     */
+    private function getPaginatedPayablesFromRequest(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'code', 'supplier_name', 'amount', 'due_date', 'status', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->payableService->getPaginatedPayables(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
