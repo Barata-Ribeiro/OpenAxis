@@ -27,6 +27,7 @@ use Auth;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Str;
 
 use function array_key_exists;
@@ -63,17 +64,17 @@ class SalesOrderService implements SalesOrderServiceInterface
         return SalesOrder::query()
             ->select(['sales_orders.*'])
             ->withOnly(['client:id,name,email', 'vendor:id,first_name,last_name' => ['user'], 'paymentCondition:id,code,name'])
-            ->when($vendorId, fn ($q, $vId) => $q->whereIn('sales_orders.vendor_id', $vId))
-            ->when($status, fn ($q) => $q->whereIn('sales_orders.status', $status))
-            ->when($search, fn ($query, $search) => $query->whereLike('sales_orders.order_number', "%$search%")
+            ->when($vendorId, fn (Builder $q, $vId) => $q->whereIn('sales_orders.vendor_id', $vId))
+            ->when($status, fn (Builder $q) => $q->whereIn('sales_orders.status', $status))
+            ->when($search, fn (Builder $query, $search) => $query->whereLike('sales_orders.order_number', "%$search%")
                 ->orWhereLike('sales_orders.notes', "%$search%")->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('name', "%$search%")
                 ->orWhereLike('email', "%$search%"))->orWhereLike('partners.name', "%$search%")->orWhereLike('vendors.first_name', "%$search%")
                 ->orWhereLike('vendors.last_name', "%$search%")->orWhereRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) LIKE ?", ["%$search%"])
                 ->orWhereHas('vendor.user', fn ($vendorUserQuery) => $vendorUserQuery->whereLike('name', "%$search%")
                     ->orWhereLike('email', "%$search%"))->orWhereLike('payment_conditions.code', "%$search%")->orWhereLike('payment_conditions.name', "%$search%"))
-            ->when($createdAtRange, fn ($q) => $q->whereBetween('sales_orders.created_at', [$start, $end]))
-            ->when(! empty($sortBy) && $sortByStartsWithVendor, fn ($q) => $q->orderByRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) $sortDir"))
-            ->when(! empty($sortBy) && ! $sortByStartsWithVendor, fn ($q) => $q->orderBy($sortBy, $sortDir))
+            ->when($createdAtRange, fn (Builder $q) => $q->whereBetween('sales_orders.created_at', [$start, $end]))
+            ->when(! empty($sortBy) && $sortByStartsWithVendor, fn (Builder $q) => $q->orderByRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) $sortDir"))
+            ->when(! empty($sortBy) && ! $sortByStartsWithVendor, fn (Builder $q) => $q->orderBy($sortBy, $sortDir))
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -214,7 +215,7 @@ class SalesOrderService implements SalesOrderServiceInterface
                 $installmentAmount = $so->total_cost / $installments;
                 $description = "Receivable for Sales Order {$so->order_number} - Installment $installment of $installments";
 
-                Receivable::insert([
+                Receivable::create([
                     'code' => $code,
                     'description' => $description,
                     'client_id' => $so->client_id,
@@ -232,7 +233,7 @@ class SalesOrderService implements SalesOrderServiceInterface
             $payableDueDate = Carbon::now()->addDays($daysUntilDue * $installments);
             $payableDescription = "Payable for Products Sold in Sales Order {$so->order_number}";
 
-            Payable::insert([
+            Payable::create([
                 'code' => $payableCode,
                 'description' => $payableDescription,
                 'vendor_id' => $so->vendor_id,
@@ -266,7 +267,7 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->whereType(PartnerTypeEnum::CLIENT->value)
             ->orderByDesc('id')
             ->whereIsActive(true)
-            ->when($clientSearch, fn ($qr) => $qr->whereLike('name', "%$clientSearch%")
+            ->when($clientSearch, fn (Builder $qr) => $qr->whereLike('name', "%$clientSearch%")
                 ->orWhereLike('email', "%$clientSearch%")->orWhereLike('identification', "%$clientSearch%"))
             ->cursorPaginate(10, ['id', 'name'], 'clients_cursor')
             ->withQueryString();
@@ -276,7 +277,7 @@ class SalesOrderService implements SalesOrderServiceInterface
             ->with(['user:id,name,email', 'user.media'])
             ->orderByDesc('id')
             ->whereIsActive(true)
-            ->when($vendorSearch, fn ($qr) => $qr->whereLike('first_name', "%$vendorSearch%")
+            ->when($vendorSearch, fn (Builder $qr) => $qr->whereLike('first_name', "%$vendorSearch%")
                 ->orWhereLike('last_name', "%$vendorSearch%")->orWhereHas('user', fn ($userQr) => $userQr->whereLike('name', "%$vendorSearch%")
                 ->orWhereLike('email', "%$vendorSearch%")))
             ->cursorPaginate(10, ['id', 'first_name', 'last_name'], 'vendors_cursor')
