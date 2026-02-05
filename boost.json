@@ -1,7 +1,13 @@
 {
     "agents": ["copilot"],
+    "editors": ["vscode"],
     "guidelines": true,
     "packages": ["laravel/fortify"],
-    "editors": ["vscode"],
-    "skills": ["wayfinder-development", "pest-testing", "inertia-react-development", "tailwindcss-development"]
+    "skills": [
+        "wayfinder-development",
+        "pest-testing",
+        "inertia-react-development",
+        "tailwindcss-development",
+        "developing-with-fortify"
+    ]
 }
