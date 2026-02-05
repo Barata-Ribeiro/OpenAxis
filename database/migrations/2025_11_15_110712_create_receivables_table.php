@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 30)->unique();
             $table->string('description');
-            $table->foreignId('client_id')->constrained('partners')->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('partners')->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
             $table->date('issue_date')->useCurrent();
             $table->date('due_date');
