@@ -27,6 +27,7 @@ export default [
             'react/prop-types': 'off',
             'react/no-unescaped-entities': 'off',
             '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
+            '@typescript-eslint/consistent-generic-constructors': 'off', // Adjust this rule once dependencies are updated to support it
         },
         settings: {
             react: {
