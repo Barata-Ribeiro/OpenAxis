@@ -6,6 +6,7 @@ use App\Models\Product;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 class ProductRequest extends FormRequest
 {
@@ -44,7 +45,8 @@ class ProductRequest extends FormRequest
             'is_active' => ['required', 'boolean'],
             'category' => ['required', 'string', Rule::exists('product_categories', 'name')],
             'images' => app()->environment('testing') ? ['nullable', 'array'] : ['nullable', 'array', 'min:1'],
-            'images.*' => ['file', 'image', 'mimes:png,jpg,gif,webp', 'max:5120'], // Each image max 5MB
+            'images.*' => File::image()->min('100kb')->max('5mb')
+                ->dimensions(Rule::dimensions()->minHeight(200)->minWidth(200)->maxWidth(5000)->maxHeight(5000)),
         ];
     }
 
