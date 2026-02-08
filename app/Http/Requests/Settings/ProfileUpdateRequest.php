@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 class ProfileUpdateRequest extends FormRequest
 {
@@ -28,7 +29,8 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
 
-            'avatar' => ['nullable', 'image', 'mimes:jpg,png,webp', 'max:2048'], // Max size in KB
+            'avatar' => ['nullable', File::image()->min('100kb')->max('5mb')
+                ->dimensions(Rule::dimensions()->minHeight(200)->minWidth(200)->maxWidth(1000)->maxHeight(1000))],
         ];
     }
 }
