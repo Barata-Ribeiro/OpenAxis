@@ -110,6 +110,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor(['edit', 'update'], 'permission:order.edit')
         ->middlewareFor('destroy', 'permission:order.destroy');
 
+    Route::get('sales-orders/generate-csv', [SalesOrderController::class, 'generateCsv'])
+        ->name('erp.sales-orders.generate-csv')
+        ->middleware('permission:sale.index');
     Route::resource('sales-orders', SalesOrderController::class)
         ->except('show')
         ->parameters(['sales-orders' => 'salesOrder'])
