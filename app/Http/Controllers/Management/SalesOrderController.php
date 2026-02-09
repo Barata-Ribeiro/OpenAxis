@@ -21,26 +21,7 @@ class SalesOrderController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'client_name', 'total_cost', 'status', 'vendor_name', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $sales = $this->salesOrderService->getPaginatedSalesOrders(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $sales = $this->getPaginatedSalesOrdersFromRequest($request);
 
         return Inertia::render('erp/sales/index', [
             'sales' => $sales,
@@ -141,5 +122,51 @@ class SalesOrderController extends Controller
 
             return redirect()->back()->withInput()->with(['error', 'An error occurred while updating the sales order. Please try again.']);
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $salesOrders = $this->getPaginatedSalesOrdersFromRequest($request);
+
+            if ($salesOrders->isEmpty()) {
+                return back()->with('error', 'No sales orders found to generate CSV.');
+            }
+
+            return $this->salesOrderService->generateCsv($salesOrders);
+        } catch (Exception $e) {
+            Log::error('Sales Orders: Error generating CSV', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    private function getPaginatedSalesOrdersFromRequest(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'client_name', 'total_cost', 'status', 'vendor_name', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->salesOrderService->getPaginatedSalesOrders(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
