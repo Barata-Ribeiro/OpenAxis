@@ -6,6 +6,7 @@ use App\Http\Requests\Management\SaleOrderRequest;
 use App\Http\Requests\Management\UpdateSaleOrderRequest;
 use App\Models\SalesOrder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface SalesOrderServiceInterface
 {
@@ -68,4 +69,17 @@ interface SalesOrderServiceInterface
      * @throws \Throwable For other unexpected errors.
      */
     public function updateSalesOrder(UpdateSaleOrderRequest $request, SalesOrder $salesOrder): void;
+
+    /**
+     * Generate a CSV export from a paginated list of sales orders.
+     *
+     * Accepts a LengthAwarePaginator of sales order entities and produces CSV-formatted output
+     * including header row and one row per sales order.
+     *
+     * @param  LengthAwarePaginator  $salesOrders  Paginated collection of sales orders to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsv(LengthAwarePaginator $salesOrders): BinaryFileResponse;
 }

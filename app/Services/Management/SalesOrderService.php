@@ -28,7 +28,10 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Log;
+use Number;
 use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use function array_key_exists;
 
@@ -353,5 +356,52 @@ class SalesOrderService implements SalesOrderServiceInterface
                 ]);
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsv(LengthAwarePaginator $salesOrders): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_sales_orders_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = ['ID', 'Client Name', 'Total Cost', 'Status', 'Vendor Name', 'Created At', 'Updated At'];
+
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($salesOrders as $order) {
+            $status = $order->status instanceof SalesOrderStatusEnum
+                ? $order->status
+                : SalesOrderStatusEnum::tryFrom($order->status);
+
+            $row = [
+                $order->id,
+                $order->client->name,
+                Number::currency($order->total_cost),
+                $status?->label() ?? ucfirst((string) $order->status),
+                isset($order->vendor) ? $order->vendor->full_name : 'No Vendor Assigned',
+                $order->created_at,
+                $order->updated_at,
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+
+        fclose($openFile);
+
+        Log::info('Sales Orders: Generated sales orders CSV export.', ['action_user_id' => Auth::id()]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
     }
 }
