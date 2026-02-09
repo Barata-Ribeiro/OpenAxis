@@ -6,7 +6,7 @@ import { columns } from '@/pages/erp/sales/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
 import type { SaleOrderWithRelations } from '@/types/erp/sale-order';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 interface SalesIndexPageProps {
     sales: PaginationMeta<SaleOrderWithRelations[]>;
@@ -15,8 +15,16 @@ interface SalesIndexPageProps {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Sales', href: erp.salesOrders.index().url }];
 
 export default function SalesIndexPage({ sales }: Readonly<SalesIndexPageProps>) {
-    const { data, ...pagination } = sales;
+    const { url } = usePage();
     const { can } = usePermission();
+
+    const { data, ...pagination } = sales;
+
+    const queryParams = new URLSearchParams(url.split('?')[1] ?? '');
+
+    const exportables = {
+        csvRoute: erp.salesOrders.generateCsv({ mergeQuery: Object.fromEntries(queryParams.entries()) }),
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -28,6 +36,7 @@ export default function SalesIndexPage({ sales }: Readonly<SalesIndexPageProps>)
                     data={data}
                     pagination={pagination}
                     createRoute={can('sale.create') ? erp.salesOrders.create() : undefined}
+                    exportables={exportables}
                 />
             </PageLayout>
         </AppLayout>
