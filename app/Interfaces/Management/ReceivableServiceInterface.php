@@ -5,8 +5,9 @@ namespace App\Interfaces\Management;
 use App\Http\Requests\Management\ReceivableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Models\Receivable;
-use Illuminate\Contracts\Pagination\CursorPaginator;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface ReceivableServiceInterface
 {
@@ -68,4 +69,17 @@ interface ReceivableServiceInterface
      * @param  ReceivableRequest  $request  The validated request containing update data.
      */
     public function updateReceivable(Receivable $receivable, ReceivableRequest $request): void;
+
+    /**
+     * Generate a CSV export from a paginated list of receivables.
+     *
+     * Accepts a LengthAwarePaginator of receivable entities and produces CSV-formatted output
+     * including header row and one row per receivable.
+     *
+     * @param  LengthAwarePaginator  $receivables  Paginated collection of receivables to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsv(LengthAwarePaginator $receivables): BinaryFileResponse;
 }

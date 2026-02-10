@@ -4,13 +4,20 @@ namespace App\Services\Management;
 
 use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
+use App\Enums\ReceivableStatusEnum;
 use App\Http\Requests\Management\ReceivableRequest;
 use App\Http\Requests\QueryRequest;
 use App\Interfaces\Management\ReceivableServiceInterface;
 use App\Models\Partner;
 use App\Models\Receivable;
+use Auth;
+use Carbon\Carbon;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Log;
+use Number;
+use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReceivableService implements ReceivableServiceInterface
 {
@@ -106,5 +113,48 @@ class ReceivableService implements ReceivableServiceInterface
         $validated = $request->validated();
 
         $receivable->update($validated);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsv(LengthAwarePaginator $receivables): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_receivables_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = ['ID', 'Code', 'Client Name', 'Amount', 'Due Date', 'Status', 'Created At', 'Updated At'];
+
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($receivables as $receivable) {
+            $row = [
+                $receivable->id,
+                $receivable->code,
+                $receivable->client->name ?? 'No Client',
+                Number::currency($receivable->amount),
+                $receivable->due_date,
+                ReceivableStatusEnum::tryFrom($receivable->status->value)?->label() ?? ucfirst($receivable->status),
+                $receivable->created_at,
+                $receivable->updated_at,
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+        fclose($openFile);
+
+        Log::info('Receivable: CSV export generated.', ['action_user_id' => Auth::id()]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
     }
 }
