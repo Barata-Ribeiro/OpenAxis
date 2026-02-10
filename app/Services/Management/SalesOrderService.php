@@ -381,15 +381,11 @@ class SalesOrderService implements SalesOrderServiceInterface
         fputcsv($openFile, $header, $delimiter);
 
         foreach ($salesOrders as $order) {
-            $status = $order->status instanceof SalesOrderStatusEnum
-                ? $order->status
-                : SalesOrderStatusEnum::tryFrom($order->status);
-
             $row = [
                 $order->id,
                 $order->client->name,
                 Number::currency($order->total_cost),
-                $status?->label() ?? ucfirst((string) $order->status),
+                SalesOrderStatusEnum::tryFrom($order->status->value)?->label() ?? ucfirst($order->status),
                 isset($order->vendor) ? $order->vendor->full_name : 'No Vendor Assigned',
                 $order->created_at,
                 $order->updated_at,
