@@ -187,6 +187,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor(['edit', 'update'], 'permission:finance.edit')
         ->middlewareFor('destroy', 'permission:finance.destroy');
 
+    Route::get('/receivables/generate-csv', [ReceivableController::class, 'generateCsv'])
+        ->name('erp.receivables.generate-csv')
+        ->middleware('permission:finance.index');
     Route::resource('receivables', ReceivableController::class)
         ->parameters(['receivables' => 'receivable'])
         ->names([
