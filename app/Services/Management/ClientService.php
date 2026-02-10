@@ -87,7 +87,7 @@ class ClientService implements ClientServiceInterface
                 $client->name,
                 $client->email,
                 $client->identification,
-                ClientTypeEnum::tryFrom($client->client_type)?->label() ?? ucfirst($client->client_type),
+                ClientTypeEnum::tryFrom($client->client_type->value)?->label() ?? ucfirst($client->client_type),
                 $client->created_at,
                 $client->updated_at,
                 $client->deleted_at,
