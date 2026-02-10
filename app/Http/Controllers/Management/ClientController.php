@@ -153,6 +153,21 @@ class ClientController extends Controller
         }
     }
 
+    /**
+     * Build and return a LengthAwarePaginator of clients based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Client models.
+     */
     private function getPaginatedClientsFromRequest(QueryRequest $request)
     {
         $validated = $request->validated();
