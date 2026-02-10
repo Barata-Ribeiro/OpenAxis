@@ -18,26 +18,7 @@ class ReceivableController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'code', 'client_name', 'amount', 'due_date', 'status', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $receivables = $this->receivableService->getPaginatedReceivables(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $receivables = $this->getPaginatedReceivables($request);
 
         Log::info('Receivable: Accessed receivable list.', ['action_user_id' => Auth::id()]);
 
@@ -106,5 +87,66 @@ class ReceivableController extends Controller
 
             return redirect()->back()->withInput()->with('error', 'An error occurred while updating the receivable. Please try again.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $receivables = $this->getPaginatedReceivables($request);
+
+            if ($receivables->isEmpty()) {
+                return redirect()->back()->with('error', 'No receivables found to generate CSV.');
+            }
+
+            return $this->receivableService->generateCsv($receivables);
+        } catch (Exception $e) {
+            Log::error('Receivable: Error generating CSV.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of receivables based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Receivable models.
+     */
+    private function getPaginatedReceivables(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'code', 'client_name', 'amount', 'due_date', 'status', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->receivableService->getPaginatedReceivables(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
