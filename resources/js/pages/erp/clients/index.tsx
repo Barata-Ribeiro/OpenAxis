@@ -6,7 +6,7 @@ import { columns } from '@/pages/erp/clients/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
 import type { Client } from '@/types/erp/client';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 interface IndexPageProps {
     clients: PaginationMeta<Client[]>;
@@ -15,8 +15,16 @@ interface IndexPageProps {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Clients', href: erp.clients.index().url }];
 
 export default function IndexPage({ clients }: Readonly<IndexPageProps>) {
-    const { data, ...pagination } = clients;
+    const { url } = usePage();
     const { can } = usePermission();
+
+    const { data, ...pagination } = clients;
+
+    const queryParams = new URLSearchParams(url.split('?')[1] ?? '');
+
+    const exportables = {
+        csvRoute: erp.clients.generateCsv({ mergeQuery: Object.fromEntries(queryParams.entries()) }),
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -28,6 +36,7 @@ export default function IndexPage({ clients }: Readonly<IndexPageProps>) {
                     data={data}
                     pagination={pagination}
                     createRoute={can('client.create') ? erp.clients.create() : undefined}
+                    exportables={exportables}
                 />
             </PageLayout>
         </AppLayout>
