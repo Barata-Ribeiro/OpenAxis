@@ -6,7 +6,7 @@ import { columns } from '@/pages/erp/receivables/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
 import type { ReceivableWithRelations } from '@/types/erp/receivable';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 interface IndexPageProps {
     receivables: PaginationMeta<ReceivableWithRelations[]>;
@@ -15,8 +15,17 @@ interface IndexPageProps {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Receivables', href: erp.receivables.index().url }];
 
 export default function IndexPage({ receivables }: Readonly<IndexPageProps>) {
-    const { data, ...pagination } = receivables;
+    const { url } = usePage();
     const { can } = usePermission();
+
+    const { data, ...pagination } = receivables;
+
+    const queryParams = new URLSearchParams(url.split('?')[1] ?? '');
+
+    const exportables = {
+        csvRoute: erp.receivables.generateCsv({ mergeQuery: Object.fromEntries(queryParams.entries()) }),
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Receivables" />
@@ -27,6 +36,7 @@ export default function IndexPage({ receivables }: Readonly<IndexPageProps>) {
                     data={data}
                     pagination={pagination}
                     createRoute={can('finance.create') ? erp.receivables.create() : undefined}
+                    exportables={exportables}
                 />
             </PageLayout>
         </AppLayout>
