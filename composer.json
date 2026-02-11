@@ -20,7 +20,7 @@
         "laravel/wayfinder": "^0.1",
         "owen-it/laravel-auditing": "^14.0",
         "spatie/laravel-medialibrary": "^11.17",
-        "spatie/laravel-permission": "^6.24"
+        "spatie/laravel-permission": "^7.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6",
