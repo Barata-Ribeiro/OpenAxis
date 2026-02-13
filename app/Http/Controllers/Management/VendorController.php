@@ -21,26 +21,7 @@ class VendorController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'first_name', 'last_name', 'user_email', 'commission_rate', 'is_active', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $vendors = $this->vendorService->getPaginatedVendors(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $vendors = $this->getPaginatedVendorsFromRequest($request);
 
         return Inertia::render('erp/vendors/index', [
             'vendors' => $vendors,
@@ -156,5 +137,63 @@ class VendorController extends Controller
 
             return back()->with('error', 'Error permanently deleting vendor.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $vendors = $this->getPaginatedVendorsFromRequest($request);
+
+            if ($vendors->isEmpty()) {
+                return back()->with('error', 'No vendors found to generate CSV.');
+            }
+
+            return $this->vendorService->generateCsvExport($vendors);
+        } catch (Exception $e) {
+            Log::error('Vendor: Error generating vendors CSV.', ['action_user_id' => $userId, 'error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of vendors based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Vendor models.
+     */
+    private function getPaginatedVendorsFromRequest(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'first_name', 'last_name', 'user_email', 'commission_rate', 'is_active', 'created_at', 'updated_at', 'deleted_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->vendorService->getPaginatedVendors(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
