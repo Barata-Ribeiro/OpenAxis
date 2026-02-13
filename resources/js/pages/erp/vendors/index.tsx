@@ -6,7 +6,7 @@ import { columns } from '@/pages/erp/vendors/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
 import type { VendorWithRelations } from '@/types/erp/vendor';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 interface IndexPageProps {
     vendors: PaginationMeta<VendorWithRelations[]>;
@@ -15,8 +15,16 @@ interface IndexPageProps {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Vendors', href: erp.vendors.index().url }];
 
 export default function IndexPage({ vendors }: Readonly<IndexPageProps>) {
-    const { data, ...pagination } = vendors;
+    const { url } = usePage();
     const { can } = usePermission();
+
+    const { data, ...pagination } = vendors;
+
+    const queryParams = new URLSearchParams(url.split('?')[1] ?? '');
+
+    const exportables = {
+        csvRoute: erp.vendors.generateCsv({ mergeQuery: Object.fromEntries(queryParams.entries()) }),
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -28,6 +36,7 @@ export default function IndexPage({ vendors }: Readonly<IndexPageProps>) {
                     data={data}
                     pagination={pagination}
                     createRoute={can('vendor.create') ? erp.vendors.create() : undefined}
+                    exportables={exportables}
                 />
             </PageLayout>
         </AppLayout>
