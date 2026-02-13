@@ -6,6 +6,7 @@ use App\Http\Requests\Management\UpdateVendorRequest;
 use App\Http\Requests\Management\VendorRequest;
 use App\Models\Vendor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface VendorServiceInterface
 {
@@ -46,4 +47,17 @@ interface VendorServiceInterface
      * @throws \Throwable If the update cannot be completed for any other reason.
      */
     public function updateVendor(UpdateVendorRequest $request, Vendor $vendor): void;
+
+    /**
+     * Generate a CSV export from a paginated list of vendors.
+     *
+     * Accepts a LengthAwarePaginator of vendor entities and produces CSV-formatted output
+     * including header row and one row per vendor.
+     *
+     * @param  LengthAwarePaginator  $vendors  Paginated collection of vendors to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsvExport(LengthAwarePaginator $vendors): BinaryFileResponse;
 }
