@@ -40,6 +40,10 @@ class PayableService implements PayableServiceInterface
             $sortBy = str_replace('supplier_name', 'partners.name', $sortBy);
         }
 
+        if (! empty($sortBy) && ! $sortByStartsWithSupplier && ! str_contains($sortBy, '.')) {
+            $sortBy = "payables.$sortBy";
+        }
+
         return Payable::query()
             ->select(['payables.id', 'payables.code', 'payables.amount', 'payables.due_date', 'payables.status', 'payables.supplier_id', 'payables.vendor_id', 'payables.created_at', 'payables.updated_at'])
             ->with(['supplier:id,name,email', 'vendor:id,first_name,last_name'])
@@ -50,8 +54,8 @@ class PayableService implements PayableServiceInterface
                     ->orWhereLike('vendors.last_name', "%$search%")->orWhereRaw("CONCAT(vendors.first_name, ' ', vendors.last_name) LIKE ?", ["%$search%"])
                     ->orWhereHas('user', fn ($userQuery) => $userQuery->whereLike('users.name', "%$search%")->orWhereLike('users.email', "%$search%"))))
             ->when($status, fn (Builder $q, $status) => $q->whereIn('payables.status', (array) $status))
-            ->when($createdAtRange, fn (Builder $q) => $q->whereBetween('created_at', [$start, $end]))
-            ->when($dueDateRange, fn (Builder $q) => $q->whereBetween('due_date', [$dueStart, $dueEnd]))
+            ->when($createdAtRange, fn (Builder $q) => $q->whereBetween('payables.created_at', [$start, $end]))
+            ->when($dueDateRange, fn (Builder $q) => $q->whereBetween('payables.due_date', [$dueStart, $dueEnd]))
             ->leftJoin(new Partner()->getTable(), 'payables.supplier_id', '=', 'partners.id')
             ->leftJoin(new Vendor()->getTable(), 'payables.vendor_id', '=', 'vendors.id')
             ->orderBy($sortBy, $sortDir)
