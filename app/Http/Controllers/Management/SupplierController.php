@@ -19,26 +19,7 @@ class SupplierController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'name', 'email', 'identification', 'is_active', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
-        $suppliers = $this->supplierService->getPaginatedSuppliers(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $suppliers = $this->getPaginatedSuppliersFromRequest($request);
 
         Log::info('Supplier: Accessed supplier list.', ['action_user_id' => Auth::id()]);
 
@@ -176,5 +157,66 @@ class SupplierController extends Controller
 
             return back()->with('error', 'An error occurred while permanently deleting the supplier. Please try again.');
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $suppliers = $this->getPaginatedSuppliersFromRequest($request);
+
+            if ($suppliers->isEmpty()) {
+                return back()->with('error', 'No suppliers found to generate CSV.');
+            }
+
+            return $this->supplierService->generateCsvExport($suppliers);
+        } catch (Exception $e) {
+            Log::error('Supplier: Error occurred while generating CSV.', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of suppliers based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of Partner(supplier) models.
+     */
+    private function getPaginatedSuppliersFromRequest(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'name', 'email', 'identification', 'is_active', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->supplierService->getPaginatedSuppliers(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
