@@ -5,6 +5,7 @@ namespace App\Interfaces\Management;
 use App\Http\Requests\Management\SupplierRequest;
 use App\Models\Partner;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface SupplierServiceInterface
 {
@@ -47,4 +48,17 @@ interface SupplierServiceInterface
      * @throws \Throwable If the update cannot be completed for any other reason.
      */
     public function updateSupplier(SupplierRequest $request, Partner $supplier): void;
+
+    /**
+     * Generate a CSV export from a paginated list of suppliers.
+     *
+     * Accepts a LengthAwarePaginator of supplier entities and produces CSV-formatted output
+     * including header row and one row per supplier.
+     *
+     * @param  LengthAwarePaginator  $suppliers  Paginated collection of suppliers to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsvExport(LengthAwarePaginator $suppliers): BinaryFileResponse;
 }
