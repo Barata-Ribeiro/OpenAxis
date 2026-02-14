@@ -154,6 +154,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
     Route::delete('suppliers/{supplier}/force', [SupplierController::class, 'forceDestroy'])
         ->name('erp.suppliers.force-destroy')
         ->middleware('permission:supplier.destroy');
+    Route::get('suppliers/generate-csv', [SupplierController::class, 'generateCsv'])
+        ->name('erp.suppliers.generate-csv')
+        ->middleware('permission:supplier.index');
     Route::resource('suppliers', SupplierController::class)
         ->names([
             'index' => 'erp.suppliers.index',
