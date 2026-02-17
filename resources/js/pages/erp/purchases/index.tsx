@@ -6,7 +6,7 @@ import { columns } from '@/pages/erp/purchases/columns';
 import erp from '@/routes/erp';
 import type { BreadcrumbItem, PaginationMeta } from '@/types';
 import type { PurchaseOrderWithRelations } from '@/types/erp/purchase-order';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 interface IndexPageProps {
     purchases: PaginationMeta<PurchaseOrderWithRelations[]>;
@@ -15,8 +15,16 @@ interface IndexPageProps {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Purchases', href: erp.purchaseOrders.index().url }];
 
 export default function IndexPage({ purchases }: Readonly<IndexPageProps>) {
-    const { data, ...pagination } = purchases;
+    const { url } = usePage();
     const { can } = usePermission();
+
+    const { data, ...pagination } = purchases;
+
+    const queryParams = new URLSearchParams(url.split('?')[1] ?? '');
+
+    const exportables = {
+        csvRoute: erp.purchaseOrders.generateCsv({ mergeQuery: Object.fromEntries(queryParams.entries()) }),
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -28,6 +36,7 @@ export default function IndexPage({ purchases }: Readonly<IndexPageProps>) {
                     data={data}
                     pagination={pagination}
                     createRoute={can('order.create') ? erp.purchaseOrders.create() : undefined}
+                    exportables={exportables}
                 />
             </PageLayout>
         </AppLayout>
