@@ -94,6 +94,9 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->group(function () {
         ->middlewareFor(['edit', 'update'], 'permission:client.edit')
         ->middlewareFor('destroy', 'permission:client.destroy');
 
+    Route::get('purchase-orders/generate-csv', [PurchaseOrderController::class, 'generateCsv'])
+        ->name('erp.purchase-orders.generate-csv')
+        ->middleware('permission:order.index');
     Route::resource('purchase-orders', PurchaseOrderController::class)
         ->except('show')
         ->parameters(['purchase-orders' => 'purchaseOrder'])
