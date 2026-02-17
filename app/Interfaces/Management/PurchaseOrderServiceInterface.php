@@ -7,6 +7,7 @@ use App\Http\Requests\Management\UpdatePurchaseOrderRequest;
 use App\Models\PurchaseOrder;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface PurchaseOrderServiceInterface
 {
@@ -69,4 +70,17 @@ interface PurchaseOrderServiceInterface
      * @param  PurchaseOrder  $purchaseOrder  The purchase order model to update.
      */
     public function updatePurchaseOrder(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder): void;
+
+    /**
+     * Generate a CSV export from a paginated list of purchase orders.
+     *
+     * Accepts a LengthAwarePaginator of purchase order entities and produces CSV-formatted output
+     * including header row and one row per purchase order.
+     *
+     * @param  LengthAwarePaginator  $purchaseOrders  Paginated collection of purchase orders to export.
+     * @return BinaryFileResponse Response containing the generated CSV file for download.
+     *
+     * @throws \RuntimeException If the CSV cannot be generated.
+     */
+    public function generateCsv(LengthAwarePaginator $purchaseOrders): BinaryFileResponse;
 }

@@ -4,6 +4,7 @@ namespace App\Services\Management;
 
 use App\Common\Helpers;
 use App\Enums\PartnerTypeEnum;
+use App\Enums\PurchaseOrderStatusEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Management\PurchaseOrderRequest;
 use App\Http\Requests\Management\UpdatePurchaseOrderRequest;
@@ -15,10 +16,14 @@ use App\Models\User;
 use App\Notifications\NewPurchaseOrder;
 use Arr;
 use Auth;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Log;
+use Number;
 use Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PurchaseOrderService implements PurchaseOrderServiceInterface
 {
@@ -175,5 +180,48 @@ class PurchaseOrderService implements PurchaseOrderServiceInterface
     {
         $validated = $request->validated();
         $purchaseOrder->update($validated);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateCsv(LengthAwarePaginator $purchaseOrders): BinaryFileResponse
+    {
+        $finalFilename = Carbon::now()->format('Y_m_d_H_i_s').'_purchase_orders_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$finalFilename\"",
+        ];
+
+        $csvFileName = tempnam(sys_get_temp_dir(), 'csv_'.Str::ulid()).'.csv';
+        $openFile = fopen($csvFileName, 'w');
+
+        fwrite($openFile, "\xEF\xBB\xBF");
+
+        $delimiter = ';';
+        $header = ['ID', 'Supplier Name', 'Total Cost', 'Status', 'Created By', 'Created At', 'Updated At'];
+
+        fputcsv($openFile, $header, $delimiter);
+
+        foreach ($purchaseOrders as $order) {
+            $row = [
+                $order->id,
+                $order->supplier->name,
+                Number::currency($order->total_cost),
+                PurchaseOrderStatusEnum::tryFrom($order->status->value)?->label() ?? ucfirst($order->status),
+                $order->user->name,
+                $order->created_at,
+                $order->updated_at,
+            ];
+
+            fputcsv($openFile, $row, $delimiter);
+        }
+
+        fclose($openFile);
+
+        Log::info('Purchase Orders: Generated purchase orders CSV export.', ['action_user_id' => Auth::id()]);
+
+        return response()->download($csvFileName, $finalFilename, $headers)->deleteFileAfterSend(true);
     }
 }
