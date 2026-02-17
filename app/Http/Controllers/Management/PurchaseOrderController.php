@@ -20,28 +20,9 @@ class PurchaseOrderController extends Controller
 
     public function index(QueryRequest $request)
     {
-        $validated = $request->validated();
-
-        $perPage = $validated['per_page'] ?? 10;
-        $sortBy = $validated['sort_by'] ?? 'id';
-        $sortDir = $validated['sort_dir'] ?? 'asc';
-        $search = trim($validated['search'] ?? '');
-        $filters = $validated['filters'] ?? [];
-
-        $allowedSorts = ['id', 'supplier_name', 'total_cost', 'status', 'user_name', 'created_at', 'updated_at'];
-        if (! \in_array($sortBy, $allowedSorts)) {
-            $sortBy = 'id';
-        }
-
         Log::info('Purchase Orders: Accessed listing of purchases', ['action_user_id' => Auth::id()]);
 
-        $purchases = $this->purchaseOrderService->getPaginatedPurchaseOrders(
-            $perPage,
-            $sortBy,
-            $sortDir,
-            $search,
-            $filters
-        );
+        $purchases = $this->getPaginatedPurchaseOrders($request);
 
         return Inertia::render('erp/purchases/index', [
             'purchases' => $purchases,
@@ -139,5 +120,66 @@ class PurchaseOrderController extends Controller
 
             return redirect()->back()->withInput()->with(['error', 'An error occurred while updating the purchase order. Please try again.']);
         }
+    }
+
+    public function generateCsv(QueryRequest $request)
+    {
+        $userId = Auth::id();
+
+        try {
+            $purchaseOrders = $this->getPaginatedPurchaseOrders($request);
+
+            if ($purchaseOrders->isEmpty()) {
+                return back()->with('error', 'No purchase orders found to generate CSV.');
+            }
+
+            return $this->purchaseOrderService->generateCsv($purchaseOrders);
+        } catch (Exception $e) {
+            Log::error('Purchase Orders: Error generating CSV', [
+                'action_user_id' => $userId,
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'An unknown error occurred while generating the CSV export.');
+        }
+    }
+
+    /**
+     * Build and return a LengthAwarePaginator of purchase orders based on the given request.
+     *
+     * Applies filtering, searching, sorting and eager-loading options provided by the
+     * validated QueryRequest, then paginates the resulting query.
+     *
+     * Expected request inputs (handled/validated by QueryRequest):
+     *  - page / per_page: pagination parameters
+     *  - sort: sorting column/direction
+     *  - filters: associative array of field => value
+     *  - with: relations to eager-load
+     *
+     * @param  QueryRequest  $request  Validated query parameters for filtering, sorting and pagination.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated collection of PurchaseOrder models.
+     */
+    private function getPaginatedPurchaseOrders(QueryRequest $request)
+    {
+        $validated = $request->validated();
+
+        $perPage = $validated['per_page'] ?? 10;
+        $sortBy = $validated['sort_by'] ?? 'id';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+        $search = trim($validated['search'] ?? '');
+        $filters = $validated['filters'] ?? [];
+
+        $allowedSorts = ['id', 'supplier_name', 'total_cost', 'status', 'user_name', 'created_at', 'updated_at'];
+        if (! \in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        return $this->purchaseOrderService->getPaginatedPurchaseOrders(
+            $perPage,
+            $sortBy,
+            $sortDir,
+            $search,
+            $filters
+        );
     }
 }
