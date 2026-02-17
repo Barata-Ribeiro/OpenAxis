@@ -34,6 +34,7 @@ use Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use function array_key_exists;
+use function in_array;
 
 class SalesOrderService implements SalesOrderServiceInterface
 {
@@ -41,7 +42,7 @@ class SalesOrderService implements SalesOrderServiceInterface
 
     public function __construct()
     {
-        $this->isSqlDriver = \in_array(DB::getDriverName(), ['mysql', 'pgsql']);
+        $this->isSqlDriver = in_array(DB::getDriverName(), ['mysql', 'pgsql']);
     }
 
     /**
