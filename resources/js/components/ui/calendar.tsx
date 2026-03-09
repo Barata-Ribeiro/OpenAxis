@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DayPicker, getDefaultClassNames, type DayButton } from 'react-day-picker';
+import { DayPicker, getDefaultClassNames, type DayButton, type Locale } from 'react-day-picker';
 
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ function Calendar({
     showOutsideDays = true,
     captionLayout = 'label',
     buttonVariant = 'ghost',
+    locale,
     formatters,
     components,
     ...props
@@ -23,14 +24,15 @@ function Calendar({
         <DayPicker
             showOutsideDays={showOutsideDays}
             className={cn(
-                'group/calendar bg-background p-3 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
+                'group/calendar bg-background p-3 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(8)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent',
                 String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
                 String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
                 className,
             )}
             captionLayout={captionLayout}
+            locale={locale}
             formatters={{
-                formatMonthDropdown: (date) => date.toLocaleString('default', { month: 'short' }),
+                formatMonthDropdown: (date) => date.toLocaleString(locale?.code, { month: 'short' }),
                 ...formatters,
             }}
             classNames={{
@@ -59,16 +61,13 @@ function Calendar({
                     'flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium',
                     defaultClassNames.dropdowns,
                 ),
-                dropdown_root: cn(
-                    'cn-calendar-dropdown-root relative rounded-(--cell-radius)',
-                    defaultClassNames.dropdown_root,
-                ),
+                dropdown_root: cn('relative rounded-(--cell-radius)', defaultClassNames.dropdown_root),
                 dropdown: cn('absolute inset-0 bg-popover opacity-0', defaultClassNames.dropdown),
                 caption_label: cn(
                     'font-medium select-none',
                     captionLayout === 'label'
                         ? 'text-sm'
-                        : 'cn-calendar-caption-label flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground',
+                        : 'flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground',
                     defaultClassNames.caption_label,
                 ),
                 table: 'w-full border-collapse',
@@ -88,12 +87,12 @@ function Calendar({
                     defaultClassNames.day,
                 ),
                 range_start: cn(
-                    'elative isolate -z-0 rounded-l-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-muted',
+                    'relative isolate z-0 rounded-l-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-muted',
                     defaultClassNames.range_start,
                 ),
                 range_middle: cn('rounded-none', defaultClassNames.range_middle),
                 range_end: cn(
-                    'after:bg-muted-200 relative isolate -z-0 rounded-r-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:left-0 after:w-4',
+                    'relative isolate z-0 rounded-r-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:left-0 after:w-4 after:bg-muted',
                     defaultClassNames.range_end,
                 ),
                 today: cn(
@@ -120,7 +119,7 @@ function Calendar({
 
                     return <ChevronDownIcon className={cn('size-4', className)} {...props} />;
                 },
-                DayButton: CalendarDayButton,
+                DayButton: ({ ...props }) => <CalendarDayButton locale={locale} {...props} />,
                 WeekNumber: ({ children, ...props }) => {
                     return (
                         <td {...props}>
@@ -137,7 +136,13 @@ function Calendar({
     );
 }
 
-function CalendarDayButton({ className, day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) {
+function CalendarDayButton({
+    className,
+    day,
+    modifiers,
+    locale,
+    ...props
+}: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {
     const defaultClassNames = getDefaultClassNames();
 
     const ref = React.useRef<HTMLButtonElement>(null);
@@ -150,7 +155,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: React.Compon
             ref={ref}
             variant="ghost"
             size="icon"
-            data-day={day.date.toLocaleDateString()}
+            data-day={day.date.toLocaleDateString(locale?.code)}
             data-selected-single={
                 modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle
             }

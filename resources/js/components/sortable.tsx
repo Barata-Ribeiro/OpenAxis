@@ -280,7 +280,7 @@ export default function SortableImageUpload({
                                 />
 
                                 {/* Drag Handle */}
-                                <SortableItemHandle className="absolute start-2 top-2 cursor-grab opacity-0 group-hover:opacity-100 active:cursor-grabbing">
+                                <SortableItemHandle className="absolute inset-s-2 top-2 cursor-grab opacity-0 group-hover:opacity-100 active:cursor-grabbing">
                                     <Button
                                         variant="outline"
                                         size="icon"
@@ -297,7 +297,7 @@ export default function SortableImageUpload({
                                     onClick={() => removeImage(item.id)}
                                     variant="outline"
                                     size="icon"
-                                    className="absolute end-2 top-2 size-6 rounded-full opacity-0 shadow-sm group-hover:opacity-100"
+                                    className="absolute inset-e-2 top-2 size-6 rounded-full opacity-0 shadow-sm group-hover:opacity-100"
                                     aria-label="Remove image"
                                     title="Remove image"
                                 >

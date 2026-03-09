@@ -30,6 +30,11 @@ function ToggleGroup({
         spacing?: number;
         orientation?: 'horizontal' | 'vertical';
     }) {
+    const values = React.useMemo(
+        () => ({ variant, size, spacing, orientation }),
+        [variant, size, spacing, orientation],
+    );
+
     return (
         <ToggleGroupPrimitive.Root
             data-slot="toggle-group"
@@ -39,14 +44,12 @@ function ToggleGroup({
             data-orientation={orientation}
             style={{ '--gap': spacing } as React.CSSProperties}
             className={cn(
-                'group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-md data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch data-[spacing=0]:data-[variant=outline]:shadow-xs',
+                'group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-md data-[spacing=0]:data-[variant=outline]:shadow-xs data-vertical:flex-col data-vertical:items-stretch',
                 className,
             )}
             {...props}
         >
-            <ToggleGroupContext.Provider value={{ variant, size, spacing, orientation }}>
-                {children}
-            </ToggleGroupContext.Provider>
+            <ToggleGroupContext.Provider value={values}>{children}</ToggleGroupContext.Provider>
         </ToggleGroupPrimitive.Root>
     );
 }
