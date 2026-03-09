@@ -1,5 +1,5 @@
 import { Avatar, AvatarBadge, AvatarFallback, AvatarGroupCount, AvatarImage } from '@/components/ui/avatar';
-import { AvatarGroup, AvatarGroupTooltip } from '@/components/ui/shadcn-io/avatar-group';
+import { AvatarGroup, AvatarGroupTooltip } from '@/components/ui/avatar-group';
 import { useInitials } from '@/hooks/use-initials';
 import { normalizeString } from '@/lib/utils';
 import type { User } from '@/types/application/user';
