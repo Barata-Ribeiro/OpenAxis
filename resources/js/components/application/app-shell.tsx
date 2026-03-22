@@ -5,6 +5,7 @@ import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { TooltipProvider } from '../ui/tooltip';
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -35,9 +36,11 @@ export function AppShell({ children, variant = 'header' }: Readonly<AppShellProp
     }
 
     return (
-        <SidebarProvider defaultOpen={isOpen}>
-            {children}
-            <Toaster />
-        </SidebarProvider>
+        <TooltipProvider>
+            <SidebarProvider defaultOpen={isOpen}>
+                {children}
+                <Toaster />
+            </SidebarProvider>
+        </TooltipProvider>
     );
 }
