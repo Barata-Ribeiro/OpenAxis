@@ -1,0 +1,33 @@
+packages:
+    - '.'
+allowBuilds:
+    msw: true
+    'unrs-resolver': true
+publicHoistPattern:
+    - '@inertiajs/core'
+supportedArchitectures:
+    os:
+        - win32
+        - darwin
+        - current
+    cpu:
+        - x64
+        - arm64
+
+catalog:
+    vite: npm:@voidzero-dev/vite-plus-core@1.6.0
+    vitest: 5.1.0
+    vite-plus: 1.6.0
+overrides:
+    vite@*: 'catalog:'
+peerDependencyRules:
+    allowAny:
+        - vite
+    allowedVersions:
+        vite: '*'
+
+minimumReleaseAgeExcludePrune: true
+minimumReleaseAgeExclude:
+    - '@rollup/rollup-linux-x64-gnu@4.68.7'
+    - '@rollup/rollup-win32-x64-msvc@4.68.7'
+    - lucide-react@1.75.0
