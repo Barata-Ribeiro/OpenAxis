@@ -49,7 +49,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     placeholder="Full name"
                                 />
 
-                                <InputError className="mt-2" message={errors.name} />
+                                <InputError className="mt-2" message={errors['name']} />
                             </div>
 
                             <div className="grid gap-2">
@@ -66,7 +66,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     placeholder="Email address"
                                 />
 
-                                <InputError className="mt-2" message={errors.email} />
+                                <InputError className="mt-2" message={errors['email']} />
                             </div>
 
                             {mustVerifyEmail && auth.user.email_verified_at === null && (
