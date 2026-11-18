@@ -1,15 +1,15 @@
-import inertia from "@inertiajs/vite";
-import { wayfinder } from "@laravel/vite-plugin-wayfinder";
-import babel from "@rolldown/plugin-babel";
-import tailwindcss from "@tailwindcss/vite";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import laravel from "laravel-vite-plugin";
-import { defineConfig, lazyPlugins } from "vite-plus";
+import inertia from '@inertiajs/vite';
+import { wayfinder } from '@laravel/vite-plugin-wayfinder';
+import babel from '@rolldown/plugin-babel';
+import tailwindcss from '@tailwindcss/vite';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import laravel from 'laravel-vite-plugin';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
-            input: ["resources/css/app.css", "resources/js/app.tsx"],
+            input: ['resources/css/app.css', 'resources/js/app.tsx'],
             detectTls: !process.env.CI,
             refresh: true,
         }),
@@ -20,14 +20,14 @@ export default defineConfig({
         wayfinder({ formVariants: true }),
     ]),
     build: {
-        target: "esnext",
-        minify: "oxc",
+        target: 'esnext',
+        minify: 'oxc',
         chunkSizeWarningLimit: 1000,
         rolldownOptions: {
             output: {
-                entryFileNames: "[hash].js",
-                chunkFileNames: "[hash].js",
-                assetFileNames: "[hash].[ext]",
+                entryFileNames: '[hash].js',
+                chunkFileNames: '[hash].js',
+                assetFileNames: '[hash].[ext]',
                 minify: true,
             },
         },
@@ -36,47 +36,41 @@ export default defineConfig({
         assetsInlineLimit: 4096,
     },
     server: {
-        host: "openaxis.test",
+        host: 'openaxis.test',
         port: 5173,
-        hmr: { host: "openaxis.test", overlay: false },
+        hmr: { host: 'openaxis.test', overlay: false },
         watch: {
             usePolling: false,
-            ignored: [
-                "**/.agents/**",
-                "**/.claude/**",
-                "**/.cursor/**",
-                "**/.junie/**",
-                "**/vendor/**",
-            ],
+            ignored: ['**/.agents/**', '**/.claude/**', '**/.cursor/**', '**/.junie/**', '**/vendor/**'],
         },
     },
     lint: {
         jsPlugins: [
-            { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
-            { name: "@shadcn/lint", specifier: "@shadcn/lint" },
+            { name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' },
+            { name: '@shadcn/lint', specifier: '@shadcn/lint' },
         ],
         rules: {
-            "vite-plus/prefer-vite-plus-imports": "error",
+            'vite-plus/prefer-vite-plus-imports': 'error',
             // "@shadcn/lint/no-arbitrary-values": "error", // TODO: Re-enable this rule once arbitrary values are handled properly. DISABLED FOR NOW
-            "typescript/consistent-type-imports": [
-                "error",
+            'typescript/consistent-type-imports': [
+                'error',
                 {
                     disallowTypeAnnotations: true,
-                    fixStyle: "separate-type-imports",
-                    prefer: "type-imports",
+                    fixStyle: 'separate-type-imports',
+                    prefer: 'type-imports',
                 },
             ],
         },
         ignorePatterns: [
-            "vendor/**",
-            "node_modules/**",
-            "public/**",
-            "bootstrap/ssr/**",
-            "tailwind.config.js",
-            "resources/js/actions/**",
-            "resources/js/components/ui/*",
-            "resources/js/routes/**",
-            "resources/js/wayfinder/**",
+            'vendor/**',
+            'node_modules/**',
+            'public/**',
+            'bootstrap/ssr/**',
+            'tailwind.config.js',
+            'resources/js/actions/**',
+            'resources/js/components/ui/*',
+            'resources/js/routes/**',
+            'resources/js/wayfinder/**',
         ],
         options: { denyWarnings: true, typeAware: true },
     },
@@ -86,16 +80,11 @@ export default defineConfig({
         singleQuote: true,
         semi: true,
         singleAttributePerLine: false,
-        htmlWhitespaceSensitivity: "css",
-        ignorePatterns: [
-            ".github/**",
-            "composer.json",
-            "resources/js/components/ui/*",
-            "resources/views/mail/*",
-        ],
+        htmlWhitespaceSensitivity: 'css',
+        ignorePatterns: ['.github/**', 'composer.json', 'resources/js/components/ui/*', 'resources/views/mail/*'],
         sortTailwindcss: {
-            functions: ["clsx", "cn", "cva"],
-            stylesheet: "resources/css/app.css",
+            functions: ['clsx', 'cn', 'cva'],
+            stylesheet: 'resources/css/app.css',
         },
     },
 });
