@@ -4,7 +4,7 @@ import {
 } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
 import InputError from '@/components/common/input-error';
 import PasswordInput from '@/components/common/password-input';
-import PasskeyVerify from '@/components/passkey-verify';
+import PasskeyVerify from '@/components/helpers/passkey/passkey-verify';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';

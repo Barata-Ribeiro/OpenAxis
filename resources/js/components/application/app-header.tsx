@@ -1,9 +1,7 @@
-import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
-import { Focusable } from 'react-aria-components';
 import AppLogo from '@/components/application/app-logo';
 import AppLogoIcon from '@/components/application/app-logo-icon';
-import { Breadcrumbs } from '@/components/breadcrumbs';
+import { Breadcrumbs } from '@/components/helpers/breadcrumbs';
+import { UserMenuContent } from '@/components/helpers/user-menu-content';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -16,13 +14,15 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { renderInertiaLink } from '@/lib/inertia-link';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { Focusable } from 'react-aria-components';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];

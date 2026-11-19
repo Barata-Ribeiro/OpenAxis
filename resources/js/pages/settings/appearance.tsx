@@ -1,5 +1,5 @@
-import AppearanceTabs from '@/components/appearance-tabs';
 import Heading from '@/components/common/heading';
+import AppearanceTabs from '@/components/helpers/appearance-tabs';
 import { edit as editAppearance } from '@/routes/appearance';
 import { Head } from '@inertiajs/react';
 

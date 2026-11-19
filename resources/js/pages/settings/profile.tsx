@@ -1,7 +1,7 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/common/heading';
 import InputError from '@/components/common/input-error';
-import DeleteUser from '@/components/delete-user';
+import DeleteUser from '@/components/helpers/delete-user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

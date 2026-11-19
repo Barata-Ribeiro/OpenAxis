@@ -1,7 +1,7 @@
 import InputError from '@/components/common/input-error';
 import PasswordInput from '@/components/common/password-input';
 import TextLink from '@/components/common/text-link';
-import PasskeyVerify from '@/components/passkey-verify';
+import PasskeyVerify from '@/components/helpers/passkey/passkey-verify';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';

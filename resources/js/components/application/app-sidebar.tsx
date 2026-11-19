@@ -1,8 +1,8 @@
 import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
 import AppLogo from '@/components/application/app-logo';
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { NavFooter } from '@/components/helpers/nav/nav-footer';
+import { NavMain } from '@/components/helpers/nav/nav-main';
+import { NavUser } from '@/components/helpers/nav/nav-user';
 import {
     Sidebar,
     SidebarContent,
