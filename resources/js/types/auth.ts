@@ -1,3 +1,5 @@
+import type { Permission, Role } from '@/types/role-permission';
+
 export type User = {
     id: number;
     name: string;
@@ -7,11 +9,14 @@ export type User = {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    roles: Role[];
     [key: string]: unknown;
 };
 
 export type Auth = {
     user: User;
+    permissions: Permission['name'][];
+    locale?: string;
 };
 
 export type Passkey = {
