@@ -10,7 +10,7 @@ import { renderInertiaLink } from '@/lib/inertia-link';
 import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
-export function NavMain({ items }: { items: NavItem[] }) {
+export function NavMain({ items }: Readonly<{ items: NavItem[] }>) {
     const { isCurrentUrl } = useCurrentUrl();
 
     return (

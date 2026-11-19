@@ -23,7 +23,7 @@ const EmptyState = () => {
     );
 };
 
-export default function ManagePasskeys(props: Props) {
+export default function ManagePasskeys(props: Readonly<Props>) {
     const passkeys = props.passkeys ?? [];
 
     const handleDelete = (id: number, onError: () => void) => {

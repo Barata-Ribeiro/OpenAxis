@@ -12,7 +12,7 @@ type Props = {
     errors: string[];
 };
 
-export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes, errors }: Props) {
+export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes, errors }: Readonly<Props>) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
@@ -103,7 +103,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                                 >
                                     {recoveryCodesList.length ? (
                                         recoveryCodesList.map((code, index) => (
-                                            <div key={index} role="listitem" className="select-text">
+                                            <div key={`recovery-code-${index}-${code}`} role="listitem" className="select-text">
                                                 {code}
                                             </div>
                                         ))

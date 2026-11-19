@@ -39,13 +39,13 @@ function TwoFactorSetupStep({
     buttonText,
     onNextStep,
     errors,
-}: {
+}: Readonly<{
     qrCodeSvg: string | null;
     manualSetupKey: string | null;
     buttonText: string;
     onNextStep: () => void;
     errors: string[];
-}) {
+}>) {
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
@@ -118,7 +118,7 @@ function TwoFactorSetupStep({
     );
 }
 
-function TwoFactorVerificationStep({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
+function TwoFactorVerificationStep({ onClose, onBack }: Readonly<{ onClose: () => void; onBack: () => void }>) {
     const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
@@ -137,7 +137,6 @@ function TwoFactorVerificationStep({ onClose, onBack }: { onClose: () => void; o
                 processing: boolean;
                 errors?: { confirmTwoFactorAuthentication?: { code?: string } };
             }) => (
-                <>
                     <div ref={pinInputContainerRef} className="relative w-full space-y-3">
                         <div className="flex w-full flex-col items-center space-y-3 py-2">
                             <InputOTP
@@ -177,7 +176,6 @@ function TwoFactorVerificationStep({ onClose, onBack }: { onClose: () => void; o
                             </Button>
                         </div>
                     </div>
-                </>
             )}
         </Form>
     );
@@ -205,7 +203,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
-}: Props) {
+}: Readonly<Props>) {
     const [showVerificationStep, setShowVerificationStep] = useState<boolean>(false);
 
     const modalConfig = useMemo<{

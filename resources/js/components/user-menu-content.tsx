@@ -16,12 +16,12 @@ type Props = {
     user: User;
 };
 
-export function UserMenuContent({ user }: Props) {
-    function handleLogout() {
+function handleLogout() {
         router.flushAll();
         router.visit(logout());
     }
 
+export function UserMenuContent({ user }: Readonly<Props>) {
     return (
         <>
             <DropdownMenuGroup aria-label="Account">

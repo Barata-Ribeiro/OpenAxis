@@ -8,7 +8,7 @@ import {
 } from "react-aria-components"
 import { CheckIcon } from "lucide-react"
 
-function Checkbox({ className, children, ...props }: CheckboxProps) {
+function Checkbox({ className, children, ...props }: Readonly<CheckboxProps>) {
   return (
     <CheckboxPrimitive
       data-slot="checkbox"

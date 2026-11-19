@@ -3,14 +3,14 @@ import { renderInertiaLink } from '@/lib/inertia-link';
 import { toUrl } from '@/lib/utils';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
-export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[] }) {
+export function Breadcrumbs({ breadcrumbs }: Readonly<{ breadcrumbs: BreadcrumbItemType[] }>) {
     return (
         <>
             {breadcrumbs.length > 0 && (
                 <Breadcrumb>
                     <BreadcrumbList>
                         {breadcrumbs.map((item, index) => (
-                            <BreadcrumbItem key={index}>
+                            <BreadcrumbItem key={`breadcrumb-${index}-${item.title}`}>
                                 {index === breadcrumbs.length - 1 ? (
                                     <BreadcrumbPage>{item.title}</BreadcrumbPage>
                                 ) : (

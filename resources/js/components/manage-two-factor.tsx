@@ -14,7 +14,7 @@ export type Props = {
     twoFactorEnabled?: boolean;
 };
 
-export default function ManageTwoFactor(props: Props) {
+export default function ManageTwoFactor(props: Readonly<Props>) {
     const requiresConfirmation = props.requiresConfirmation ?? false;
     const twoFactorEnabled = props.twoFactorEnabled ?? false;
 
