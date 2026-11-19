@@ -3,18 +3,21 @@ import Heading from '@/components/common/heading';
 import InputError from '@/components/common/input-error';
 import DeleteUser from '@/components/helpers/delete-user';
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { Auth } from '@/types';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Activity } from 'react';
 
 type PageProps = {
     auth: Auth;
 };
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+export default function Profile({ mustVerifyEmail, status }: Readonly<{ mustVerifyEmail: boolean; status?: string }>) {
     const { auth } = usePage<PageProps>().props;
 
     return (
@@ -28,14 +31,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                 <Form
                     {...ProfileController.update.form()}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                    className="space-y-6"
+                    options={{ preserveScroll: true }}
+                    disableWhileProcessing
+                    className="space-y-6 inert:pointer-events-none inert:grayscale-100"
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="grid gap-2">
+                            <Field data-invalid={!!errors['name']}>
                                 <Label htmlFor="name">Name</Label>
 
                                 <Input
@@ -46,12 +48,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     required
                                     autoComplete="name"
                                     placeholder="Full name"
+                                    aria-invalid={!!errors['name']}
                                 />
 
                                 <InputError className="mt-2" message={errors['name']} />
-                            </div>
+                            </Field>
 
-                            <div className="grid gap-2">
+                            <Field data-invalid={!!errors['email']}>
                                 <Label htmlFor="email">Email address</Label>
 
                                 <Input
@@ -63,12 +66,15 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     required
                                     autoComplete="username"
                                     placeholder="Email address"
+                                    aria-invalid={!!errors['email']}
                                 />
 
                                 <InputError className="mt-2" message={errors['email']} />
-                            </div>
+                            </Field>
 
-                            {mustVerifyEmail && auth.user.email_verified_at === null && (
+                            <Activity
+                                mode={mustVerifyEmail && auth.user.email_verified_at === null ? 'visible' : 'hidden'}
+                            >
                                 <div>
                                     <p className="-mt-4 text-sm text-muted-foreground">
                                         Your email address is unverified.{' '}
@@ -81,15 +87,18 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                         </Link>
                                     </p>
 
-                                    {status === 'verification-link-sent' && (
+                                    <Activity mode={status === 'verification-link-sent' ? 'visible' : 'hidden'}>
                                         <div className="mt-2 text-sm font-medium text-green-600">
                                             A new verification link has been sent to your email address.
                                         </div>
-                                    )}
+                                    </Activity>
                                 </div>
-                            )}
+                            </Activity>
 
                             <div className="flex items-center gap-4">
+                                <Activity mode={processing ? 'visible' : 'hidden'}>
+                                    <Spinner aria-hidden />
+                                </Activity>
                                 <Button type="submit" isDisabled={processing} data-test="update-profile-button">
                                     Save
                                 </Button>

@@ -11,6 +11,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Field } from '@/components/ui/field';
 import { Label } from '@/components/ui/label';
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
@@ -54,7 +55,7 @@ export default function DeleteUser() {
                         >
                             {({ resetAndClearErrors, processing, errors }) => (
                                 <>
-                                    <div className="grid gap-2">
+                                    <Field data-invalid={errors['password']}>
                                         <Label htmlFor="password" className="sr-only">
                                             Password
                                         </Label>
@@ -65,10 +66,11 @@ export default function DeleteUser() {
                                             ref={passwordInput}
                                             placeholder="Password"
                                             autoComplete="current-password"
+                                            aria-invalid={!!errors['password']}
                                         />
 
                                         <InputError message={errors['password']} />
-                                    </div>
+                                    </Field>
 
                                     <DialogFooter className="gap-2">
                                         <DialogClose

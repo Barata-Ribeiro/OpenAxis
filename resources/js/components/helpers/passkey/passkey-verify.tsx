@@ -37,7 +37,7 @@ export default function PasskeyVerify({ routes, label, loadingLabel, separator }
     return (
         <>
             <div className="grid gap-2">
-                <Button type="button" variant="outline" className="w-full" onPress={verify} isDisabled={isLoading}>
+                <Button type="button" variant="outline" className="w-full" onPress={verify} isDisabled>
                     {isLoading ? <Spinner /> : <KeyRoundIcon aria-hidden data-icon="inline-start" className="size-4" />}
                     {isLoading ? (loadingLabel ?? 'Authenticating...') : (label ?? 'Sign in with a passkey')}
                 </Button>

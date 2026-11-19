@@ -5,23 +5,26 @@ import { Spinner } from '@/components/ui/spinner';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 import { Form, Head } from '@inertiajs/react';
+import { Activity } from 'react';
 
-export default function VerifyEmail({ status }: { status?: string }) {
+export default function VerifyEmail({ status }: Readonly<{ status?: string }>) {
     return (
         <>
             <Head title="Email verification" />
 
-            {status === 'verification-link-sent' && (
+            <Activity mode={status === 'verification-link-sent' ? 'visible' : 'hidden'}>
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
                     A new verification link has been sent to the email address you provided during registration.
                 </div>
-            )}
+            </Activity>
 
             <Form {...send.form()} className="space-y-6 text-center">
                 {({ processing }) => (
                     <>
                         <Button type="submit" isDisabled={processing} variant="secondary">
-                            {processing && <Spinner />}
+                            <Activity mode={processing ? 'visible' : 'hidden'}>
+                                <Spinner aria-hidden />
+                            </Activity>
                             Resend verification email
                         </Button>
 
