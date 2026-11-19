@@ -9,7 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 export function NavUser() {
     const { auth } = usePage().props;
     const { state } = useSidebar();
-    const isMobile = useIsMobile();
+    const { isMobile } = useIsMobile();
 
     if (!auth.user) {
         return null;
