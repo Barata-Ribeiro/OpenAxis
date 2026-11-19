@@ -21,7 +21,11 @@ export default function AuthSplitLayout({ children, title, description }: Readon
                 />
                 <div aria-hidden className="absolute inset-0 bg-image-overlay" />
                 <Link href={home()} className="relative z-20 self-end text-lg font-medium" aria-label="Home">
-                    <AppLogoBig className="h-10 fill-current text-background sm:h-12" aria-label={name} />
+                    <AppLogoBig
+                        className="h-10 fill-current text-background sm:h-12"
+                        aria-label={name}
+                        style={{ viewTransitionName: 'app-logo' }}
+                    />
                 </Link>
             </div>
 
@@ -32,7 +36,11 @@ export default function AuthSplitLayout({ children, title, description }: Readon
                         className="relative z-20 flex items-center justify-center lg:hidden"
                         aria-label="Home"
                     >
-                        <AppLogoBig className="h-10 fill-current text-background sm:h-12" aria-label={name} />
+                        <AppLogoBig
+                            className="h-10 fill-current text-background sm:h-12"
+                            aria-label={name}
+                            style={{ viewTransitionName: 'app-logo' }}
+                        />
                     </Link>
 
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">

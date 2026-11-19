@@ -1,20 +1,12 @@
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
-import AppLogo from '@/components/application/app-logo';
 import { NavFooter } from '@/components/helpers/nav/nav-footer';
 import { NavMain } from '@/components/helpers/nav/nav-main';
 import { NavUser } from '@/components/helpers/nav/nav-user';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { renderInertiaLink } from '@/lib/inertia-link';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
+import { Link } from '@inertiajs/react';
+import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import AppLogoBig from './app-logo-big';
 
 const mainNavItems: NavItem[] = [
     {
@@ -39,19 +31,17 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="offcanvas" variant="floating">
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
-                            href={dashboard.url()}
-                            size="lg"
-                            render={renderInertiaLink(dashboard(), true)}
-                        >
-                            <AppLogo />
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <Link
+                    href={dashboard()}
+                    aria-label="Go to dashboard"
+                    title="Go to dashboard"
+                    prefetch="hover"
+                    viewTransition
+                >
+                    <AppLogoBig className="my-1 h-9 w-full" style={{ viewTransitionName: 'app-logo' }} />
+                </Link>
             </SidebarHeader>
 
             <SidebarContent>
