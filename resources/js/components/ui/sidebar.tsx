@@ -1,4 +1,7 @@
-import { Slot as SlotPrimitive } from "radix-ui"
+import {
+  Button as ButtonPrimitive,
+  Link as LinkPrimitive,
+} from "react-aria-components"
 import type { VariantProps} from "class-variance-authority";
 import { cva } from "class-variance-authority"
 import { PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react"
@@ -9,7 +12,6 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
-  SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
@@ -17,7 +19,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
-  TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -178,25 +179,28 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet
+        isOpen={openMobile}
+        onOpenChange={setOpenMobile}
+        data-sidebar="sidebar"
+        data-slot="sidebar"
+        data-mobile="true"
+        side={side}
+        showCloseButton={false}
+        {...props}
+        className={cn("bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0", className)}
+        style={
+          {
+            "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+            ...props.style,
+          } as React.CSSProperties
+        }
+      >
         <SheetHeader className="sr-only">
           <SheetTitle>Sidebar</SheetTitle>
           <SheetDescription>Displays the mobile sidebar.</SheetDescription>
         </SheetHeader>
-        <SheetContent
-          data-sidebar="sidebar"
-          data-slot="sidebar"
-          data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
-          side={side}
-        >
-          <div className="flex h-full w-full flex-col">{children}</div>
-        </SheetContent>
+        <div className="flex h-full w-full flex-col">{children}</div>
       </Sheet>
     )
   }
@@ -248,7 +252,7 @@ function Sidebar({
 
 function SidebarTrigger({
   className,
-  onClick,
+  onPress,
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar, isMobile, state } = useSidebar()
@@ -260,8 +264,8 @@ function SidebarTrigger({
       variant="ghost"
       size="icon"
       className={cn("h-7 w-7", className)}
-      onClick={(event) => {
-        onClick?.(event)
+      onPress={(event) => {
+        onPress?.(event)
         toggleSidebar()
       }}
       {...props}
@@ -388,13 +392,10 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
 
 function SidebarGroupLabel({
   className,
-  asChild = false,
   ...props
-}: React.ComponentProps<"div"> & { asChild?: boolean }) {
-  const Comp = asChild ? SlotPrimitive.Slot : "div"
-
+}: React.ComponentProps<"div">) {
   return (
-    <Comp
+    <div
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
@@ -409,13 +410,10 @@ function SidebarGroupLabel({
 
 function SidebarGroupAction({
   className,
-  asChild = false,
   ...props
-}: React.ComponentProps<"button"> & { asChild?: boolean }) {
-  const Comp = asChild ? SlotPrimitive.Slot : "button"
-
+}: Omit<React.ComponentProps<typeof ButtonPrimitive>, "className"> & { className?: string }) {
   return (
-    <Comp
+    <ButtonPrimitive
       data-slot="sidebar-group-action"
       data-sidebar="group-action"
       className={cn(
@@ -467,7 +465,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground aria-expanded:hover:bg-sidebar-accent aria-expanded:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -488,69 +486,59 @@ const sidebarMenuButtonVariants = cva(
   }
 )
 
+type SidebarMenuButtonProps = (
+  | (Omit<React.ComponentProps<typeof ButtonPrimitive>, "className"> & { href?: undefined })
+  | (Omit<React.ComponentProps<typeof LinkPrimitive>, "className"> & { href: string })
+) & VariantProps<typeof sidebarMenuButtonVariants> & {
+  className?: string
+  isActive?: boolean
+  tooltip?: string | React.ComponentProps<typeof Tooltip>
+}
+
 function SidebarMenuButton({
-  asChild = false,
   isActive = false,
   variant = "default",
   size = "default",
   tooltip,
   className,
   ...props
-}: React.ComponentProps<"button"> & {
-  asChild?: boolean
-  isActive?: boolean
-  tooltip?: string | React.ComponentProps<typeof TooltipContent>
-} & VariantProps<typeof sidebarMenuButtonVariants>) {
-  const Comp = asChild ? SlotPrimitive.Slot : "button"
+}: SidebarMenuButtonProps) {
   const { isMobile, state } = useSidebar()
-
-  const button = (
-    <Comp
-      data-slot="sidebar-menu-button"
-      data-sidebar="menu-button"
-      data-size={size}
-      data-active={isActive}
-      className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-      {...props}
-    />
+  const sharedProps = {
+    "data-slot": "sidebar-menu-button",
+    "data-sidebar": "menu-button",
+    "data-size": size,
+    "data-active": isActive,
+    className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+  }
+  const button = typeof props.href === "string" ? (
+    <LinkPrimitive {...sharedProps} {...props} />
+  ) : (
+    <ButtonPrimitive {...sharedProps} {...props} />
   )
 
   if (!tooltip) {
     return button
   }
 
-  if (typeof tooltip === "string") {
-    tooltip = {
-      children: tooltip,
-    }
-  }
-
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent
-        side="right"
-        align="center"
-        hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
-      />
-    </Tooltip>
+    <TooltipTrigger isDisabled={state !== "collapsed" || isMobile}>
+      {button}
+      <Tooltip placement="right" {...(typeof tooltip === "string" ? { children: tooltip } : tooltip)} />
+    </TooltipTrigger>
   )
 }
 
 function SidebarMenuAction({
   className,
-  asChild = false,
   showOnHover = false,
   ...props
-}: React.ComponentProps<"button"> & {
-  asChild?: boolean
+}: Omit<React.ComponentProps<typeof ButtonPrimitive>, "className"> & {
+  className?: string
   showOnHover?: boolean
 }) {
-  const Comp = asChild ? SlotPrimitive.Slot : "button"
-
   return (
-    <Comp
+    <ButtonPrimitive
       data-slot="sidebar-menu-action"
       data-sidebar="menu-action"
       className={cn(
@@ -562,7 +550,7 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 aria-expanded:opacity-100 md:opacity-0",
         className
       )}
       {...props}
@@ -660,20 +648,17 @@ function SidebarMenuSubItem({
 }
 
 function SidebarMenuSubButton({
-  asChild = false,
   size = "md",
   isActive = false,
   className,
   ...props
-}: React.ComponentProps<"a"> & {
-  asChild?: boolean
+}: Omit<React.ComponentProps<typeof LinkPrimitive>, "className"> & {
+  className?: string
   size?: "sm" | "md"
   isActive?: boolean
 }) {
-  const Comp = asChild ? SlotPrimitive.Slot : "a"
-
   return (
-    <Comp
+    <LinkPrimitive
       data-slot="sidebar-menu-sub-button"
       data-sidebar="menu-sub-button"
       data-size={size}

@@ -1,19 +1,37 @@
-import { Slot as SlotPrimitive } from "radix-ui"
-import { ChevronRight, MoreHorizontal } from "lucide-react"
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
+import {
+  Breadcrumb as BreadcrumbPrimitive,
+  Breadcrumbs as BreadcrumbsPrimitive,
+  composeRenderProps,
+  Link as LinkPrimitive,
+  type BreadcrumbProps,
+  type BreadcrumbsProps,
+  type LinkProps,
+} from "react-aria-components"
 
-function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
+import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
+
+function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
+  return (
+    <nav
+      aria-label="breadcrumb"
+      data-slot="breadcrumb"
+      className={cn(className)}
+      {...props}
+    />
+  )
 }
 
-function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
+function BreadcrumbList<T extends object>({
+  className,
+  ...props
+}: BreadcrumbsProps<T>) {
   return (
-    <ol
+    <BreadcrumbsPrimitive
       data-slot="breadcrumb-list"
       className={cn(
-        "text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5",
+        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word sm:gap-2.5 text-muted-foreground",
         className
       )}
       {...props}
@@ -21,29 +39,43 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
   )
 }
 
-function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
+function BreadcrumbItem({
+  className,
+  children,
+  separatorClassName,
+  ...props
+}: BreadcrumbProps & { separatorClassName?: string }) {
   return (
-    <li
+    <BreadcrumbPrimitive
       data-slot="breadcrumb-item"
-      className={cn("inline-flex items-center gap-1.5", className)}
+      className={cn("inline-flex items-center gap-1", className)}
       {...props}
-    />
+    >
+      {composeRenderProps(children, (children, { isCurrent }) => (
+        <>
+          {children}
+          {!isCurrent && (
+            <span
+              data-slot="breadcrumb-separator"
+              role="presentation"
+              aria-hidden="true"
+              className={cn("[&>svg]:size-3.5", separatorClassName)}
+            >
+              <ChevronRightIcon />
+            </span>
+          )}
+        </>
+      ))}
+    </BreadcrumbPrimitive>
   )
 }
 
-function BreadcrumbLink({
-  asChild,
-  className,
-  ...props
-}: React.ComponentProps<"a"> & {
-  asChild?: boolean
-}) {
-  const Comp = asChild ? SlotPrimitive.Slot : "a"
-
+function BreadcrumbLink({ className, render, ...props }: LinkProps) {
   return (
-    <Comp
+    <LinkPrimitive
       data-slot="breadcrumb-link"
-      className={cn("hover:text-foreground transition-colors", className)}
+      className={cn("transition-colors hover:text-foreground", className)}
+      render={render}
       {...props}
     />
   )
@@ -56,27 +88,9 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn("text-foreground font-normal", className)}
+      className={cn("font-normal text-foreground", className)}
       {...props}
     />
-  )
-}
-
-function BreadcrumbSeparator({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<"li">) {
-  return (
-    <li
-      data-slot="breadcrumb-separator"
-      role="presentation"
-      aria-hidden="true"
-      className={cn("[&>svg]:size-3.5", className)}
-      {...props}
-    >
-      {children ?? <ChevronRight />}
-    </li>
   )
 }
 
@@ -89,10 +103,13 @@ function BreadcrumbEllipsis({
       data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn("flex size-9 items-center justify-center", className)}
+      className={cn(
+        "flex size-5 items-center justify-center [&>svg]:size-4",
+        className
+      )}
       {...props}
     >
-      <MoreHorizontal className="size-4" />
+      <MoreHorizontalIcon />
       <span className="sr-only">More</span>
     </span>
   )
@@ -104,6 +121,5 @@ export {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbPage,
-  BreadcrumbSeparator,
   BreadcrumbEllipsis,
 }

@@ -61,7 +61,7 @@ export default function ManageTwoFactor(props: Props) {
                     <div className="relative inline">
                         <Form {...disable.form()}>
                             {({ processing }) => (
-                                <Button variant="destructive" type="submit" disabled={processing}>
+                                <Button variant="destructive" type="submit" isDisabled={processing}>
                                     Disable 2FA
                                 </Button>
                             )}
@@ -83,14 +83,14 @@ export default function ManageTwoFactor(props: Props) {
 
                     <div>
                         {hasSetupData ? (
-                            <Button onClick={() => setShowSetupModal(true)}>
+                            <Button onPress={() => setShowSetupModal(true)}>
                                 <ShieldCheck />
                                 Continue setup
                             </Button>
                         ) : (
                             <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
                                 {({ processing }) => (
-                                    <Button type="submit" disabled={processing}>
+                                    <Button type="submit" isDisabled={processing}>
                                         Enable 2FA
                                     </Button>
                                 )}

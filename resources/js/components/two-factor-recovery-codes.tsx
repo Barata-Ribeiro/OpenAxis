@@ -57,7 +57,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
             <CardContent>
                 <div className="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between">
                     <Button
-                        onClick={toggleCodesVisibility}
+                        onPress={toggleCodesVisibility}
                         className="w-fit"
                         aria-expanded={codesAreVisible}
                         aria-controls="recovery-codes-section"
@@ -76,7 +76,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                                 <Button
                                     variant="secondary"
                                     type="submit"
-                                    disabled={processing}
+                                    isDisabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
                                     <RefreshCw /> Regenerate codes

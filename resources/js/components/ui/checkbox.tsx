@@ -1,29 +1,38 @@
-import { Checkbox as CheckboxPrimitive } from "radix-ui"
-import { CheckIcon } from "lucide-react"
-import * as React from "react"
-
 import { cn } from "@/lib/utils"
+import {
+  Checkbox as CheckboxPrimitive,
+  composeRenderProps,
+  type CheckboxProps,
+} from "react-aria-components"
 
-function Checkbox({
-  className,
-  ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+import { CheckIcon, MinusIcon } from "lucide-react"
+
+function Checkbox({ className, children, ...props }: CheckboxProps) {
   return (
-    <CheckboxPrimitive.Root
+    <CheckboxPrimitive
       data-slot="checkbox"
-      className={cn(
-        "peer border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+      className={composeRenderProps(className, (className) => cn(
+        "group/checkbox inline-flex items-center gap-3 text-sm leading-none font-medium select-none data-disabled:cursor-not-allowed data-disabled:opacity-50",
         className
-      )}
+      ))}
       {...props}
     >
-      <CheckboxPrimitive.Indicator
-        data-slot="checkbox-indicator"
-        className="flex items-center justify-center text-current transition-none"
-      >
-        <CheckIcon className="size-3.5" />
-      </CheckboxPrimitive.Indicator>
-    </CheckboxPrimitive.Root>
+      {composeRenderProps(
+        children,
+        (children, { isSelected, isIndeterminate }) => (
+          <>
+            <span
+              data-slot="checkbox-indicator"
+              aria-hidden="true"
+              className="grid size-4 shrink-0 place-content-center rounded-[4px] border border-input shadow-xs transition-shadow group-data-focus-visible/checkbox:border-ring group-data-focus-visible/checkbox:ring-[3px] group-data-focus-visible/checkbox:ring-ring/50 group-data-invalid/checkbox:border-destructive group-data-selected/checkbox:border-primary group-data-selected/checkbox:bg-primary group-data-selected/checkbox:text-primary-foreground group-data-indeterminate/checkbox:border-primary group-data-indeterminate/checkbox:bg-primary group-data-indeterminate/checkbox:text-primary-foreground [&>svg]:size-3.5"
+            >
+              {isIndeterminate ? <MinusIcon /> : isSelected && <CheckIcon />}
+            </span>
+            {children}
+          </>
+        )
+      )}
+    </CheckboxPrimitive>
   )
 }
 

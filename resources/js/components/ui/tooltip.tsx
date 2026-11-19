@@ -1,55 +1,63 @@
-import { Tooltip as TooltipPrimitive } from "radix-ui"
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
+import {
+  OverlayArrow,
+  Tooltip as TooltipPrimitive,
+  TooltipTrigger as TooltipTriggerPrimitive,
+} from "react-aria-components"
 
-function TooltipProvider({
-  delayDuration = 0,
+function TooltipTrigger({
+  delay = 0,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delayDuration={delayDuration}
-      {...props}
-    />
-  )
+}: React.ComponentProps<typeof TooltipTriggerPrimitive>) {
+  return <TooltipTriggerPrimitive delay={delay} {...props} />
 }
 
 function Tooltip({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
-}
-
-function TooltipTrigger({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
-}
-
-function TooltipContent({
   className,
-  sideOffset = 4,
+  placement = "top",
+  offset = 4,
+  crossOffset = 0,
   children,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+}: Omit<
+  React.ComponentProps<typeof TooltipPrimitive>,
+  "children" | "className"
+> & {
+  className?: string
+  children?: React.ReactNode
+}) {
   return (
-    <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Content
-        data-slot="tooltip-content"
-        sideOffset={sideOffset}
-        className={cn(
-          "bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-w-sm rounded-md px-3 py-1.5 text-xs",
-          className
-        )}
-        {...props}
-      >
-        {children}
-        <TooltipPrimitive.Arrow className="bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" />
-      </TooltipPrimitive.Content>
-    </TooltipPrimitive.Portal>
+    <TooltipPrimitive
+      data-slot="tooltip-content"
+      placement={placement}
+      offset={offset}
+      crossOffset={crossOffset}
+      className={cn(
+        "bg-primary text-primary-foreground data-entering:animate-in data-entering:fade-in-0 data-entering:zoom-in-95 data-exiting:animate-out data-exiting:fade-out-0 data-exiting:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2 z-50 max-w-sm origin-(--trigger-anchor-point) rounded-md px-3 py-1.5 text-xs",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <OverlayArrow
+        className="z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-xs bg-primary fill-primary"
+        style={({ placement, defaultStyle }) => ({
+          ...defaultStyle,
+          rotate: "0deg",
+          translate: "0 0",
+          transform:
+            placement === "bottom"
+              ? "translate(-50%, calc(50% + 2px)) rotate(45deg)"
+              : placement === "top"
+                ? "translate(-50%, calc(-50% - 2px)) rotate(45deg)"
+                : placement === "left"
+                  ? "translate(calc(-50% - 2px), -50%) rotate(45deg)"
+                  : "translate(calc(50% + 2px), -50%) rotate(45deg)",
+        })}
+      />
+    </TooltipPrimitive>
   )
 }
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+export { Tooltip, TooltipTrigger }

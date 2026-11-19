@@ -1,4 +1,3 @@
-import { Avatar as AvatarPrimitive } from "radix-ui"
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
@@ -6,9 +5,9 @@ import { cn } from "@/lib/utils"
 function Avatar({
   className,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+}: React.ComponentProps<"span">) {
   return (
-    <AvatarPrimitive.Root
+    <span
       data-slot="avatar"
       className={cn(
         "relative flex size-8 shrink-0 overflow-hidden rounded-full",
@@ -21,13 +20,43 @@ function Avatar({
 
 function AvatarImage({
   className,
+  src,
+  srcSet,
+  alt = "",
+  onLoad,
+  onError,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+}: React.ComponentPropsWithoutRef<"img">) {
+  const [loadedSource, setLoadedSource] = React.useState<string | null>(null)
+  const source = src || srcSet
+  const isLoaded = Boolean(source && loadedSource === source)
+
+  if (!source) {
+    return null
+  }
+
   return (
-    <AvatarPrimitive.Image
+    <img
       data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
+      data-loaded={isLoaded || undefined}
+      className={cn("peer hidden aspect-square size-full data-loaded:block", className)}
+      alt={alt}
+      src={src}
+      srcSet={srcSet}
       {...props}
+      ref={(image) => {
+        if (image?.complete && image.naturalWidth > 0) {
+          setLoadedSource(source)
+        }
+      }}
+      onLoad={(event) => {
+        setLoadedSource(source)
+        onLoad?.(event)
+      }}
+      onError={(event) => {
+        setLoadedSource(null)
+        onError?.(event)
+      }}
     />
   )
 }
@@ -35,12 +64,12 @@ function AvatarImage({
 function AvatarFallback({
   className,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+}: React.ComponentProps<"span">) {
   return (
-    <AvatarPrimitive.Fallback
+    <span
       data-slot="avatar-fallback"
       className={cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
+        "bg-muted flex size-full items-center justify-center rounded-full peer-data-loaded:hidden",
         className
       )}
       {...props}

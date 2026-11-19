@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
-    DialogContent,
     DialogDescription,
     DialogFooter,
     DialogTitle,
@@ -52,33 +51,31 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                 </div>
             </div>
 
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Remove</span>
-                    </Button>
-                </DialogTrigger>
-                <DialogContent>
+            <DialogTrigger>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Remove</span>
+                </Button>
+                <Dialog>
                     <DialogTitle>Remove passkey</DialogTitle>
                     <DialogDescription>
                         Are you sure you want to remove the "{passkey.name}" passkey? You will no longer be able to use
                         it to sign in.
                     </DialogDescription>
                     <DialogFooter className="gap-2">
-                        <DialogClose asChild>
-                            <Button variant="secondary">Cancel</Button>
+                        <DialogClose variant="secondary" autoFocus>
+                            Cancel
                         </DialogClose>
-                        <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                        <Button variant="destructive" onPress={handleDelete} isDisabled={isDeleting}>
                             {isDeleting ? 'Removing...' : 'Remove passkey'}
                         </Button>
                     </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </Dialog>
+            </DialogTrigger>
         </div>
     );
 }
