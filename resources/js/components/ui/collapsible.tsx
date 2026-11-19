@@ -7,11 +7,11 @@ import {
   type DisclosureProps,
 } from "react-aria-components"
 
-function Collapsible({ ...props }: DisclosureProps) {
+function Collapsible({ ...props }: Readonly<DisclosureProps>) {
   return <CollapsiblePrimitive data-slot="collapsible" {...props} />
 }
 
-function CollapsibleTrigger({ ...props }: ButtonProps) {
+function CollapsibleTrigger({ ...props }: Readonly<ButtonProps>) {
   return (
     <CollapsibleTriggerPrimitive
       slot="trigger"
@@ -21,7 +21,7 @@ function CollapsibleTrigger({ ...props }: ButtonProps) {
   )
 }
 
-function CollapsibleContent({ ...props }: DisclosurePanelProps) {
+function CollapsibleContent({ ...props }: Readonly<DisclosurePanelProps>) {
   return (
     <CollapsibleContentPrimitive data-slot="collapsible-content" {...props} />
   )

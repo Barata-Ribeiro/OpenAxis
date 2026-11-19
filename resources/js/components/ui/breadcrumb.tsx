@@ -1,5 +1,7 @@
+
+
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   Breadcrumb as BreadcrumbPrimitive,
   Breadcrumbs as BreadcrumbsPrimitive,
@@ -9,7 +11,6 @@ import {
   type BreadcrumbsProps,
   type LinkProps,
 } from "react-aria-components"
-
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
@@ -26,12 +27,12 @@ function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
 function BreadcrumbList<T extends object>({
   className,
   ...props
-}: BreadcrumbsProps<T>) {
+}: Readonly<BreadcrumbsProps<T>>) {
   return (
     <BreadcrumbsPrimitive
       data-slot="breadcrumb-list"
       className={cn(
-        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word sm:gap-2.5 text-muted-foreground",
+        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground",
         className
       )}
       {...props}
@@ -70,7 +71,7 @@ function BreadcrumbItem({
   )
 }
 
-function BreadcrumbLink({ className, render, ...props }: LinkProps) {
+function BreadcrumbLink({ className, render, ...props }: Readonly<LinkProps>) {
   return (
     <LinkPrimitive
       data-slot="breadcrumb-link"
@@ -109,7 +110,8 @@ function BreadcrumbEllipsis({
       )}
       {...props}
     >
-      <MoreHorizontalIcon />
+      <MoreHorizontalIcon
+      />
       <span className="sr-only">More</span>
     </span>
   )

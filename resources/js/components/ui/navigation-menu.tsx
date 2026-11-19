@@ -187,7 +187,7 @@ export const NavigationMenuViewport = (props: React.ComponentProps<"div">) => {
   return (
     <div
       className={cn(
-        "absolute start-0 top-full isolate z-50 flex justify-center",
+        "absolute inset-s-0 top-full isolate z-50 flex justify-center",
         className
       )}
       data-slot="navigation-menu-viewport"
