@@ -1,4 +1,4 @@
-import AppLogoBig from '@/components/app-logo-big';
+import AppLogoBig from '@/components/application/app-logo-big';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
