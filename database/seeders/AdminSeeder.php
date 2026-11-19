@@ -27,9 +27,7 @@ class AdminSeeder extends Seeder
                     ]
                 );
 
-                // TODO: Assign roles or permissions to the admin user when implemented
-                // Example:
-                // $account->assignRole('super-admin');
+                $account->assignRole('super-admin');
 
                 return $account;
             });
