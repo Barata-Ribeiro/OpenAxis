@@ -63,7 +63,7 @@ export default function PasskeyRegistration({ onSuccess }: Readonly<Props>) {
 
     if (!showForm) {
         return (
-            <Button variant="outline" onPress={() => setShowForm(true)}>
+            <Button variant="outline" onPress={() => setShowForm(true)} isDisabled>
                 Add passkey
             </Button>
         );
