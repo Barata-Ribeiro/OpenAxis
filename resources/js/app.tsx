@@ -9,6 +9,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 const appName = import.meta.env['VITE_APP_NAME'] || 'Laravel';
 
 void createInertiaApp({
+    strictMode: true,
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
@@ -22,17 +23,20 @@ void createInertiaApp({
                 return AppLayout;
         }
     },
-    strictMode: true,
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>
                 {app}
-                <Toaster />
+                <Toaster position="top-right"  closeButton />
             </TooltipProvider>
         );
     },
-    progress: {
-        color: '#4B5563',
+     progress: { color: '#4B5563' },
+    defaults: {
+        prefetch: {
+            cacheFor: '1m',
+            hoverDelay: 150,
+        },
     },
 });
 
