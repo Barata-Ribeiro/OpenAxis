@@ -4,14 +4,16 @@ export default function AppLogoIcon(props: Readonly<SVGAttributes<SVGElement>>) 
     return (
         <svg
             {...props}
-            width="100%"
-            height="100%"
+            xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 144 144"
-            version="1.1"
-            xmlns="https://www.w3.org/2000/svg"
-            xmlnsXlink="https://www.w3.org/1999/xlink"
-            xmlSpace="preserve"
-            style={{ fillRule: 'evenodd', clipRule: 'evenodd', strokeLinejoin: 'round', strokeMiterlimit: 2 }}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fillRule="evenodd"
+            clipRule="evenodd"
+            className="lucide"
         >
             <path
                 id="Background"
