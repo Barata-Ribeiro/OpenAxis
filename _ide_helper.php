@@ -19407,6 +19407,56 @@ namespace Illuminate\Support\Facades {
             return \Illuminate\Routing\Router::inertia($uri, $component, $props);
         }
 
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $roles
+         * @static
+         */
+        public static function role($roles = [])
+        {
+            return \Illuminate\Routing\Router::role($roles);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function permission($permissions = [])
+        {
+            return \Illuminate\Routing\Router::permission($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $rolesOrPermissions
+         * @static
+         */
+        public static function roleOrPermission($rolesOrPermissions = [])
+        {
+            return \Illuminate\Routing\Router::roleOrPermission($rolesOrPermissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAny($permissions = [])
+        {
+            return \Illuminate\Routing\Router::canAny($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAll($permissions = [])
+        {
+            return \Illuminate\Routing\Router::canAll($permissions);
+        }
+
             }
     /**
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440, bool $releaseOnTerminationSignals = true)
@@ -25108,6 +25158,186 @@ namespace Illuminate\Routing {
         public static function inertia($uri, $component, $props = [])
         {
             return \Illuminate\Routing\Router::inertia($uri, $component, $props);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $roles
+         * @static
+         */
+        public static function role($roles = [])
+        {
+            return \Illuminate\Routing\Router::role($roles);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function permission($permissions = [])
+        {
+            return \Illuminate\Routing\Router::permission($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $rolesOrPermissions
+         * @static
+         */
+        public static function roleOrPermission($rolesOrPermissions = [])
+        {
+            return \Illuminate\Routing\Router::roleOrPermission($rolesOrPermissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAny($permissions = [])
+        {
+            return \Illuminate\Routing\Router::canAny($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAll($permissions = [])
+        {
+            return \Illuminate\Routing\Router::canAll($permissions);
+        }
+
+            }
+    /**
+     * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route get(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route post(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route put(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\Route query(string $uri, \Closure|array|string|null $action = null)
+     * @method \Illuminate\Routing\RouteRegistrar as(string $value)
+     * @method \Illuminate\Routing\RouteRegistrar can(\UnitEnum|string  $ability, array|string $models = [])
+     * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
+     * @method \Illuminate\Routing\RouteRegistrar domain(\BackedEnum|string $value)
+     * @method \Illuminate\Routing\RouteRegistrar metadata(array $metadata)
+     * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
+     * @method \Illuminate\Routing\RouteRegistrar missing(\Closure $missing)
+     * @method \Illuminate\Routing\RouteRegistrar name(\BackedEnum|string $value)
+     * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
+     * @method \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
+     * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
+     * @method \Illuminate\Routing\RouteRegistrar where(array $where)
+     * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
+     * @method \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
+     */
+    class RouteRegistrar {
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $roles
+         * @static
+         */
+        public static function role($roles = [])
+        {
+            return \Illuminate\Routing\RouteRegistrar::role($roles);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function permission($permissions = [])
+        {
+            return \Illuminate\Routing\RouteRegistrar::permission($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $rolesOrPermissions
+         * @static
+         */
+        public static function roleOrPermission($rolesOrPermissions = [])
+        {
+            return \Illuminate\Routing\RouteRegistrar::roleOrPermission($rolesOrPermissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAny($permissions = [])
+        {
+            return \Illuminate\Routing\RouteRegistrar::canAny($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAll($permissions = [])
+        {
+            return \Illuminate\Routing\RouteRegistrar::canAll($permissions);
+        }
+
+            }
+    /**
+     */
+    class Route {
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $roles
+         * @static
+         */
+        public static function role($roles = [])
+        {
+            return \Illuminate\Routing\Route::role($roles);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function permission($permissions = [])
+        {
+            return \Illuminate\Routing\Route::permission($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $rolesOrPermissions
+         * @static
+         */
+        public static function roleOrPermission($rolesOrPermissions = [])
+        {
+            return \Illuminate\Routing\Route::roleOrPermission($rolesOrPermissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAny($permissions = [])
+        {
+            return \Illuminate\Routing\Route::canAny($permissions);
+        }
+
+        /**
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static
+         */
+        public static function canAll($permissions = [])
+        {
+            return \Illuminate\Routing\Route::canAll($permissions);
         }
 
             }
