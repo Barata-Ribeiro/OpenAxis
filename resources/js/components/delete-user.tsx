@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
-    DialogContent,
     DialogDescription,
     DialogFooter,
     DialogTitle,
@@ -32,13 +31,11 @@ export default function DeleteUser() {
                     <p className="text-sm">Please proceed with caution, this cannot be undone.</p>
                 </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive" data-test="delete-user-button">
-                            Delete account
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
+                <DialogTrigger>
+                    <Button variant="destructive" data-test="delete-user-button">
+                        Delete account
+                    </Button>
+                    <Dialog>
                         <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                         <DialogDescription>
                             Once your account is deleted, all of its resources and data will also be permanently
@@ -74,23 +71,28 @@ export default function DeleteUser() {
                                     </div>
 
                                     <DialogFooter className="gap-2">
-                                        <DialogClose asChild>
-                                            <Button variant="secondary" onClick={() => resetAndClearErrors()}>
-                                                Cancel
-                                            </Button>
+                                        <DialogClose
+                                            variant="secondary"
+                                            onPress={() => resetAndClearErrors()}
+                                            autoFocus
+                                        >
+                                            Cancel
                                         </DialogClose>
 
-                                        <Button variant="destructive" disabled={processing} asChild>
-                                            <button type="submit" data-test="confirm-delete-user-button">
-                                                Delete account
-                                            </button>
+                                        <Button
+                                            variant="destructive"
+                                            type="submit"
+                                            isDisabled={processing}
+                                            data-test="confirm-delete-user-button"
+                                        >
+                                            Delete account
                                         </Button>
                                     </DialogFooter>
                                 </>
                             )}
                         </Form>
-                    </DialogContent>
-                </Dialog>
+                    </Dialog>
+                </DialogTrigger>
             </div>
         </div>
     );

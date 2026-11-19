@@ -1,22 +1,25 @@
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { Focusable } from 'react-aria-components';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import {
     NavigationMenu,
     NavigationMenuItem,
+    NavigationMenuLink,
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Tooltip, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
+import { renderInertiaLink } from '@/lib/inertia-link';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
@@ -60,13 +63,16 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
-                        <Sheet>
-                            <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 h-[34px] w-[34px]">
-                                    <Menu className="h-5 w-5" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent
+                        <SheetTrigger>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="mr-2 size-[34px]"
+                                aria-label="Open navigation menu"
+                            >
+                                <Menu />
+                            </Button>
+                            <Sheet
                                 side="left"
                                 className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar"
                             >
@@ -105,8 +111,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         </div>
                                     </div>
                                 </div>
-                            </SheetContent>
-                        </Sheet>
+                            </Sheet>
+                        </SheetTrigger>
                     </div>
 
                     <Link href={dashboard()} prefetch className="flex items-center space-x-2">
@@ -115,24 +121,26 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
                     {/* Desktop Navigation */}
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
-                        <NavigationMenu className="flex h-full items-stretch">
-                            <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
-                                    <NavigationMenuItem key={index} className="relative flex h-full items-center">
-                                        <Link
-                                            href={item.href}
+                        <NavigationMenu className="flex h-full items-stretch" aria-label="Main navigation">
+                            <NavigationMenuList className="flex h-full items-stretch gap-2">
+                                {mainNavItems.map((item) => (
+                                    <NavigationMenuItem
+                                        key={item.title}
+                                        className="relative flex h-full items-center has-aria-[current=page]:after:absolute has-aria-[current=page]:after:inset-x-0 has-aria-[current=page]:after:bottom-0 has-aria-[current=page]:after:h-0.5 has-aria-[current=page]:after:translate-y-px has-aria-[current=page]:after:bg-foreground"
+                                    >
+                                        <NavigationMenuLink
+                                            href={toUrl(item.href)}
+                                            aria-current={isCurrentUrl(item.href) ? 'page' : undefined}
+                                            render={renderInertiaLink(item.href)}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
                                                 whenCurrentUrl(item.href, activeItemStyles),
                                                 'h-9 cursor-pointer px-3',
                                             )}
                                         >
-                                            {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                                            {item.icon && <item.icon />}
                                             {item.title}
-                                        </Link>
-                                        {isCurrentUrl(item.href) && (
-                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
-                                        )}
+                                        </NavigationMenuLink>
                                     </NavigationMenuItem>
                                 ))}
                             </NavigationMenuList>
@@ -146,8 +154,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
-                                    <Tooltip key={item.title}>
-                                        <TooltipTrigger>
+                                    <TooltipTrigger key={item.title}>
+                                        <Focusable>
                                             <a
                                                 href={toUrl(item.href)}
                                                 target="_blank"
@@ -159,29 +167,27 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     <item.icon className="size-5 opacity-80 group-hover:opacity-100" />
                                                 )}
                                             </a>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                        </Focusable>
+                                        <Tooltip>
                                             <p>{item.title}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        </Tooltip>
+                                    </TooltipTrigger>
                                 ))}
                             </div>
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="size-10 rounded-full p-1">
-                                    <Avatar className="size-8 overflow-hidden rounded-full">
-                                        <AvatarImage src={auth.user?.avatar} alt={auth.user?.name} />
-                                        <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                            {getInitials(auth.user?.name ?? '')}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56" align="end">
+                        <DropdownMenuTrigger>
+                            <Button variant="ghost" className="size-10 rounded-full p-1" aria-label="Account menu">
+                                <Avatar className="size-8 overflow-hidden rounded-full">
+                                    <AvatarImage src={auth.user?.avatar} alt={auth.user?.name} />
+                                    <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                        {getInitials(auth.user?.name ?? '')}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </Button>
+                            <DropdownMenu className="w-56" placement="bottom end">
                                 {auth.user && <UserMenuContent user={auth.user} />}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenu>
+                        </DropdownMenuTrigger>
                     </div>
                 </div>
             </div>

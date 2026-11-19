@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig, lazyPlugins } from 'vite-plus';
+import { bunny } from 'laravel-vite-plugin/fonts';
 
 export default defineConfig({
     plugins: lazyPlugins(() => [
@@ -12,6 +13,10 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             detectTls: !process.env.CI,
             refresh: true,
+            fonts: [
+                bunny('Inter', { weights: [100, 200, 300, 400, 500, 600, 700, 800, 900] }),
+                bunny('JetBrains Mono', { weights: [100, 200, 300, 400, 500, 600, 700, 800] }),
+            ],
         }),
         inertia({ ssr: { cluster: true } }),
         react(),

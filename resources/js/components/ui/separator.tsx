@@ -1,21 +1,19 @@
-import * as SeparatorPrimitive from "@radix-ui/react-separator"
-import * as React from "react"
 
-import { cn } from "@/lib/utils"
+
+import { cn } from "cn"
+import { Separator as SeparatorPrimitive } from "react-aria-components"
 
 function Separator({
   className,
   orientation = "horizontal",
-  decorative = true,
   ...props
-}: React.ComponentProps<typeof SeparatorPrimitive.Root>) {
+}: React.ComponentProps<typeof SeparatorPrimitive>) {
   return (
-    <SeparatorPrimitive.Root
-      data-slot="separator-root"
-      decorative={decorative}
+    <SeparatorPrimitive
+      data-slot="separator"
       orientation={orientation}
       className={cn(
-        "bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
+        "block shrink-0 border-0 bg-border aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=vertical]:w-px aria-[orientation=vertical]:self-stretch [:is(hr)]:h-px [:is(hr)]:w-full",
         className
       )}
       {...props}

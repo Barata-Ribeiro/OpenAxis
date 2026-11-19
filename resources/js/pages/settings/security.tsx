@@ -102,7 +102,7 @@ export default function Security(props: Props) {
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button disabled={processing} data-test="update-password-button">
+                                <Button type="submit" isDisabled={processing} data-test="update-password-button">
                                     Save
                                 </Button>
                             </div>

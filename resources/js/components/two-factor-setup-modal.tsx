@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/hooks/use-appearance';
@@ -78,7 +78,7 @@ function TwoFactorSetupStep({
                     </div>
 
                     <div className="flex w-full space-x-5">
-                        <Button className="w-full" onClick={onNextStep}>
+                        <Button className="w-full" onPress={onNextStep}>
                             {buttonText}
                         </Button>
                     </div>
@@ -163,15 +163,15 @@ function TwoFactorVerificationStep({ onClose, onBack }: { onClose: () => void; o
                                 type="button"
                                 variant="outline"
                                 className="flex-1"
-                                onClick={onBack}
-                                disabled={processing}
+                                onPress={onBack}
+                                isDisabled={processing}
                             >
                                 Back
                             </Button>
                             <Button
                                 type="submit"
                                 className="flex-1"
-                                disabled={processing || code.length < OTP_MAX_LENGTH}
+                                isDisabled={processing || code.length < OTP_MAX_LENGTH}
                             >
                                 Confirm
                             </Button>
@@ -275,31 +275,26 @@ export default function TwoFactorSetupModal({
     }, [isOpen, qrCodeSvg]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader className="flex items-center justify-center">
-                    <GridScanIcon />
-                    <DialogTitle>{modalConfig.title}</DialogTitle>
-                    <DialogDescription className="text-center">{modalConfig.description}</DialogDescription>
-                </DialogHeader>
+        <Dialog isOpen={isOpen} onOpenChange={(open) => !open && handleClose()} className="sm:max-w-md">
+            <DialogHeader className="flex items-center justify-center">
+                <GridScanIcon />
+                <DialogTitle>{modalConfig.title}</DialogTitle>
+                <DialogDescription className="text-center">{modalConfig.description}</DialogDescription>
+            </DialogHeader>
 
-                <div className="flex flex-col items-center space-y-5">
-                    {showVerificationStep ? (
-                        <TwoFactorVerificationStep
-                            onClose={handleClose}
-                            onBack={() => setShowVerificationStep(false)}
-                        />
-                    ) : (
-                        <TwoFactorSetupStep
-                            qrCodeSvg={qrCodeSvg}
-                            manualSetupKey={manualSetupKey}
-                            buttonText={modalConfig.buttonText}
-                            onNextStep={handleModalNextStep}
-                            errors={errors}
-                        />
-                    )}
-                </div>
-            </DialogContent>
+            <div className="flex flex-col items-center space-y-5">
+                {showVerificationStep ? (
+                    <TwoFactorVerificationStep onClose={handleClose} onBack={() => setShowVerificationStep(false)} />
+                ) : (
+                    <TwoFactorSetupStep
+                        qrCodeSvg={qrCodeSvg}
+                        manualSetupKey={manualSetupKey}
+                        buttonText={modalConfig.buttonText}
+                        onNextStep={handleModalNextStep}
+                        errors={errors}
+                    />
+                )}
+            </div>
         </Dialog>
     );
 }

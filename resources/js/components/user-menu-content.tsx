@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';
 import {
     DropdownMenuGroup,
@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
+import { renderInertiaLink } from '@/lib/inertia-link';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
@@ -17,42 +17,41 @@ type Props = {
 };
 
 export function UserMenuContent({ user }: Props) {
-    const cleanup = useMobileNavigation();
-
-    const handleLogout = () => {
-        cleanup();
+    function handleLogout() {
         router.flushAll();
-    };
+        router.visit(logout());
+    }
 
     return (
         <>
-            <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <UserInfo user={user} showEmail={true} />
-                </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                    <Link className="block w-full cursor-pointer" href={edit()} prefetch onClick={cleanup}>
-                        <Settings className="mr-2" />
-                        Settings
-                    </Link>
+            <DropdownMenuGroup aria-label="Account">
+                <DropdownMenuLabel className="mb-1 border-b border-border p-0 font-normal">
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                        <UserInfo user={user} showEmail={true} />
+                    </div>
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                    className="cursor-pointer"
+                    href={edit.url()}
+                    textValue="Settings"
+                    render={renderInertiaLink(edit(), true)}
+                >
+                    <Settings className="mr-2" />
+                    Settings
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link
-                    className="block w-full cursor-pointer"
-                    href={logout()}
-                    as="button"
-                    onClick={handleLogout}
+            <DropdownMenuGroup aria-label="Session">
+                <DropdownMenuItem
+                    className="cursor-pointer"
+                    textValue="Log out"
+                    onAction={handleLogout}
                     data-test="logout-button"
                 >
                     <LogOut className="mr-2" />
                     Log out
-                </Link>
-            </DropdownMenuItem>
+                </DropdownMenuItem>
+            </DropdownMenuGroup>
         </>
     );
 }
