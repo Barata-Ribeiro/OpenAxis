@@ -103,7 +103,11 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                                 >
                                     {recoveryCodesList.length ? (
                                         recoveryCodesList.map((code, index) => (
-                                            <div key={`recovery-code-${index}-${code}`} role="listitem" className="select-text">
+                                            <div
+                                                key={`recovery-code-${index}-${code}`}
+                                                role="listitem"
+                                                className="select-text"
+                                            >
                                                 {code}
                                             </div>
                                         ))

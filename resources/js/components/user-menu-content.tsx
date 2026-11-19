@@ -17,9 +17,9 @@ type Props = {
 };
 
 function handleLogout() {
-        router.flushAll();
-        router.visit(logout());
-    }
+    router.flushAll();
+    router.visit(logout());
+}
 
 export function UserMenuContent({ user }: Readonly<Props>) {
     return (

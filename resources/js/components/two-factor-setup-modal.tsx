@@ -137,45 +137,45 @@ function TwoFactorVerificationStep({ onClose, onBack }: Readonly<{ onClose: () =
                 processing: boolean;
                 errors?: { confirmTwoFactorAuthentication?: { code?: string } };
             }) => (
-                    <div ref={pinInputContainerRef} className="relative w-full space-y-3">
-                        <div className="flex w-full flex-col items-center space-y-3 py-2">
-                            <InputOTP
-                                id="otp"
-                                name="code"
-                                maxLength={OTP_MAX_LENGTH}
-                                onChange={setCode}
-                                disabled={processing}
-                                pattern={REGEXP_ONLY_DIGITS}
-                                autoFocus
-                            >
-                                <InputOTPGroup>
-                                    {Array.from({ length: OTP_MAX_LENGTH }, (_, index) => (
-                                        <InputOTPSlot key={index} index={index} />
-                                    ))}
-                                </InputOTPGroup>
-                            </InputOTP>
-                            <InputError message={errors?.confirmTwoFactorAuthentication?.code} />
-                        </div>
-
-                        <div className="flex w-full space-x-5">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                className="flex-1"
-                                onPress={onBack}
-                                isDisabled={processing}
-                            >
-                                Back
-                            </Button>
-                            <Button
-                                type="submit"
-                                className="flex-1"
-                                isDisabled={processing || code.length < OTP_MAX_LENGTH}
-                            >
-                                Confirm
-                            </Button>
-                        </div>
+                <div ref={pinInputContainerRef} className="relative w-full space-y-3">
+                    <div className="flex w-full flex-col items-center space-y-3 py-2">
+                        <InputOTP
+                            id="otp"
+                            name="code"
+                            maxLength={OTP_MAX_LENGTH}
+                            onChange={setCode}
+                            disabled={processing}
+                            pattern={REGEXP_ONLY_DIGITS}
+                            autoFocus
+                        >
+                            <InputOTPGroup>
+                                {Array.from({ length: OTP_MAX_LENGTH }, (_, index) => (
+                                    <InputOTPSlot key={index} index={index} />
+                                ))}
+                            </InputOTPGroup>
+                        </InputOTP>
+                        <InputError message={errors?.confirmTwoFactorAuthentication?.code} />
                     </div>
+
+                    <div className="flex w-full space-x-5">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            onPress={onBack}
+                            isDisabled={processing}
+                        >
+                            Back
+                        </Button>
+                        <Button
+                            type="submit"
+                            className="flex-1"
+                            isDisabled={processing || code.length < OTP_MAX_LENGTH}
+                        >
+                            Confirm
+                        </Button>
+                    </div>
+                </div>
             )}
         </Form>
     );
