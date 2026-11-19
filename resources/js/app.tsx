@@ -36,7 +36,7 @@ void createInertiaApp({
             cacheFor: '1m',
             hoverDelay: 150,
         },
-        visitOptions: (href, options) => {
+        visitOptions: (_href, _options) => {
             return { viewTransition: true };
         },
     },
