@@ -16,7 +16,8 @@
         "laravel/framework": "^13.43",
         "laravel/tinker": "^3.2",
         "laravel/wayfinder": "^0.1",
-        "owen-it/laravel-auditing": "^14.0"
+        "owen-it/laravel-auditing": "^14.0",
+        "spatie/laravel-permission": "^8.5"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.8",
