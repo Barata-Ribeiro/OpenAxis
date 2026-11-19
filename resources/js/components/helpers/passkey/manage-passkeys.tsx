@@ -1,10 +1,10 @@
+import { destroy } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyRegistrationController';
+import Heading from '@/components/common/heading';
+import PasskeyItem from '@/components/helpers/passkey/passkey-item';
+import PasskeyRegistration from '@/components/helpers/passkey/passkey-register';
+import type { Passkey } from '@/types/auth';
 import { router } from '@inertiajs/react';
 import { KeyRound } from 'lucide-react';
-import { destroy } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyRegistrationController';
-import Heading from '@/components/heading';
-import PasskeyItem from '@/components/passkey-item';
-import PasskeyRegistration from '@/components/passkey-register';
-import type { Passkey } from '@/types/auth';
 
 export type Props = {
     canManagePasskeys?: boolean;
@@ -23,7 +23,7 @@ const EmptyState = () => {
     );
 };
 
-export default function ManagePasskeys(props: Props) {
+export default function ManagePasskeys(props: Readonly<Props>) {
     const passkeys = props.passkeys ?? [];
 
     const handleDelete = (id: number, onError: () => void) => {

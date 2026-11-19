@@ -1,5 +1,4 @@
-import type { PropsWithChildren } from 'react';
-import Heading from '@/components/heading';
+import Heading from '@/components/common/heading';
 import { LinkButton } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
@@ -9,6 +8,7 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
+import type { PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -28,7 +28,7 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function SettingsLayout({ children }: Readonly<PropsWithChildren>) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (

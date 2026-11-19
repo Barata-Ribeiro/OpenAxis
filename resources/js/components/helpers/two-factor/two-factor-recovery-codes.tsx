@@ -1,10 +1,10 @@
-import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import AlertError from '@/components/alert-error';
+import AlertError from '@/components/common/alert-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
+import { Form } from '@inertiajs/react';
+import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Props = {
     recoveryCodesList: string[];
@@ -12,7 +12,7 @@ type Props = {
     errors: string[];
 };
 
-export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes, errors }: Props) {
+export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes, errors }: Readonly<Props>) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
@@ -103,7 +103,11 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                                 >
                                     {recoveryCodesList.length ? (
                                         recoveryCodesList.map((code, index) => (
-                                            <div key={index} role="listitem" className="select-text">
+                                            <div
+                                                key={`recovery-code-${index}-${code}`}
+                                                role="listitem"
+                                                className="select-text"
+                                            >
                                                 {code}
                                             </div>
                                         ))

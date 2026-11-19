@@ -1,11 +1,11 @@
-import type { UrlMethodPair } from '@inertiajs/core';
-import { router } from '@inertiajs/react';
-import { usePasskeyVerify } from '@laravel/passkeys/react';
-import { KeyRound } from 'lucide-react';
-import InputError from '@/components/input-error';
+import InputError from '@/components/common/input-error';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import type { UrlMethodPair } from '@inertiajs/core';
+import { router } from '@inertiajs/react';
+import { usePasskeyVerify } from '@laravel/passkeys/react';
+import { KeyRoundIcon } from 'lucide-react';
 
 type Props = {
     routes?: {
@@ -37,8 +37,8 @@ export default function PasskeyVerify({ routes, label, loadingLabel, separator }
     return (
         <>
             <div className="grid gap-2">
-                <Button type="button" variant="outline" className="w-full" onPress={verify} isDisabled={isLoading}>
-                    {isLoading ? <Spinner /> : <KeyRound className="h-4 w-4" />}
+                <Button type="button" variant="outline" className="w-full" onPress={verify} isDisabled>
+                    {isLoading ? <Spinner /> : <KeyRoundIcon aria-hidden data-icon="inline-start" className="size-4" />}
                     {isLoading ? (loadingLabel ?? 'Authenticating...') : (label ?? 'Sign in with a passkey')}
                 </Button>
                 {error && <InputError message={error} className="text-center" />}

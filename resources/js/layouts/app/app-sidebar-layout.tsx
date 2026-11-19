@@ -1,10 +1,10 @@
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
-import { AppSidebar } from '@/components/app-sidebar';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { AppContent } from '@/components/application/app-content';
+import { AppShell } from '@/components/application/app-shell';
+import { AppSidebar } from '@/components/application/app-sidebar';
+import { AppSidebarHeader } from '@/components/application/app-sidebar-header';
 import type { AppLayoutProps } from '@/types';
 
-export default function AppSidebarLayout({ children, breadcrumbs = [] }: AppLayoutProps) {
+export default function AppSidebarLayout({ children, breadcrumbs = [] }: Readonly<AppLayoutProps>) {
     return (
         <AppShell variant="sidebar">
             <AppSidebar />

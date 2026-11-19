@@ -1,9 +1,9 @@
-import { AppContent } from '@/components/app-content';
-import { AppHeader } from '@/components/app-header';
-import { AppShell } from '@/components/app-shell';
+import { AppContent } from '@/components/application/app-content';
+import { AppHeader } from '@/components/application/app-header';
+import { AppShell } from '@/components/application/app-shell';
 import type { AppLayoutProps } from '@/types';
 
-export default function AppHeaderLayout({ children, breadcrumbs }: AppLayoutProps) {
+export default function AppHeaderLayout({ children, breadcrumbs }: Readonly<AppLayoutProps>) {
     return (
         <AppShell variant="header">
             <AppHeader breadcrumbs={breadcrumbs} />

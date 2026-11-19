@@ -1,15 +1,16 @@
-import { usePasskeyRegister } from '@laravel/passkeys/react';
-import { useState } from 'react';
-import InputError from '@/components/input-error';
+import InputError from '@/components/common/input-error';
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { usePasskeyRegister } from '@laravel/passkeys/react';
+import { useState } from 'react';
 
 type Props = {
     onSuccess: () => void;
 };
 
-export default function PasskeyRegistration({ onSuccess }: Props) {
+export default function PasskeyRegistration({ onSuccess }: Readonly<Props>) {
     const [name, setName] = useState(() => {
         const ua = navigator.userAgent;
 
@@ -70,7 +71,7 @@ export default function PasskeyRegistration({ onSuccess }: Props) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-border bg-muted/50 p-4">
-            <div className="grid gap-2">
+            <Field data-invalid={!!error}>
                 <Label htmlFor="passkey-name">Passkey name</Label>
                 <Input
                     id="passkey-name"
@@ -82,9 +83,8 @@ export default function PasskeyRegistration({ onSuccess }: Props) {
                     autoFocus
                 />
                 <p className="text-xs text-muted-foreground">A name helps you identify this passkey later.</p>
-            </div>
-
-            {error && <InputError message={error} />}
+                {error && <InputError message={error} />}
+            </Field>
 
             <div className="flex gap-2">
                 <Button type="submit" isDisabled={isLoading || !name.trim()}>

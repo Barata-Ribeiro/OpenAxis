@@ -1,12 +1,12 @@
-import { Form, Head, setLayoutProps } from '@inertiajs/react';
-import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { useMemo, useState } from 'react';
-import InputError from '@/components/input-error';
+import InputError from '@/components/common/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { store } from '@/routes/two-factor/login';
+import { Form, Head, setLayoutProps } from '@inertiajs/react';
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { useMemo, useState } from 'react';
 
 export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
@@ -48,7 +48,13 @@ export default function TwoFactorChallenge() {
             <Head title="Two-factor authentication" />
 
             <div className="space-y-6">
-                <Form {...store.form()} className="space-y-4" resetOnError resetOnSuccess={!showRecoveryInput}>
+                <Form
+                    {...store.form()}
+                    resetOnError
+                    resetOnSuccess={!showRecoveryInput}
+                    disableWhileProcessing
+                    className="space-y-4 inert:pointer-events-none inert:grayscale-100"
+                >
                     {({ errors, processing, clearErrors }) => (
                         <>
                             {showRecoveryInput ? (
@@ -58,6 +64,7 @@ export default function TwoFactorChallenge() {
                                         type="text"
                                         placeholder="Enter recovery code"
                                         autoFocus={showRecoveryInput}
+                                        aria-invalid={!!errors['recovery_code']}
                                         required
                                     />
                                     <InputError message={errors['recovery_code']} />
@@ -72,6 +79,7 @@ export default function TwoFactorChallenge() {
                                             onChange={(value) => setCode(value)}
                                             disabled={processing}
                                             pattern={REGEXP_ONLY_DIGITS}
+                                            aria-invalid={!!errors['code']}
                                             autoFocus
                                         >
                                             <InputOTPGroup>

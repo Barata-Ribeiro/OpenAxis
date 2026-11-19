@@ -1,34 +1,41 @@
-import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
+import InputError from '@/components/common/input-error';
+import PasswordInput from '@/components/common/password-input';
+import TextLink from '@/components/common/text-link';
+import PasskeyVerify from '@/components/helpers/passkey/passkey-verify';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Field, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/passkey-verify';
+import { Form, Head } from '@inertiajs/react';
+import { Activity } from 'react';
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
 };
 
-export default function Login({ status, canResetPassword }: Props) {
+export default function Login({ status, canResetPassword }: Readonly<Props>) {
     return (
         <>
             <Head title="Log in" />
 
             <PasskeyVerify />
 
-            <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
+            <Form
+                {...store.form()}
+                resetOnSuccess={['password']}
+                disableWhileProcessing
+                className="flex flex-col gap-6 inert:pointer-events-none inert:grayscale-100"
+            >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
+                        <FieldGroup>
+                            <Field data-invalid={errors['email']}>
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
                                     id="email"
@@ -37,12 +44,13 @@ export default function Login({ status, canResetPassword }: Props) {
                                     required
                                     autoFocus
                                     autoComplete="email"
+                                    aria-invalid={!!errors['email']}
                                     placeholder="email@example.com"
                                 />
                                 <InputError message={errors['email']} />
-                            </div>
+                            </Field>
 
-                            <div className="grid gap-2">
+                            <Field data-invalid={errors['password']}>
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Password</Label>
                                     {canResetPassword && (
@@ -57,11 +65,15 @@ export default function Login({ status, canResetPassword }: Props) {
                                     required
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                    aria-invalid={!!errors['password']}
                                 />
                                 <InputError message={errors['password']} />
-                            </div>
+                            </Field>
 
-                            <Checkbox name="remember">Remember me</Checkbox>
+                            <div className="flex items-center space-x-3">
+                                <Checkbox id="remember" name="remember" />
+                                <Label htmlFor="remember">Remember me</Label>
+                            </div>
 
                             <Button
                                 type="submit"
@@ -69,10 +81,12 @@ export default function Login({ status, canResetPassword }: Props) {
                                 isDisabled={processing}
                                 data-test="login-button"
                             >
-                                {processing && <Spinner />}
+                                <Activity mode={processing ? 'visible' : 'hidden'}>
+                                    <Spinner />
+                                </Activity>
                                 Log in
                             </Button>
-                        </div>
+                        </FieldGroup>
 
                         <div className="text-center text-sm text-muted-foreground">
                             Don't have an account? <TextLink href={register()}>Sign up</TextLink>

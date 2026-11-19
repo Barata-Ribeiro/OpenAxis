@@ -166,17 +166,6 @@
     --shadow-2xl: 0px 4px 8px 0px hsl(0 0% 0% / 1.25);
 }
 
-@layer base {
-    * {
-        @apply border-border outline-ring/50;
-    }
-
-    body {
-        @apply bg-background text-foreground;
-        letter-spacing: var(--tracking-normal);
-    }
-}
-
 @theme inline {
     --font-sans: Inter, system-ui, sans-serif;
     --font-mono: JetBrains Mono, monospace;
@@ -243,4 +232,40 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    --texttrim-both: trim-both;
+    --texttrim-start: trim-start;
+    --texttrim-end: trim-end;
+
+    --textedge-start-text: text;
+    --textedge-start-cap: cap;
+    --textedge-start-ex: ex;
+    --textedge-end-alphabetic: alphabetic;
+    --textedge-end-text: text;
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        letter-spacing: var(--tracking-normal);
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+@utility text-trim-* {
+    text-box: trim-both --value(--textedge-start-*) --modifier(--textedge-end-*, --default(alphabetic));
+    text-box: trim-both --value([*]);
+    text-box-trim: --value(--texttrim-*, 'none');
+}
+
+@utility bg-image-overlay {
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
 }

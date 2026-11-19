@@ -1,5 +1,3 @@
-import { KeyRound, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -10,13 +8,15 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import type { Passkey } from '@/types/auth';
+import { KeyRoundIcon, Trash2Icon } from 'lucide-react';
+import { useState } from 'react';
 
 type Props = {
     passkey: Passkey;
     onDelete: (id: number, onError: () => void) => void;
 };
 
-export default function PasskeyItem({ passkey, onDelete }: Props) {
+export default function PasskeyItem({ passkey, onDelete }: Readonly<Props>) {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = () => {
@@ -27,8 +27,8 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
     return (
         <div className="flex items-center justify-between border-b p-4 last:border-b-0">
             <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-                    <KeyRound className="h-5 w-5 text-muted-foreground" />
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
+                    <KeyRoundIcon aria-hidden className="size-5 text-muted-foreground" />
                 </div>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2.5">
@@ -57,7 +57,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                     size="sm"
                     className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2Icon aria-hidden data-icon="inline-start" className="size-4" />
                     <span className="sr-only">Remove</span>
                 </Button>
                 <Dialog>
