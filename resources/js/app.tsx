@@ -1,9 +1,9 @@
-import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { createInertiaApp } from '@inertiajs/react';
 
 const appName = import.meta.env['VITE_APP_NAME'] || 'Laravel';
 
@@ -35,6 +35,9 @@ void createInertiaApp({
         prefetch: {
             cacheFor: '1m',
             hoverDelay: 150,
+        },
+        visitOptions: (href, options) => {
+            return { viewTransition: true };
         },
     },
 });
