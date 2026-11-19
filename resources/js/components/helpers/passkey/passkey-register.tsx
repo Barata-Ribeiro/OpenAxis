@@ -1,5 +1,6 @@
 import InputError from '@/components/common/input-error';
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePasskeyRegister } from '@laravel/passkeys/react';
@@ -70,7 +71,7 @@ export default function PasskeyRegistration({ onSuccess }: Readonly<Props>) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-border bg-muted/50 p-4">
-            <div className="grid gap-2">
+            <Field data-invalid={!!error}>
                 <Label htmlFor="passkey-name">Passkey name</Label>
                 <Input
                     id="passkey-name"
@@ -82,9 +83,8 @@ export default function PasskeyRegistration({ onSuccess }: Readonly<Props>) {
                     autoFocus
                 />
                 <p className="text-xs text-muted-foreground">A name helps you identify this passkey later.</p>
-            </div>
-
-            {error && <InputError message={error} />}
+                {error && <InputError message={error} />}
+            </Field>
 
             <div className="flex gap-2">
                 <Button type="submit" isDisabled={isLoading || !name.trim()}>
