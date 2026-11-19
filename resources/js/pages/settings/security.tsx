@@ -43,11 +43,11 @@ export default function Security(props: Props) {
                     resetOnError={['password', 'password_confirmation', 'current_password']}
                     resetOnSuccess
                     onError={(errors) => {
-                        if (errors.password) {
+                        if (errors['password']) {
                             passwordInput.current?.focus();
                         }
 
-                        if (errors.current_password) {
+                        if (errors['current_password']) {
                             currentPasswordInput.current?.focus();
                         }
                     }}
@@ -67,7 +67,7 @@ export default function Security(props: Props) {
                                     placeholder="Current password"
                                 />
 
-                                <InputError message={errors.current_password} />
+                                <InputError message={errors['current_password']} />
                             </div>
 
                             <div className="grid gap-2">
@@ -83,7 +83,7 @@ export default function Security(props: Props) {
                                     passwordrules={props.passwordRules}
                                 />
 
-                                <InputError message={errors.password} />
+                                <InputError message={errors['password']} />
                             </div>
 
                             <div className="grid gap-2">
@@ -98,7 +98,7 @@ export default function Security(props: Props) {
                                     passwordrules={props.passwordRules}
                                 />
 
-                                <InputError message={errors.password_confirmation} />
+                                <InputError message={errors['password_confirmation']} />
                             </div>
 
                             <div className="flex items-center gap-4">
