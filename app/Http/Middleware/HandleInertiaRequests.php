@@ -35,11 +35,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $now = now();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()?->load('roles:id,name'),
+                'permissions' => fn () => $request->user()?->getAllPermissions()->pluck('name'),
+                'locale' => app()->currentLocale(),
+            ],
+            'date' => [
+                'now' => $now->toISOString(),
+                'displayDate' => $now->translatedFormat('F j, Y'),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
