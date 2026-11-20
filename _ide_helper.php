@@ -25053,6 +25053,32 @@ namespace Laravel\Mcp\Facades {
             }
     }
 
+namespace Spatie\Sluggable\Facades {
+    /**
+     * @see SelfHealingManager
+     */
+    class SelfHealing {
+        /**
+         * @static
+         */
+        public static function onStaleSelfHealingUrl($handler)
+        {
+            /** @var \Spatie\Sluggable\SelfHealingManager $instance */
+            return $instance->onStaleSelfHealingUrl($handler);
+        }
+
+        /**
+         * @static
+         */
+        public static function handleStaleUrl($model, $staleRouteKey, $request)
+        {
+            /** @var \Spatie\Sluggable\SelfHealingManager $instance */
+            return $instance->handleStaleUrl($model, $staleRouteKey, $request);
+        }
+
+            }
+    }
+
 namespace Illuminate\Http {
     /**
      */
@@ -30486,6 +30512,7 @@ namespace  {
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
     class Mcp extends \Laravel\Mcp\Facades\Mcp {}
+    class SelfHealing extends \Spatie\Sluggable\Facades\SelfHealing {}
 }
 
 
