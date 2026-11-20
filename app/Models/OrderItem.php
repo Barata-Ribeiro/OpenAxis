@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperOrderItem
+ */
 #[Fillable(['order_id', 'product_id', 'quantity_milliunits', 'unit_price_cents'])]
 class OrderItem extends Model implements Auditable
 {

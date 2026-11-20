@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperStorageLocation
+ */
 #[Fillable(['code', 'name', 'is_active'])]
 class StorageLocation extends Model implements Auditable
 {

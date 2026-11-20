@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperProductBatch
+ */
 #[Fillable(['product_id', 'supplier_lot_code', 'expires_on'])]
 class ProductBatch extends Model implements Auditable
 {

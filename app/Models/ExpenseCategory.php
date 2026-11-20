@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperExpenseCategory
+ */
 #[Fillable(['name'])]
 class ExpenseCategory extends Model implements Auditable
 {

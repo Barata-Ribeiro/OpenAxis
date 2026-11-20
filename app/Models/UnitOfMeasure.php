@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperUnitOfMeasure
+ */
 #[Fillable(['code', 'name', 'quantity_decimals'])]
 class UnitOfMeasure extends Model implements Auditable
 {

@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperImage
+ */
 #[Fillable(['disk', 'path', 'sort_order'])]
 class Image extends Model implements Auditable
 {

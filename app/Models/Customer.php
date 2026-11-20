@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperCustomer
+ */
 #[Fillable(['name', 'phone', 'email'])]
 class Customer extends Model implements Auditable
 {

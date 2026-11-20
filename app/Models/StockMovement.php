@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperStockMovement
+ */
 #[Fillable(['product_batch_id', 'storage_location_id', 'order_item_id', 'return_of_id', 'created_by_id', 'type', 'quantity_milliunits', 'cost_cents', 'occurred_at', 'notes'])]
 class StockMovement extends Model implements Auditable
 {

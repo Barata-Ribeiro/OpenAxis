@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperCashEntry
+ */
 #[Fillable(['type', 'financial_account_id', 'expense_category_id', 'payment_method_id', 'created_by_id', 'description', 'amount_cents', 'occurred_at', 'notes'])]
 class CashEntry extends Model implements Auditable
 {

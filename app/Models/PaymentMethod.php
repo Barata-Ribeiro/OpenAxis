@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperPaymentMethod
+ */
 #[Fillable(['name', 'fee_type', 'fee_rate', 'is_active'])]
 class PaymentMethod extends Model implements Auditable
 {

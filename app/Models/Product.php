@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Sluggable\Attributes\Sluggable;
 
+/**
+ * @mixin IdeHelperProduct
+ */
 #[Sluggable(from: 'name', maxLength: 180, preventOverwrite: true)]
 #[Fillable(['unit_of_measure_id', 'storage_location_id', 'sku', 'name', 'description', 'cost_price_cents', 'sale_price_cents', 'minimum_stock_milliunits', 'is_active'])]
 class Product extends Model implements Auditable

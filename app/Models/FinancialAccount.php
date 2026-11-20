@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @mixin IdeHelperFinancialAccount
+ */
 #[Fillable(['type', 'order_id', 'expense_category_id', 'created_by_id', 'description', 'contact_name', 'contact_phone', 'amount_cents', 'due_on', 'cancelled_at', 'notes'])]
 class FinancialAccount extends Model implements Auditable
 {
