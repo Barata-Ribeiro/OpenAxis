@@ -29,6 +29,7 @@ class PermissionSeeder extends Seeder
         ];
 
         $resourceModules = [
+            ['name' => 'dashboard', 'label' => ['singular' => 'dashboard', 'plural' => 'dashboards'], 'actions' => ['show']],
             ['name' => 'user', 'label' => ['singular' => 'user', 'plural' => 'users'], 'actions' => ['all']],
             ['name' => 'role', 'label' => ['singular' => 'role', 'plural' => 'roles'], 'actions' => ['all']],
             ['name' => 'permission', 'label' => ['singular' => 'permission', 'plural' => 'permissions'], 'actions' => ['all']],
