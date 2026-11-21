@@ -2,18 +2,23 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        $this->call([PermissionSeeder::class, RoleSeeder::class, AdminSeeder::class]);
+        Model::withoutEvents(fn () => $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            AdminSeeder::class,
+        ]));
+
+        $this->call(ErpReferenceSeeder::class);
+
+        if (app()->environment('local', 'testing')) {
+            $this->call(ErpDemoSeeder::class);
+        }
     }
 }
