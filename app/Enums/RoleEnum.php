@@ -4,25 +4,26 @@ namespace App\Enums;
 
 enum RoleEnum: string
 {
-    // case NAMEINAPP = 'name-in-database';
+    case SuperAdmin = 'super-admin';
+    case User = 'user';
+    case Sales = 'sales';
+    case Purchasing = 'purchasing';
+    case Inventory = 'inventory';
+    case CatalogManager = 'catalog-manager';
+    case Finance = 'finance';
+    case Auditor = 'auditor';
 
-    case SUPER_ADMIN = 'super-admin';
-    case USER = 'user';
-
-    /**
-     * Get a human-readable label for this enum case.
-     *
-     * Provides a display-friendly string intended for UI, logs, or selection
-     * lists. Implementations may return a static value, a translated string,
-     * or a computed label based on the enum case.
-     *
-     * @return string Human-readable label for the enum case.
-     */
     public function label(): string
     {
         return match ($this) {
-            self::SUPER_ADMIN => 'Super Admins',
-            self::USER => 'Users',
+            self::SuperAdmin => 'Super Admins',
+            self::User => 'Users',
+            self::Sales => 'Sales',
+            self::Purchasing => 'Purchasing',
+            self::Inventory => 'Inventory',
+            self::CatalogManager => 'Catalog Managers',
+            self::Finance => 'Finance',
+            self::Auditor => 'Auditors',
         };
     }
 }
