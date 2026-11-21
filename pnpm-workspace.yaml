@@ -30,4 +30,3 @@ minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
     - '@rollup/rollup-linux-x64-gnu@4.68.7'
     - '@rollup/rollup-win32-x64-msvc@4.68.7'
-    - lucide-react@1.75.0

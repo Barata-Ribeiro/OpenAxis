@@ -46,7 +46,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
         <Card>
             <CardHeader>
                 <CardTitle className="flex gap-3">
-                    <LockKeyhole className="size-4" aria-hidden="true" />
+                    <LockKeyhole className="size-4" aria-hidden />
                     2FA recovery codes
                 </CardTitle>
                 <CardDescription>
@@ -62,7 +62,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                         aria-expanded={codesAreVisible}
                         aria-controls="recovery-codes-section"
                     >
-                        <RecoveryCodeIconComponent className="size-4" aria-hidden="true" />
+                        <RecoveryCodeIconComponent className="size-4" aria-hidden />
                         {codesAreVisible ? 'Hide' : 'View'} recovery codes
                     </Button>
 
