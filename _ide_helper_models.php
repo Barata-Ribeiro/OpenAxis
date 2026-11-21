@@ -13,20 +13,20 @@
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $type
- * @property int|null $financial_account_id
- * @property int|null $expense_category_id
- * @property int $payment_method_id
- * @property int|null $created_by_id
- * @property string $description
- * @property int $amount_cents
- * @property string $fee_type
- * @property int $fee_rate
- * @property int $fee_cents
- * @property \Carbon\CarbonImmutable $occurred_at
- * @property string|null $notes
- * @property \Carbon\CarbonImmutable|null $created_at
+ * @property int $id Internal primary key.
+ * @property string $type Direction of the cash flow.
+ * @property int|null $financial_account_id Account settled by this entry, if any.
+ * @property int|null $expense_category_id Classification for a manual expense.
+ * @property int $payment_method_id Method actually used for the payment or receipt.
+ * @property int|null $created_by_id User who recorded the cash entry.
+ * @property string $description Description of the actual receipt or expense.
+ * @property int $amount_cents Gross amount paid or received, in cents, before processing fees.
+ * @property string $fee_type Processing fee type captured at posting time.
+ * @property int $fee_rate Processing fee rate captured in cents or basis points at posting time.
+ * @property int $fee_cents Processing fee charged on the entry, in cents.
+ * @property \Carbon\CarbonImmutable $occurred_at Effective date and time of the cash movement.
+ * @property string|null $notes Optional cash movement notes.
+ * @property \Carbon\CarbonImmutable|null $created_at When the cash entry was recorded.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\User|null $createdBy
@@ -59,12 +59,12 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $name
- * @property int|null $parent_id
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $name Display name of the category.
+ * @property int|null $parent_id Parent category. Null identifies a root category.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $children
@@ -93,13 +93,13 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $name
- * @property string|null $phone
- * @property string|null $email
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $name Display or legal name.
+ * @property string|null $phone Contact phone number.
+ * @property string|null $email Contact email address.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
@@ -126,12 +126,12 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $name
- * @property bool $is_system
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $name Expense category name, such as Rent or Taxes.
+ * @property bool $is_system Whether the category was supplied by the system reference seeder.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CashEntry> $cashEntries
@@ -159,20 +159,20 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $type
- * @property int|null $order_id
- * @property int|null $expense_category_id
- * @property int|null $created_by_id
- * @property string $description
- * @property string|null $contact_name
- * @property string|null $contact_phone
- * @property int $amount_cents
- * @property \Carbon\CarbonImmutable $due_on
- * @property \Carbon\CarbonImmutable|null $cancelled_at
- * @property string|null $notes
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int $id Internal primary key.
+ * @property string $type Whether the amount is owed or expected to be received.
+ * @property int|null $order_id Purchase or sale that originated this obligation, when applicable.
+ * @property int|null $expense_category_id Required classification for accounts payable.
+ * @property int|null $created_by_id User who recorded the obligation.
+ * @property string $description Description of the amount payable or receivable.
+ * @property string|null $contact_name Historical contact name, required for a receivable linked to a sale.
+ * @property string|null $contact_phone Historical contact phone, required for a receivable linked to a sale.
+ * @property int $amount_cents Original amount due, in cents.
+ * @property \Carbon\CarbonImmutable $due_on Date when the amount is due.
+ * @property \Carbon\CarbonImmutable|null $cancelled_at When the unsettled obligation was cancelled.
+ * @property string|null $notes Optional internal notes about the obligation.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CashEntry> $cashEntries
@@ -207,14 +207,14 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $imageable_type
- * @property int $imageable_id
- * @property string $disk
- * @property string $path
- * @property int $sort_order
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int $id Internal primary key.
+ * @property string $imageable_type Polymorphic type of the associated model.
+ * @property int $imageable_id Primary key of the associated model.
+ * @property string $disk Laravel filesystem disk that stores the image.
+ * @property string $path Path to the original image relative to its disk.
+ * @property int $sort_order Display position among images of the same model.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Model $imageable
@@ -238,20 +238,20 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $number
- * @property string $type
- * @property string $status
- * @property int|null $customer_id
- * @property int|null $supplier_id
- * @property int|null $created_by_id
- * @property \Carbon\CarbonImmutable $ordered_at
- * @property string|null $external_reference
- * @property string|null $delivery_fee_type
- * @property int $delivery_fee_rate
- * @property string|null $notes
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int $id Internal primary key.
+ * @property string $number Generated public reference, displayed with a leading number sign.
+ * @property string $type Direction of the trade order.
+ * @property string $status Current operational state of the order.
+ * @property int|null $customer_id Customer associated with a sale, when identified.
+ * @property int|null $supplier_id Supplier associated with a purchase.
+ * @property int|null $created_by_id User who recorded the order.
+ * @property \Carbon\CarbonImmutable $ordered_at Effective date and time of the order.
+ * @property string|null $external_reference Supplier invoice or other external document reference.
+ * @property string|null $delivery_fee_type Delivery fee calculation type, when a fee applies.
+ * @property int $delivery_fee_rate Delivery fee rate in cents when fixed or basis points when percentage.
+ * @property string|null $notes Optional operational notes.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\User|null $createdBy
@@ -287,17 +287,17 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property int $order_id
- * @property int $product_id
- * @property string $product_sku
- * @property string $product_name
- * @property string $unit_code
- * @property int $quantity_milliunits
- * @property int $unit_price_cents
- * @property int $line_total_cents
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int $id Internal primary key.
+ * @property int $order_id Order containing this item.
+ * @property int $product_id Product purchased or sold.
+ * @property string $product_sku Product SKU at the time this item was recorded.
+ * @property string $product_name Product name at the time this item was recorded.
+ * @property string $unit_code Base unit code at the time this item was recorded.
+ * @property int $quantity_milliunits Ordered quantity in thousandths of a base unit.
+ * @property int $unit_price_cents Charged purchase or sale price per base unit, in cents.
+ * @property int $line_total_cents Extended price rounded to the nearest cent.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\Order $order
@@ -327,14 +327,14 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $name
- * @property string $fee_type
- * @property int $fee_rate
- * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $name Payment method name, such as Cash, Pix, or Debit Card.
+ * @property string $fee_type Whether the processing fee is fixed or percentage-based.
+ * @property int $fee_rate Processing fee in cents when fixed or basis points when percentage.
+ * @property bool $is_active Whether this method can be selected for new cash entries.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CashEntry> $cashEntries
@@ -362,20 +362,20 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property int $unit_of_measure_id
- * @property int|null $storage_location_id
- * @property string $sku
- * @property string $name
- * @property string $slug
- * @property string $description
- * @property int $cost_price_cents
- * @property int $sale_price_cents
- * @property int $minimum_stock_milliunits
- * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property int $unit_of_measure_id Base unit used for purchasing, selling, and inventory.
+ * @property int|null $storage_location_id Preferred location for new stock. Actual locations are recorded on movements.
+ * @property string $sku Stable stock keeping unit used to generate batch codes.
+ * @property string $name Display name of the product.
+ * @property string $slug Unique URL-friendly product identifier.
+ * @property string $description Product description. An empty string represents no description.
+ * @property int $cost_price_cents Current reference purchase cost per base unit, in cents.
+ * @property int $sale_price_cents Current reference selling price per base unit, in cents.
+ * @property int $minimum_stock_milliunits Reorder threshold in thousandths of a base unit.
+ * @property bool $is_active Whether the product is available for new transactions.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductBatch> $batches
@@ -418,14 +418,14 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property int $product_id
- * @property int $sequence
- * @property string $code
- * @property string|null $supplier_lot_code
- * @property \Carbon\CarbonImmutable|null $expires_on
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int $id Internal primary key.
+ * @property int $product_id Product identified by this batch.
+ * @property int $sequence Sequential batch number within the product.
+ * @property string $code Generated internal batch code, such as RI435-001.
+ * @property string|null $supplier_lot_code Lot reference printed or supplied by the vendor.
+ * @property \Carbon\CarbonImmutable|null $expires_on Expiry date of the units in this batch, when applicable.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\Product $product
@@ -451,18 +451,18 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property int $product_batch_id
- * @property int $storage_location_id
- * @property int|null $order_item_id
- * @property int|null $return_of_id
- * @property int|null $created_by_id
- * @property string $type
- * @property int $quantity_milliunits
- * @property int|null $cost_cents
- * @property \Carbon\CarbonImmutable $occurred_at
- * @property string|null $notes
- * @property \Carbon\CarbonImmutable|null $created_at
+ * @property int $id Internal primary key.
+ * @property int $product_batch_id Product batch affected by the movement.
+ * @property int $storage_location_id Physical location where the movement occurred.
+ * @property int|null $order_item_id Purchase or sale line that caused the movement, when applicable.
+ * @property int|null $return_of_id Original stock movement reversed by a return.
+ * @property int|null $created_by_id User who recorded the stock movement.
+ * @property string $type Opening balance, incoming receipt, outgoing issue, or linked return.
+ * @property int $quantity_milliunits Signed change in thousandths of a base unit. Positive adds stock.
+ * @property int|null $cost_cents Exact total acquisition cost in cents, required for opening stock.
+ * @property \Carbon\CarbonImmutable $occurred_at Effective date and time of the movement.
+ * @property string|null $notes Reason, external reference, or other stock movement notes.
+ * @property \Carbon\CarbonImmutable|null $created_at When the movement was recorded.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\User|null $createdBy
@@ -496,13 +496,13 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $code
- * @property string $name
- * @property bool $is_active
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $code Stable warehouse, room, or bin code.
+ * @property string $name Display name of the location.
+ * @property bool $is_active Whether the location is available to new inventory operations.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
@@ -531,13 +531,13 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $name
- * @property string|null $phone
- * @property string|null $email
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $name Display or legal name.
+ * @property string|null $phone Contact phone number.
+ * @property string|null $email Contact email address.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
@@ -564,13 +564,13 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property int $id
- * @property string $code
- * @property string $name
- * @property int $quantity_decimals
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property int $id Internal primary key.
+ * @property string $code Stable unit code, such as EA, L, or KG.
+ * @property string $name Display name of the unit.
+ * @property int $quantity_decimals Allowed fractional digits, from zero through three.
+ * @property \Carbon\CarbonImmutable|null $created_at When the record was created.
+ * @property \Carbon\CarbonImmutable|null $updated_at When the record was last updated.
+ * @property \Carbon\CarbonImmutable|null $deleted_at When the record was archived.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @method static \Database\Factories\UnitOfMeasureFactory factory($count = null, $state = [])
