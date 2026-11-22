@@ -265,6 +265,16 @@
     }
 }
 
+@layer components {
+    .app-sidebar-header {
+        @apply transition-[width,height];
+    }
+
+    .passkey-authenticator {
+        font-size: 11px;
+    }
+}
+
 @keyframes fade-in {
     from {
         opacity: 0;
