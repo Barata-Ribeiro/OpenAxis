@@ -189,7 +189,7 @@ importers:
     dependencies:
       '@inertiajs/react':
         specifier: ^3.11.0
-        version: 3.11.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 3.11.0(@laravel/echo-react@2.6.3(pusher-js@8.6.0)(react@19.3.1))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@inertiajs/vite':
         specifier: ^3.11.0
         version: 3.11.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(jiti@2.7.0)(typescript@7.0.2))
@@ -260,6 +260,9 @@ importers:
         specifier: 'catalog:'
         version: '@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(jiti@2.7.0)(typescript@7.0.2)'
     devDependencies:
+      '@laravel/echo-react':
+        specifier: ^2.6.3
+        version: 2.6.3(pusher-js@8.6.0)(react@19.3.1)
       '@laravel/vite-plugin-wayfinder':
         specifier: ^0.1.11
         version: 0.1.11
@@ -281,6 +284,12 @@ importers:
       fontaine:
         specifier: ^1.0.3
         version: 1.0.3(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(jiti@2.7.0)(typescript@7.0.2))(postcss@8.5.33)(rolldown@1.3.3)
+      laravel-echo:
+        specifier: ^2.6.3
+        version: 2.6.3(pusher-js@8.6.0)
+      pusher-js:
+        specifier: ^8.6.0
+        version: 8.6.0
       vite-plus:
         specifier: 'catalog:'
         version: 1.6.0(@types/node@26.6.6)(@vitest/ui@5.1.0)(jiti@2.7.0)(typescript@7.0.2)
@@ -466,6 +475,19 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@laravel/echo-react@2.6.3':
+    resolution: {integrity: sha512-KUqMonhI7zcX3EK5xZckAuC6C1iABXrAWx6ikX9DjdpA69LhU9e/BgQ3e3qFxBG+lEhZYNUm27TbeWY9kiR6Ww==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      pusher-js: '*'
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      socket.io-client: '*'
+    peerDependenciesMeta:
+      pusher-js:
+        optional: true
+      socket.io-client:
+        optional: true
 
   '@laravel/multiplex@0.4.5':
     resolution: {integrity: sha512-NhDhj4b1/+6j1xYnonzx3vZa39CAUUM7iCAN0xZ5jjcYw3GKORtiXXb0XwXW74wyeVJ25vAvXzfIhy4MXmmzCw==}
@@ -1889,6 +1911,18 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  laravel-echo@2.6.3:
+    resolution: {integrity: sha512-I5tIbxIIC0lJMCeAYlo/ywJ2Zacu5uL3iCOOZkbUjT42Tv0LrNXGqMPhENIyJBFJT6C6Xk5jYktSwO6GSINVBQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      pusher-js: '*'
+      socket.io-client: '*'
+    peerDependenciesMeta:
+      pusher-js:
+        optional: true
+      socket.io-client:
+        optional: true
+
   laravel-precognition@2.1.1:
     resolution: {integrity: sha512-Wg05+puJ5qiNsE8rdO5JmSiqQ2xcEf7442AIZiDhZg1JyPOePv5SSCu0fO7z7LqmJcPMxNNuOIcZd6UatEmYug==}
     peerDependencies:
@@ -2096,6 +2130,9 @@ packages:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
 
+  pusher-js@8.6.0:
+    resolution: {integrity: sha512-wShJPfCS/kYkCBVzVW67wa9cnQIgHTszEK2XHNrFkOgGruuGw081aERAxfRjfdFU+WcIt8x6dvbwkTW4iZuQ8Q==}
+
   react-aria-components@1.22.1:
     resolution: {integrity: sha512-UTHaYHOaM71bOCjGPF50DcLywlrwAodE63IP64LB4kO+OizatQEL8TesVEOM8+TkBeSgHoflJ45388IlJfa7aw==}
     peerDependencies:
@@ -2259,6 +2296,9 @@ packages:
 
   tw-animate-css@1.4.0:
     resolution: {integrity: sha512-7bziOlRqH0hJx80h/3mbicLW7o8qLsH5+RaLR2t+OHM3D0JlWGODQKQ4cxbK7WlvmUxpcj6Kgu6EKqjrGFe3QQ==}
+
+  tweetnacl@1.0.3:
+    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
   type-fest@5.10.0:
     resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
@@ -2576,7 +2616,7 @@ snapshots:
       es-toolkit: 1.53.2
       laravel-precognition: 2.1.1
 
-  '@inertiajs/react@3.11.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@inertiajs/react@3.11.0(@laravel/echo-react@2.6.3(pusher-js@8.6.0)(react@19.3.1))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@inertiajs/core': 3.11.0
       es-toolkit: 1.53.2
@@ -2584,6 +2624,7 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     optionalDependencies:
+      '@laravel/echo-react': 2.6.3(pusher-js@8.6.0)(react@19.3.1)
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
     transitivePeerDependencies:
@@ -2634,6 +2675,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.3
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@laravel/echo-react@2.6.3(pusher-js@8.6.0)(react@19.3.1)':
+    dependencies:
+      react: 19.3.1
+    optionalDependencies:
+      pusher-js: 8.6.0
 
   '@laravel/multiplex@0.4.5(@types/react@19.3.0)':
     dependencies:
@@ -3572,6 +3619,10 @@ snapshots:
 
   json5@2.2.3: {}
 
+  laravel-echo@2.6.3(pusher-js@8.6.0):
+    optionalDependencies:
+      pusher-js: 8.6.0
+
   laravel-precognition@2.1.1:
     dependencies:
       es-toolkit: 1.53.2
@@ -3776,6 +3827,10 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 17.0.2
 
+  pusher-js@8.6.0:
+    dependencies:
+      tweetnacl: 1.0.3
+
   react-aria-components@1.22.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       '@internationalized/date': 3.12.4
@@ -3956,6 +4011,8 @@ snapshots:
   tslib@2.9.1: {}
 
   tw-animate-css@1.4.0: {}
+
+  tweetnacl@1.0.3: {}
 
   type-fest@5.10.0:
     dependencies:
