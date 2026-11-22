@@ -2,68 +2,66 @@
 
 namespace Database\Seeders;
 
-use Exception;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Log;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
-
-use function in_array;
-use function sprintf;
 
 class PermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run(PermissionRegistrar $registrar): void
     {
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        $guard = config('auth.defaults.guard', 'web');
 
-        $resourceActions = [
-            ['name' => 'index', 'label' => 'List %s'],
-            ['name' => 'show', 'label' => 'View %s'],
-            ['name' => 'create', 'label' => 'Create %s'],
-            ['name' => 'edit', 'label' => 'Edit %s'],
-            ['name' => 'destroy', 'label' => 'Delete %s'],
+        $registrar->forgetCachedPermissions();
+
+        Permission::query()->upsert(
+            array_map(fn (string $name): array => ['name' => $name, 'guard_name' => $guard], self::names()),
+            ['name', 'guard_name'],
+            ['name'],
+        );
+
+        $registrar->forgetCachedPermissions();
+    }
+
+    /** @return list<string> */
+    public static function names(): array
+    {
+        $read = ['index', 'show'];
+        $maintain = [...$read, 'create', 'edit'];
+        $crud = [...$maintain, 'destroy'];
+        $order = [...$maintain, 'confirm', 'complete', 'cancel'];
+
+        $modules = [
+            'dashboard' => ['show'],
+            'user' => $crud,
+            'role' => $crud,
+            'permission' => $crud,
+            'customer' => $crud,
+            'supplier' => $crud,
+            // Product images and order items follow the permissions of their parent.
+            'product' => $crud,
+            'category' => $crud,
+            'unit-of-measure' => $crud,
+            'storage-location' => $crud,
+            'product-batch' => $maintain,
+            'stock-movement' => [...$read, 'create'],
+            'sale-order' => $order,
+            'purchase-order' => $order,
+            'financial-account' => [...$maintain, 'cancel'],
+            'cash-entry' => [...$read, 'create'],
+            'expense-category' => $crud,
+            'payment-method' => $crud,
+            'audit' => $read,
         ];
 
-        $resourceModules = [
-            ['name' => 'user', 'label' => ['singular' => 'user', 'plural' => 'users'], 'actions' => ['all']],
-            ['name' => 'role', 'label' => ['singular' => 'role', 'plural' => 'roles'], 'actions' => ['all']],
-            ['name' => 'permission', 'label' => ['singular' => 'permission', 'plural' => 'permissions'], 'actions' => ['all']],
-        ];
+        $names = [];
 
-        try {
-            $permissions = [];
-
-            foreach ($resourceModules as $module) {
-                foreach ($resourceActions as $act) {
-                    if (! in_array('all', $module['actions']) && ! in_array($act['name'], $module['actions'])) {
-                        continue;
-                    }
-
-                    $label = sprintf($act['label'], $module['label']['singular']);
-
-                    if ($act['name'] === 'index') {
-                        $label = sprintf($act['label'], $module['label']['plural']);
-                    }
-
-                    $permissions[] = [
-                        'name' => $module['name'].'.'.$act['name'],
-                        'title' => $label,
-                        'guard_name' => config('auth.defaults.guard', 'web'),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
+        foreach ($modules as $module => $actions) {
+            foreach ($actions as $action) {
+                $names[] = "$module.$action";
             }
-
-            DB::table('permissions')->insertOrIgnore($permissions);
-
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
-        } catch (Exception $e) {
-            Log::error('Error seeding permissions!', ['error' => $e->getMessage()]);
         }
+
+        return $names;
     }
 }
