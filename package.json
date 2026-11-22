@@ -48,6 +48,7 @@
         "vite": "catalog:"
     },
     "devDependencies": {
+        "@laravel/echo-react": "^2.6.3",
         "@laravel/vite-plugin-wayfinder": "^0.1.11",
         "@rolldown/plugin-babel": "^0.3.1",
         "@shadcn/lint": "^0.2.5",
@@ -55,6 +56,8 @@
         "@types/node": "^26.6.6",
         "babel-plugin-react-compiler": "^1.0.0",
         "fontaine": "^1.0.3",
+        "laravel-echo": "^2.6.3",
+        "pusher-js": "^8.6.0",
         "vite-plus": "catalog:"
     },
     "optionalDependencies": {
