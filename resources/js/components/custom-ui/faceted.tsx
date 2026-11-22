@@ -203,7 +203,7 @@ function FacetedContent({
             data-slot="faceted-content"
             {...contentProps}
             placement={placement}
-            className={cn('w-[200px] origin-(--trigger-anchor-point) p-0', className)}
+            className={cn('w-50 origin-(--trigger-anchor-point) p-0', className)}
         >
             <Command>{children}</Command>
         </Popover>

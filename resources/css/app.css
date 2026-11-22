@@ -270,8 +270,34 @@
         @apply transition-[width,height];
     }
 
+    .data-table-filter-popover {
+        --data-table-popover-width: calc(100vw - --spacing(12));
+    }
+
+    .data-table-sort-popover {
+        --data-table-popover-width: calc(100vw - --spacing(20));
+    }
+
+    .data-table-filter-row {
+        grid-template-columns: 70px 135px 125px minmax(0, 200px) 32px;
+    }
+
+    .data-table-sort-row {
+        grid-template-columns: 175px 100px 32px 32px;
+    }
+
     .passkey-authenticator {
         font-size: 11px;
+    }
+}
+
+@layer utilities {
+    .data-table-filter-count[data-slot='badge'] {
+        height: 1.14rem;
+        border-radius: 0.2rem;
+        padding-inline: 0.32rem;
+        font-size: 0.65rem;
+        line-height: inherit;
     }
 }
 

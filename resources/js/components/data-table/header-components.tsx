@@ -35,7 +35,7 @@ export function ResizeHandle(): React.ReactNode {
                     onMouseDown={header.getResizeHandler()}
                     onTouchStart={header.getResizeHandler()}
                     className={cn(
-                        'absolute top-1/2 right-[-2px] z-10 h-6 w-[3px] -translate-y-1/2 cursor-e-resize touch-none rounded-md transition-colors select-none before:absolute before:top-0 before:right-[-4px] before:left-[-4px] before:h-full before:content-[""] hover:bg-blue-600',
+                        'absolute top-1/2 -right-0.5 z-10 h-6 w-0.75 -translate-y-1/2 cursor-e-resize touch-none rounded-md transition-colors select-none before:absolute before:-inset-x-1 before:top-0 before:h-full hover:bg-blue-600',
                         header.column.getIsResizing() && 'bg-blue-600',
                     )}
                 />
