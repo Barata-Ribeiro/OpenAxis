@@ -4,8 +4,8 @@ import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
-import { defineConfig, lazyPlugins } from 'vite-plus';
 import { bunny } from 'laravel-vite-plugin/fonts';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 
 export default defineConfig({
     plugins: lazyPlugins(() => [
@@ -56,7 +56,7 @@ export default defineConfig({
         ],
         rules: {
             'vite-plus/prefer-vite-plus-imports': 'error',
-            // "@shadcn/lint/no-arbitrary-values": "error", // TODO: Re-enable this rule once arbitrary values are handled properly. DISABLED FOR NOW
+            '@shadcn/lint/no-arbitrary-values': 'error',
             'typescript/consistent-type-imports': [
                 'error',
                 {
