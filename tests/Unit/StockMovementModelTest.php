@@ -7,10 +7,6 @@ use App\Models\ProductBatch;
 use App\Models\StockMovement;
 use App\Models\StorageLocation;
 use App\Models\UnitOfMeasure;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
 
 test('batches are numbered per SKU and retain their own expiry dates', function () {
     $product = Product::factory()->create(['sku' => 'RI435']);
