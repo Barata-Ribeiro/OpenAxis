@@ -1,7 +1,6 @@
 import type { features } from '@/hooks/data-table/features';
 import type { ExtendedColumnFilter, FilterOperator } from '@/types/data-table';
 import type { Column, RowData } from '@tanstack/react-table';
-import { format } from 'date-fns';
 import { Check, ChevronsUpDown, ListFilter, Trash2 } from 'lucide-react';
 import * as React from 'react';
 
@@ -135,8 +134,11 @@ export function DataTableFilterList(): React.ReactNode {
 
                     if (updates.operator && filter.value) {
                         const column = filterableColumns.find((col) => col.id === filter.id);
-                        if (column && getColumnFilterVariant(column) === 'date') {
+                        if (column && ['date', 'number'].includes(getColumnFilterVariant(column))) {
                             const currentValue = filter.value;
+                            if (updates.operator === 'isRelativeToToday' || filter.operator === 'isRelativeToToday') {
+                                return { ...filter, ...updates, value: '' };
+                            }
                             if (updates.operator === 'inRange' && !Array.isArray(currentValue)) {
                                 return {
                                     ...filter,
@@ -188,8 +190,30 @@ export function DataTableFilterList(): React.ReactNode {
             const currentFilter = columnFilters.find((filter) => filter.filterId === filterId);
             const columnLabel = column.columnDef.meta?.label ?? column.id;
 
+            if (operator === 'isEmpty' || operator === 'isNotEmpty') return null;
+
             switch (filterVariant) {
                 case 'date': {
+                    if (operator === 'isRelativeToToday') {
+                        return (
+                            <Input
+                                id={inputId}
+                                type="number"
+                                min={-36500}
+                                max={36500}
+                                step={1}
+                                aria-label={columnLabel + ' days from today'}
+                                placeholder="Days from today"
+                                value={
+                                    typeof currentFilter?.value === 'string' || typeof currentFilter?.value === 'number'
+                                        ? currentFilter.value
+                                        : ''
+                                }
+                                onChange={(event) => onFilterUpdate(filterId, { value: event.target.value })}
+                            />
+                        );
+                    }
+
                     const values = Array.isArray(currentFilter?.value)
                         ? currentFilter.value
                         : [currentFilter?.value, undefined];
@@ -198,11 +222,9 @@ export function DataTableFilterList(): React.ReactNode {
                             id={index === 0 ? inputId : `${inputId}-end`}
                             type="date"
                             aria-label={`${columnLabel} ${label}`}
-                            value={values[index] ? format(new Date(values[index]), 'yyyy-MM-dd') : ''}
+                            value={values[index] ?? ''}
                             onChange={(event) => {
-                                const value = event.target.value
-                                    ? new Date(`${event.target.value}T00:00:00`).toISOString()
-                                    : undefined;
+                                const value = event.target.value || undefined;
                                 const dateRangeValues = index === 0 ? [value, values[1]] : [values[0], value];
 
                                 onFilterUpdate(filterId, {
@@ -405,20 +427,6 @@ export function DataTableFilterList(): React.ReactNode {
                 }
 
                 default:
-                    if (operator === 'isEmpty' || operator === 'isNotEmpty') {
-                        return (
-                            <div
-                                role="status"
-                                id={inputId}
-                                aria-live="polite"
-                                aria-label={`${columnLabel} filter is ${
-                                    operator === 'isEmpty' ? 'empty' : 'not empty'
-                                }`}
-                                className="h-8 w-full rounded-md border border-dashed"
-                            />
-                        );
-                    }
-
                     return (
                         <Input
                             id={inputId}
@@ -452,18 +460,20 @@ export function DataTableFilterList(): React.ReactNode {
             const filterItemId = `${id}-filter-${filter.filterId}`;
             const triggerId = `${filterItemId}-trigger`;
             const inputId = `${filterItemId}-input`;
+            const group = columnFilters.filter((item) => item.id === filter.id);
+            const groupIndex = group.findIndex((item) => item.filterId === filter.filterId);
+            const join = group[0]?.joinOperator ?? 'and';
 
             const joinOperatorSelect =
-                index === 1 ? (
+                groupIndex === 1 ? (
                     <Select
-                        aria-label="Select join operator"
-                        selectedKey={filter.joinOperator ?? 'and'}
+                        aria-label={'Select join operator for ' + (column.columnDef.meta?.label ?? column.id)}
+                        selectedKey={join}
                         onSelectionChange={(value) => {
                             if (value === 'and' || value === 'or') {
-                                const updatedFilters = columnFilters.map((f): ExtendedColumnFilter => ({
-                                    ...f,
-                                    joinOperator: value,
-                                }));
+                                const updatedFilters = columnFilters.map<ExtendedColumnFilter>((item) =>
+                                    item.id === filter.id ? { ...item, joinOperator: value } : item,
+                                );
                                 setColumnFilters(updatedFilters);
                             }
                         }}
@@ -479,7 +489,7 @@ export function DataTableFilterList(): React.ReactNode {
                         </SelectContent>
                     </Select>
                 ) : (
-                    <span className="text-center text-sm text-muted-foreground">{filter.joinOperator}</span>
+                    <span className="text-center text-sm text-muted-foreground">{groupIndex === 0 ? 'and' : join}</span>
                 );
 
             return (

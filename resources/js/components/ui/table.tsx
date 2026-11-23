@@ -22,6 +22,9 @@ function Table({ className, ...props }: Readonly<TableProps>) {
     <div
       data-slot="table-container"
       className="relative w-full overflow-x-auto"
+      role="region"
+      aria-label={props["aria-label"]}
+      tabIndex={0}
     >
       <TablePrimitive
         data-slot="table"
