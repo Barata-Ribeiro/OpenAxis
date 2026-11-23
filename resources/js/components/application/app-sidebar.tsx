@@ -2,10 +2,28 @@ import { NavFooter } from '@/components/helpers/nav/nav-footer';
 import { NavMain } from '@/components/helpers/nav/nav-main';
 import { NavUser } from '@/components/helpers/nav/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
+import { usePermission } from '@/hooks/use-permission';
+import { sections } from '@/lib/erp-settings';
 import { dashboard } from '@/routes';
+import { index as cashFlow } from '@/routes/erp/cash-flow';
+import { index as inventory } from '@/routes/erp/inventory';
+import movements from '@/routes/erp/inventory/movements';
+import products from '@/routes/erp/inventory/products';
 import type { NavItem } from '@/types';
+import type { Permission } from '@/types/role-permission';
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    ArrowDownToLine,
+    ArrowUpFromLine,
+    BookOpen,
+    CircleDollarSign,
+    FolderGit2,
+    History,
+    LayoutGrid,
+    Package,
+    PackagePlus,
+    Settings2,
+} from 'lucide-react';
 import AppLogoBig from './app-logo-big';
 
 const mainNavItems: NavItem[] = [
@@ -29,7 +47,34 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+const erpItems: (NavItem & { permissions: Permission['name'][] })[] = [
+    { title: 'Inventory', href: inventory(), icon: Package, permissions: ['product.index'] },
+    { title: 'Stock movements', href: movements.index(), icon: History, permissions: ['stock-movement.index'] },
+    {
+        title: 'Cash flow',
+        href: cashFlow(),
+        icon: CircleDollarSign,
+        permissions: ['cash-entry.index', 'financial-account.index'],
+    },
+];
+
+const quickLinks: (NavItem & { permissions: Permission['name'][] })[] = [
+    {
+        title: 'Stock receipt',
+        href: movements.receipt(),
+        icon: ArrowDownToLine,
+        permissions: ['stock-movement.create'],
+    },
+    { title: 'Stock issue', href: movements.issue(), icon: ArrowUpFromLine, permissions: ['stock-movement.create'] },
+    { title: 'New product', href: products.create(), icon: PackagePlus, permissions: ['product.create'] },
+];
+
 export function AppSidebar() {
+    const { can } = usePermission();
+    const settings = Object.values(sections)
+        .filter(({ permission }) => can(`${permission}.index`))
+        .map(({ title, routes }) => ({ title, href: routes.index(), icon: Settings2 }));
+
     return (
         <Sidebar collapsible="offcanvas" variant="floating">
             <SidebarHeader>
@@ -46,6 +91,9 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                <NavMain label="ERP" items={erpItems.filter(({ permissions }) => can(...permissions))} />
+                <NavMain label="Quick actions" items={quickLinks.filter(({ permissions }) => can(...permissions))} />
+                <NavMain label="Settings" items={settings} />
             </SidebarContent>
 
             <SidebarFooter>

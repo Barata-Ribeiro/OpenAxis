@@ -2,11 +2,24 @@
 
 namespace App\Providers;
 
+use App\Events\ErpDataChanged;
+use App\Models\CashEntry;
+use App\Models\Category;
+use App\Models\ExpenseCategory;
+use App\Models\FinancialAccount;
+use App\Models\Image;
+use App\Models\PaymentMethod;
+use App\Models\Product;
+use App\Models\ProductBatch;
+use App\Models\StockMovement;
+use App\Models\StorageLocation;
+use App\Models\UnitOfMeasure;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
@@ -33,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerErpUpdates();
 
         Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
             if (in_array($response->statusCode(), [403, 404, 500, 503])) {
@@ -41,6 +55,23 @@ class AppServiceProvider extends ServiceProvider
                 ])->withSharedData();
             }
         });
+    }
+
+    private function registerErpUpdates(): void
+    {
+        $channels = [
+            'inventory' => [Product::class, ProductBatch::class, StockMovement::class, Image::class, Category::class, UnitOfMeasure::class],
+            'movements' => [Product::class, StockMovement::class, StorageLocation::class],
+            'cash-flow' => [CashEntry::class, FinancialAccount::class, ExpenseCategory::class, PaymentMethod::class],
+        ];
+
+        foreach ($channels as $channel => $models) {
+            foreach ($models as $model) {
+                Event::listen("eloquent.saved: $model", fn () => ErpDataChanged::dispatch($channel));
+                Event::listen("eloquent.deleted: $model", fn () => ErpDataChanged::dispatch($channel));
+                Event::listen("eloquent.restored: $model", fn () => ErpDataChanged::dispatch($channel));
+            }
+        }
     }
 
     /**
