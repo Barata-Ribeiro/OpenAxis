@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 arch('no debug calls')
-    ->expect('app')
-    ->not->toUse(['dd', 'dump', 'ray', 'var_dump', 'die', 'exit', 'print_r', 'printf', 'vprintf', 'trigger_error']);
+    ->expect(value: 'app')
+    ->not->toUse(targets: ['dd', 'ddd', 'dump', 'ray', 'var_dump', 'die', 'exit', 'print_r', 'printf', 'vprintf', 'trigger_error', 'sleep']);
 
 arch('no env outside of config')
-    ->expect('app')
-    ->not->toUse('env');
+    ->expect(value: 'app')
+    ->not->toUse(targets: 'env');
