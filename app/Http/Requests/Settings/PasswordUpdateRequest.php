@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Settings;
 
 use App\Concerns\PasswordValidationRules;
@@ -7,7 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use SanderMuller\FluentValidation\Contracts\FluentRuleContract;
 use SanderMuller\FluentValidation\HasFluentRules;
 
-class PasswordUpdateRequest extends FormRequest
+final class PasswordUpdateRequest extends FormRequest
 {
     use HasFluentRules, PasswordValidationRules;
 
