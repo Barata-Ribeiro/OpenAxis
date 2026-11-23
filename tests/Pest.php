@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Foundation\Testing\WithCachedConfig;
 use Tests\TestCase;
 
 /*
@@ -15,8 +16,13 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->in('Feature');
+    ->use(LazilyRefreshDatabase::class)
+    ->use(WithCachedConfig::class)
+    ->in('Arch', 'Feature', 'Unit');
+
+arch()->preset()->php();
+arch()->preset()->laravel();
+arch()->preset()->security();
 
 /*
 |--------------------------------------------------------------------------
