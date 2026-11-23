@@ -3,10 +3,6 @@
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
 
 test('a product keeps its SKU and slug and reserves the slug after archival', function () {
     $product = Product::factory()->create(['sku' => 'RI435', 'name' => 'Precision Scale']);

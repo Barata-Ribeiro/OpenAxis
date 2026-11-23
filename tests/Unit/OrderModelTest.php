@@ -5,11 +5,7 @@ use App\Models\OrderItem;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\UnitOfMeasure;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
 
 test('purchase and sale share a reference namespace and retain their parties', function () {
     $purchase = Order::factory()->purchase()->create();

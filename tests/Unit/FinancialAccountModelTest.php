@@ -6,10 +6,6 @@ use App\Models\ExpenseCategory;
 use App\Models\FinancialAccount;
 use App\Models\Order;
 use App\Models\PaymentMethod;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
 
 test('a sale on credit retains contact details and is paid using the settlement method', function () {
     $customer = Customer::factory()->create(['name' => 'Buyer', 'phone' => '555-0100']);
