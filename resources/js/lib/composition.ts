@@ -81,4 +81,15 @@ function useComposedRefs<T>(...refs: Array<PossibleRef<T>>): React.RefCallback<T
     return React.useCallback(composeRefs(...refs), refs);
 }
 
+/**
+ * A custom hook that returns a stable callback ref.
+ */
+export function useCallbackRef<T extends (...args: any[]) => any>(callback: T | undefined): T {
+    const callbackRef = React.useRef(callback);
+
+    React.useEffect(() => (callbackRef.current = callback));
+
+    return React.useMemo(() => ((...args) => callbackRef.current?.(...args)) as T, []);
+}
+
 export { composeEventHandlers, composeRefs, useComposedRefs };
