@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Routing\Controller;
 use OwenIt\Auditing\Contracts\Auditable;
+use SanderMuller\FluentValidation\HasFluentRules;
 
 arch()
     ->expect(value: 'App\Console\Commands')
@@ -44,6 +46,15 @@ arch()
     ])
     ->toExtend(class: Controller::class)
     ->toHaveSuffix('Controller');
+
+arch()
+    ->expect(value: 'App\Http\Requests')
+    ->toBeClasses()
+    ->toUseStrictTypes()
+    ->toBeFinal()
+    ->toExtend(class: FormRequest::class)
+    ->toUseTrait(trait: HasFluentRules::class)
+    ->toHaveSuffix(suffix: 'Request');
 
 arch()
     ->expect(value: 'App\Jobs')
