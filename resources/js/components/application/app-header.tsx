@@ -67,7 +67,7 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="mr-2 size-[34px]"
+                                className="mr-2 size-8.5"
                                 aria-label="Open navigation menu"
                             >
                                 <Menu />

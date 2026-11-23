@@ -33,7 +33,7 @@ export function DataTableSortList(): React.ReactNode {
                 containerPadding={16}
                 aria-labelledby={labelId}
                 aria-describedby={descriptionId}
-                className="flex w-[calc(100vw-(--spacing(20)))] max-w-[25rem] min-w-72 flex-col gap-3 p-4 sm:w-[25rem]"
+                className="data-table-sort-popover flex w-(--data-table-popover-width) max-w-100 min-w-72 flex-col gap-3 p-4 sm:w-100"
             >
                 <div className="flex flex-col gap-1">
                     <h4 id={labelId} className="leading-none font-medium">
@@ -53,7 +53,7 @@ export function DataTableSortList(): React.ReactNode {
                         aria-label="Sorting priority"
                         keyboardNavigationBehavior="tab"
                         dragAndDropHooks={dragAndDropHooks}
-                        className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-0.5 [&_.react-aria-DropIndicator[data-drop-target]]:h-1 [&_.react-aria-DropIndicator[data-drop-target]]:bg-primary"
+                        className="flex max-h-75 flex-col gap-2 overflow-y-auto p-0.5 [&_.react-aria-DropIndicator[data-drop-target]]:h-1 [&_.react-aria-DropIndicator[data-drop-target]]:bg-primary"
                     >
                         {sorting.map((sort) => {
                             const title =
@@ -64,7 +64,7 @@ export function DataTableSortList(): React.ReactNode {
                                     key={sort.id}
                                     id={sort.id}
                                     textValue={title}
-                                    className="grid grid-cols-[175px_100px_32px_32px] items-center gap-2"
+                                    className="data-table-sort-row grid items-center gap-2"
                                 >
                                     <PopoverTrigger>
                                         <Button

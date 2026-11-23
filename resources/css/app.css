@@ -7,6 +7,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+    --container-welcome: 335px;
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -262,6 +264,73 @@
     [data-view-transition='app-content'] {
         contain: layout style paint;
         view-transition-name: app-content;
+    }
+}
+
+@layer components {
+    .app-sidebar-header {
+        @apply transition-[width,height];
+    }
+
+    .data-table-filter-popover {
+        --data-table-popover-width: calc(100vw - --spacing(12));
+    }
+
+    .data-table-sort-popover {
+        --data-table-popover-width: calc(100vw - --spacing(20));
+    }
+
+    .data-table-filter-row {
+        grid-template-columns: 70px 135px 125px minmax(0, 200px) 32px;
+    }
+
+    .data-table-sort-row {
+        grid-template-columns: 175px 100px 32px 32px;
+    }
+
+    .passkey-authenticator {
+        font-size: 11px;
+    }
+
+    .welcome-panel,
+    .welcome-image-outline {
+        box-shadow: inset 0 0 0 1px rgba(26, 26, 0, 0.16);
+
+        @variant dark {
+            box-shadow: inset 0 0 0 1px #fffaed2d;
+        }
+    }
+
+    .welcome-panel {
+        @apply bg-white;
+        font-size: 13px;
+
+        @variant dark {
+            background-color: #161615;
+            color: #ededec;
+        }
+    }
+
+    .welcome-description {
+        color: #706f6c;
+
+        @variant dark {
+            color: #a1a09a;
+        }
+    }
+
+    .welcome-image {
+        background-image: url('https://images.unsplash.com/photo-1565530995968-2e619c04a8a1?q=100&w=432&auto=format&fit=crop');
+    }
+}
+
+@layer utilities {
+    .data-table-filter-count[data-slot='badge'] {
+        height: 1.14rem;
+        border-radius: 0.2rem;
+        padding-inline: 0.32rem;
+        font-size: 0.65rem;
+        line-height: inherit;
     }
 }
 

@@ -483,11 +483,7 @@ export function DataTableFilterList(): React.ReactNode {
                 );
 
             return (
-                <div
-                    role="listitem"
-                    id={filterItemId}
-                    className="grid grid-cols-[70px_135px_125px_minmax(0,200px)_32px] items-center gap-2"
-                >
+                <div role="listitem" id={filterItemId} className="data-table-filter-row grid items-center gap-2">
                     {index === 0 ? (
                         <span className="text-center text-sm text-muted-foreground">Where</span>
                     ) : (
@@ -587,10 +583,7 @@ export function DataTableFilterList(): React.ReactNode {
                 <ListFilter />
                 Filter
                 {columnFilters.length > 0 && (
-                    <Badge
-                        variant="secondary"
-                        className="h-[1.14rem] rounded-[0.2rem] px-[0.32rem] font-mono text-[0.65rem] font-normal"
-                    >
+                    <Badge variant="secondary" className="data-table-filter-count font-mono font-normal">
                         {columnFilters.length}
                     </Badge>
                 )}
@@ -600,7 +593,7 @@ export function DataTableFilterList(): React.ReactNode {
                 aria-labelledby={labelId}
                 placement="bottom start"
                 containerPadding={16}
-                className="flex w-[calc(100vw-(--spacing(12)))] min-w-60 flex-col gap-3 p-4 sm:w-fit sm:min-w-80"
+                className="data-table-filter-popover flex w-(--data-table-popover-width) min-w-60 flex-col gap-3 p-4 sm:w-fit sm:min-w-80"
             >
                 <div className="flex flex-col gap-1">
                     <h4 id={labelId} className="leading-none font-medium">
@@ -616,7 +609,7 @@ export function DataTableFilterList(): React.ReactNode {
                     </p>
                 </div>
                 {columnFilters.length > 0 && (
-                    <div role="list" id={listId} className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-0.5">
+                    <div role="list" id={listId} className="flex max-h-75 flex-col gap-2 overflow-y-auto p-0.5">
                         {columnFilters.map((filter, index) => (
                             <React.Fragment key={filter.filterId}>{onFilterRender({ filter, index })}</React.Fragment>
                         ))}
