@@ -5,6 +5,7 @@ import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { createInertiaApp } from '@inertiajs/react';
 import { echo } from '@inertiajs/react/echo';
+import { ModalStackProvider } from '@inertiaui/modal-react';
 import { configureEcho } from '@laravel/echo-react';
 
 configureEcho({ broadcaster: 'reverb' });
@@ -30,10 +31,10 @@ void createInertiaApp({
     },
     withApp(app) {
         return (
-            <>
+            <ModalStackProvider>
                 {app}
                 <Toaster position="top-right" closeButton />
-            </>
+            </ModalStackProvider>
         );
     },
     progress: { color: '#4B5563' },
