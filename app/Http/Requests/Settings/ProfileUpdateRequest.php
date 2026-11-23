@@ -3,13 +3,14 @@
 namespace App\Http\Requests\Settings;
 
 use App\Concerns\ProfileValidationRules;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use SanderMuller\FluentValidation\Contracts\FluentRuleContract;
+use SanderMuller\FluentValidation\HasFluentRules;
 
 class ProfileUpdateRequest extends FormRequest
 {
-    use ProfileValidationRules;
+    use HasFluentRules, ProfileValidationRules;
 
     /**
      * Prepare the data for validation.
@@ -24,7 +25,7 @@ class ProfileUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, FluentRuleContract>
      */
     public function rules(): array
     {
