@@ -2,28 +2,25 @@
 
 namespace App\Concerns;
 
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Validation\Rules\Password;
+use SanderMuller\FluentValidation\FluentRule;
+use SanderMuller\FluentValidation\Rules\PasswordRule;
+use SanderMuller\FluentValidation\Rules\StringRule;
 
 trait PasswordValidationRules
 {
     /**
      * Get the validation rules used to validate passwords.
-     *
-     * @return array<int, Password|ValidationRule|array<mixed>|string>
      */
-    protected function passwordRules(): array
+    protected function passwordRules(): PasswordRule
     {
-        return ['required', 'string', Password::default(), 'confirmed'];
+        return FluentRule::password()->required()->confirmed();
     }
 
     /**
      * Get the validation rules used to validate the current password.
-     *
-     * @return array<int, Password|ValidationRule|array<mixed>|string>
      */
-    protected function currentPasswordRules(): array
+    protected function currentPasswordRules(): StringRule
     {
-        return ['required', 'string', 'current_password'];
+        return FluentRule::string()->required()->currentPassword();
     }
 }

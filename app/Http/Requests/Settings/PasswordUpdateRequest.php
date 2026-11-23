@@ -3,17 +3,18 @@
 namespace App\Http\Requests\Settings;
 
 use App\Concerns\PasswordValidationRules;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use SanderMuller\FluentValidation\Contracts\FluentRuleContract;
+use SanderMuller\FluentValidation\HasFluentRules;
 
 class PasswordUpdateRequest extends FormRequest
 {
-    use PasswordValidationRules;
+    use HasFluentRules, PasswordValidationRules;
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, FluentRuleContract>
      */
     public function rules(): array
     {

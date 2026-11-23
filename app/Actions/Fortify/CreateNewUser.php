@@ -5,8 +5,8 @@ namespace App\Actions\Fortify;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use SanderMuller\FluentValidation\RuleSet;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -19,10 +19,10 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
+        RuleSet::from([
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
-        ])->validate();
+        ])->validate($input);
 
         return User::create([
             'name' => $input['name'],

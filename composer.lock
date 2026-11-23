@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6d1a0300bbf73f4282cb591031aa7fc",
+    "content-hash": "192df254b72dd4390ca7aa6e67a26a52",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -5173,6 +5173,96 @@
             ],
             "time": "2024-06-11T12:45:25+00:00",
             "published-time": "2024-06-11T12:48:34+00:00"
+        },
+        {
+            "name": "sandermuller/laravel-fluent-validation",
+            "version": "1.47.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SanderMuller/laravel-fluent-validation.git",
+                "reference": "386dc2840d1bdebca78cd337b619b3ee03acbc92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SanderMuller/laravel-fluent-validation/zipball/386dc2840d1bdebca78cd337b619b3ee03acbc92",
+                "reference": "386dc2840d1bdebca78cd337b619b3ee03acbc92",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0||^13.0",
+                "illuminate/http": "^12.0||^13.0",
+                "illuminate/support": "^12.0||^13.0",
+                "illuminate/validation": "^12.0||^13.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "boundwize/structarmed": "^0.19 || ^0.20 || ^0.21",
+                "brianium/paratest": "<7.26.1",
+                "driftingly/rector-laravel": "^2.3",
+                "larastan/larastan": "^3.12.1",
+                "laravel/framework": "^12.0||^13.0",
+                "laravel/pao": "^1.1",
+                "laravel/pint": "^1.29",
+                "livewire/livewire": "^3.0||^4.0",
+                "mrpunyapal/rector-pest": "^0.2.7",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^10.11||^11.0",
+                "pestphp/pest": "^3.0||^4.4.5||^5.0",
+                "pestphp/pest-plugin-arch": "^3.0||^4.0||^5.0",
+                "pestphp/pest-plugin-laravel": "^3.0||^4.1||^5.0",
+                "phpstan/extension-installer": "^1.4.3",
+                "phpstan/phpstan-deprecation-rules": "^2.0.4",
+                "phpstan/phpstan-phpunit": "^2.0.16",
+                "phpstan/phpstan-strict-rules": "^2.0.10",
+                "phpstan/tally": "^1.0.1",
+                "rector/rector": "^2.4.1",
+                "sandermuller/boost-skills": "^2.27",
+                "sandermuller/package-boost-laravel": "^1.1",
+                "spaze/phpstan-disallowed-calls": "^4.10",
+                "symplify/phpstan-extensions": "^12.0.2",
+                "tomasvotruba/cognitive-complexity": "^1.1",
+                "tomasvotruba/type-coverage": "^2.1"
+            },
+            "suggest": {
+                "nikic/php-parser": "^5.0 — required by SanderMuller\\FluentValidation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SanderMuller\\FluentValidation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sander Muller",
+                    "email": "github@scode.nl",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Fluent validation rule builders for Laravel",
+            "homepage": "https://github.com/sandermuller/laravel-fluent-validation",
+            "keywords": [
+                "fluent",
+                "laravel",
+                "rule-builder",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/SanderMuller/laravel-fluent-validation/issues",
+                "source": "https://github.com/SanderMuller/laravel-fluent-validation/tree/1.47.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/SanderMuller",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-11-22T11:59:55+00:00",
+            "published-time": "2026-11-22T12:15:27+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",

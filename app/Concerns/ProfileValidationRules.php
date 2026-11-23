@@ -3,16 +3,18 @@
 namespace App\Concerns;
 
 use App\Models\User;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
+use SanderMuller\FluentValidation\Contracts\FluentRuleContract;
+use SanderMuller\FluentValidation\FluentRule;
+use SanderMuller\FluentValidation\Rules\EmailRule;
+use SanderMuller\FluentValidation\Rules\StringRule;
 
 trait ProfileValidationRules
 {
     /**
      * Get the validation rules used to validate user profiles.
      *
-     * @return array<string, array<int, Unique|ValidationRule|array<mixed>|string>>
+     * @return array<string, FluentRuleContract>
      */
     protected function profileRules(?int $userId = null): array
     {
@@ -24,29 +26,20 @@ trait ProfileValidationRules
 
     /**
      * Get the validation rules used to validate user names.
-     *
-     * @return array<int, Unique|ValidationRule|array<mixed>|string>
      */
-    protected function nameRules(): array
+    protected function nameRules(): StringRule
     {
-        return ['required', 'string', 'max:255'];
+        return FluentRule::string()->required()->max(255);
     }
 
     /**
      * Get the validation rules used to validate user emails.
-     *
-     * @return array<int, Unique|ValidationRule|array<mixed>|string>
      */
-    protected function emailRules(?int $userId = null): array
+    protected function emailRules(?int $userId = null): EmailRule
     {
-        return [
-            'required',
-            'string',
-            'email',
-            'max:255',
-            $userId === null
-                ? Rule::unique(User::class)
-                : Rule::unique(User::class)->ignore($userId),
-        ];
+        return FluentRule::email(defaults: false)
+            ->required()
+            ->max(255)
+            ->unique(User::class, 'email', fn (Unique $rule): Unique => $rule->ignore($userId));
     }
 }
