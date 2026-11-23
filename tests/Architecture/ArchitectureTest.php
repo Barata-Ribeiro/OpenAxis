@@ -28,7 +28,8 @@ arch()
     ->expect(value: 'App\Models')
     ->toBeClasses()
     ->toExtend(class: Model::class)
-    ->toImplement(interfaces: Auditable::class);
+    ->toImplement(interfaces: Auditable::class)
+    ->toUseTrait(trait: OwenIt\Auditing\Auditable::class);
 
 arch(description: 'app')
     ->expect(value: 'App\Enums')
