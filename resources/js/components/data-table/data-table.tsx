@@ -1,5 +1,5 @@
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { features } from '@/hooks/data-table/features';
@@ -7,7 +7,7 @@ import { useAppTable } from '@/hooks/data-table/table';
 import { useDebouncedCallback } from '@/hooks/use-debounce-callback';
 import type { ExtendedColumnFilter } from '@/types/data-table';
 import { router } from '@inertiajs/react';
-import type { ColumnDef, PaginationState, SortingState, Updater } from '@tanstack/react-table';
+import type { Column, ColumnDef, PaginationState, SortingState, Updater } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ChevronsUpDown, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -27,6 +27,30 @@ type Props<TData extends { id: string | number }> = {
     url: string;
     label: string;
 };
+
+/**
+ * TODO: Implement pinning styles for columns
+ */
+function getCommonPinningStyles<TData extends { id: string | number }>(
+    column: Column<typeof features, TData>,
+    isSelected = false,
+): React.CSSProperties {
+    const isPinned = column.getIsPinned();
+    const isLastLeftPinnedColumn = isPinned === 'start' && column.getIsLastColumn('start');
+    const isFirstRightPinnedColumn = isPinned === 'end' && column.getIsFirstColumn('end');
+
+    const rightPinnedBoxShadow = isFirstRightPinnedColumn ? '4px 0 4px -4px var(--border) inset' : undefined;
+    const pinnedBackground = isPinned ? 'var(--background)' : undefined;
+
+    return {
+        boxShadow: isLastLeftPinnedColumn ? '-4px 0 4px -4px var(--border) inset' : rightPinnedBoxShadow,
+        insetInlineStart: isPinned === 'start' ? `${column.getStart('start')}px` : undefined,
+        insetInlineEnd: isPinned === 'end' ? `${column.getAfter('end')}px` : undefined,
+        position: isPinned ? 'sticky' : 'relative',
+        background: isSelected ? 'var(--muted)' : pinnedBackground,
+        zIndex: isPinned ? 1 : 0,
+    };
+}
 
 function update<T>(updater: Updater<T>, previous: T): T {
     return typeof updater === 'function' ? (updater as (value: T) => T)(previous) : updater;
