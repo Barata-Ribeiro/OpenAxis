@@ -1,9 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useCellContext, useTableContext } from '@/hooks/data-table/table';
+import { useClipboard } from '@/hooks/use-clipboard';
 import { Subscribe } from '@tanstack/react-table';
 import { formatDate } from 'date-fns/format';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy, EllipsisVertical, Eye, PencilLine, Trash } from 'lucide-react';
 
 export function SelectCell(): React.ReactNode {
     const cell = useCellContext();
@@ -32,7 +40,7 @@ export function TextCell(): React.ReactNode {
 
 export function DateCell(): React.ReactNode {
     const cell = useCellContext<string>();
-    return <>{formatDate(cell.getValue(), 'PPP')}</>;
+    return <time dateTime={cell.getValue()}>{formatDate(cell.getValue(), 'PPP')}</time>;
 }
 
 export function GroupedCell(): React.ReactNode {
@@ -67,3 +75,37 @@ export function JoinDateAggregatedCell(): React.ReactNode {
 }
 
 // Additional aggregated cells can be added below as needed; e.g. ActionsCell, StatusCell, etc.
+
+// TODO: Implement actions for the ActionsCell dropdown menu items; receive props for links etc...
+export function ActionsCell(): React.ReactNode {
+    const { copied, copy, error, value } = useClipboard();
+    const cell = useCellContext();
+
+    return (
+        <DropdownMenuTrigger>
+            <Button variant="ghost" className="size-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <EllipsisVertical aria-hidden className="size-4" />
+            </Button>
+
+            <DropdownMenu placement="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem>
+                    <Copy aria-hidden data-icon="inline-start" />
+                    Copy Row
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <Eye aria-hidden data-icon="inline-start" /> View
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <PencilLine aria-hidden data-icon="inline-start" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem variant="destructive">
+                    <Trash aria-hidden data-icon="inline-start" />
+                    Archive
+                </DropdownMenuItem>
+            </DropdownMenu>
+        </DropdownMenuTrigger>
+    );
+}
