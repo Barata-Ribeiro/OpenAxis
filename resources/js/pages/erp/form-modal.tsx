@@ -4,12 +4,8 @@ import { useState } from 'react';
 
 export default function FormModal(props: Readonly<RecordProps>) {
     const [processing, setProcessing] = useState(false);
-    const description =
-        props.mode === 'show'
-            ? 'Record details'
-            : props.mode === 'archive'
-              ? 'Confirm this change'
-              : 'Complete the fields below';
+    const confirmationMessage = props.mode === 'archive' ? 'Confirm this change' : 'Complete the fields below';
+    const description = props.mode === 'show' ? 'Record details' : confirmationMessage;
 
     return (
         <Modal title={props.title} description={description} processing={processing}>
