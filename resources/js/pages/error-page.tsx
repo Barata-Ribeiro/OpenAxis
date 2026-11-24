@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { LinkButton } from '@/components/ui/button';
 import { renderInertiaLink } from '@/lib/inertia-link';
 import { home } from '@/routes';
 import { HomeIcon } from 'lucide-react';
@@ -46,10 +46,10 @@ export default function ErrorPage({ status }: Readonly<{ status: number }>) {
                     </p>
                 </div>
 
-                <Button size="lg" render={renderInertiaLink(home())}>
+                <LinkButton href={home.url()} size="lg" render={renderInertiaLink(home())}>
                     Go Back Home
                     <HomeIcon aria-hidden data-icon="inline-end" />
-                </Button>
+                </LinkButton>
             </section>
         </main>
     );

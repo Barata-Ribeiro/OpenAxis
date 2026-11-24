@@ -10,14 +10,21 @@ import { renderInertiaLink } from '@/lib/inertia-link';
 import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
-export function NavMain({ items, label = 'Platform' }: Readonly<{ items: NavItem[]; label?: string }>) {
+export function NavMain({
+    items,
+    label = 'Platform',
+    icon: Icon,
+}: Readonly<{ items: NavItem[]; label?: string; icon?: NonNullable<NavItem['icon']> }>) {
     const { isCurrentUrl } = useCurrentUrl();
 
     if (items.length === 0) return null;
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>{label}</SidebarGroupLabel>
+            <SidebarGroupLabel className="gap-2">
+                {Icon && <Icon aria-hidden />}
+                {label}
+            </SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
