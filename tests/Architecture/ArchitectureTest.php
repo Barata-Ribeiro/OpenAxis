@@ -46,8 +46,9 @@ arch()
     ])
     ->toExtend(class: Controller::class)
     ->toHaveSuffix('Controller')
-    ->toHavePublicMethods()
-    ->classes();
+    ->not->toHavePublicMethodsBesides([
+        '__invoke', 'index', 'create', 'store', 'show', 'edit', 'update', 'destroy', 'archive', 'confirmDestroy',
+    ]);
 
 arch()
     ->expect(value: 'App\Http\Requests')

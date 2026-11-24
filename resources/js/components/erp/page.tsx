@@ -10,9 +10,6 @@ import { ModalLink } from '@inertiaui/modal-react';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
-export const currency = new Intl.NumberFormat('en', { style: 'currency', currency: 'BRL' });
-export const quantity = new Intl.NumberFormat('en', { maximumFractionDigits: 3 });
-
 export function humanize(text: string) {
     return text.replaceAll('_', ' ').replace(/^./, (letter) => letter.toUpperCase());
 }

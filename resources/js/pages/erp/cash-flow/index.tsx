@@ -6,21 +6,15 @@ import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
+import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
 import payables from '@/routes/erp/cash-flow/payables';
 import { router } from '@inertiajs/react';
 import { CalendarDays } from 'lucide-react';
 import { useState } from 'react';
-import {
-    actionColumn,
-    choices,
-    currency,
-    ErpLink,
-    ErpPage,
-    humanize,
-    Metrics,
-    tableColumn,
-} from '@/components/erp/page';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { ErpDate, ErpMoney, useErpFormatting } from '@/components/erp/format';
+import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
 
 type CashRow = {
     id: number;
@@ -51,12 +45,13 @@ type Summary = Record<
     number | null
 >;
 
-const money = (cents: number | null) => (cents === null ? null : currency.format(cents / 100));
 const column = tableColumn<CashRow>;
-const dateColumn = column('occurred_at', 'Date and time', 'date');
+const dateColumn = column('occurred_at', 'Date and time', 'date', (row) => (
+    <ErpDate value={row.occurred_at} withTime />
+));
 const descriptionColumn = column('description', 'Description');
 const categoryColumn = column('category', 'Category');
-const amountColumn = column('amount', 'Amount', 'number', (row) => currency.format(Number(row.amount)));
+const amountColumn = column('amount', 'Amount', 'number', (row) => <ErpMoney amount={Number(row.amount)} />);
 const entryActions = actionColumn<CashRow>((row) => (
     <ErpLink href={cash.showEntry.url(row.id)} permission="cash-entry.show" compact modal>
         View
@@ -64,10 +59,10 @@ const entryActions = actionColumn<CashRow>((row) => (
 ));
 
 function DueDate({ value, today }: Readonly<{ value: string; today: string }>) {
-    const days = Math.round((Date.parse(value) - Date.parse(today)) / 86_400_000);
+    const days = differenceInCalendarDays(parseISO(value), parseISO(today));
     return (
         <div className="flex flex-col">
-            <time dateTime={value}>{value}</time>
+            <ErpDate value={value} />
             <span className={cn('text-xs text-muted-foreground', days < 0 && 'text-destructive')}>
                 {days === 0 ? 'Due today' : days < 0 ? `${-days}d overdue` : `In ${days}d`}
             </span>
@@ -110,7 +105,7 @@ const receiptColumns = [
     entryActions,
 ];
 const expenseColumns = [
-    column('occurred_at', 'Date', 'date', (row) => row.occurred_at.slice(0, 10)),
+    column('occurred_at', 'Date', 'date', (row) => <ErpDate value={row.occurred_at} />),
     descriptionColumn,
     categoryColumn,
     amountColumn,
@@ -140,6 +135,8 @@ export default function CashFlow({
     tabs: Tab[];
 }>) {
     const [calendarOpen, setCalendarOpen] = useState(false);
+    const { money: currency } = useErpFormatting();
+    const money = (cents: number | null) => (cents === null ? null : currency.format(cents / 100));
     const change = (next: Period, target = tab) => {
         router.get(
             cash.index.url({ query: rangeQuery(next, target) }),
@@ -221,8 +218,13 @@ export default function CashFlow({
                     </Popover>
                 </PopoverTrigger>
                 <p className="text-sm text-muted-foreground" aria-live="polite">
-                    {period.start}
-                    {period.end !== period.start ? ` – ${period.end}` : ''}
+                    <ErpDate value={period.start} />
+                    {period.end !== period.start && (
+                        <>
+                            {' '}
+                            – <ErpDate value={period.end} />
+                        </>
+                    )}
                 </p>
             </div>
             <Metrics
@@ -264,3 +266,10 @@ export default function CashFlow({
         </ErpPage>
     );
 }
+
+CashFlow.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: 'Cash flow', href: cash.index() },
+    ],
+};

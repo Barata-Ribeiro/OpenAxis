@@ -1,4 +1,6 @@
 import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
+import { ErpFee } from '@/components/erp/format';
+import { dashboard } from '@/routes';
 import { actionColumn, ErpLink, ErpPage, humanize, tableColumn } from '@/components/erp/page';
 import { sections, type SettingsSection } from '@/lib/erp-settings';
 
@@ -20,7 +22,7 @@ const code = column('code', 'Code');
 const extraColumns = {
     'payment-methods': [
         column('fee_type', 'Fee type', 'text', (row) => humanize(row.fee_type)),
-        column('fee_rate', 'Fee rate', 'number'),
+        column('fee_rate', 'Fee rate', 'number', (row) => <ErpFee rate={row.fee_rate} type={row.fee_type} />),
         active,
     ],
     'expense-categories': [column('is_system', 'System category', 'number', (row) => (row.is_system ? 'Yes' : 'No'))],
@@ -76,3 +78,10 @@ export default function SettingsIndex({
         </ErpPage>
     );
 }
+
+SettingsIndex.layout = ({ section }: { section: SettingsSection }) => ({
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: sections[section].title, href: sections[section].routes.index() },
+    ],
+});

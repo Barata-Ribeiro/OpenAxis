@@ -226,9 +226,9 @@ export default function DataTable<TData extends { id: string | number }>({
                         </TableHeader>
                         <TableBody items={table.getRowModel().rows} renderEmptyState={() => 'No records found.'}>
                             {(row) => (
-                                <TableRow id={row.id} columns={row.getVisibleCells()}>
+                                <TableRow id={'row:' + row.id} columns={row.getVisibleCells()}>
                                     {(cell) => (
-                                        <TableCell id={cell.column.id} className="px-3">
+                                        <TableCell id={'cell:' + cell.id} className="px-3">
                                             <table.FlexRender cell={cell} />
                                         </TableCell>
                                     )}

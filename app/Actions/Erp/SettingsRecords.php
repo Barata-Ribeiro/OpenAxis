@@ -116,7 +116,8 @@ final class SettingsRecords
         return $details + match (true) {
             $record instanceof Category => ['Parent category' => $record->parent()->value('name')],
             $record instanceof PaymentMethod => [
-                'Fee type' => ucfirst($record->fee_type), 'Fee rate' => $record->fee_rate,
+                'Fee type' => ucfirst($record->fee_type),
+                'Fee rate' => ['feeRate' => $record->fee_rate, 'feeType' => $record->fee_type],
                 'Status' => $record->is_active ? 'Active' : 'Inactive',
             ],
             $record instanceof ExpenseCategory => ['System category' => $record->is_system ? 'Yes' : 'No'],

@@ -73,7 +73,7 @@ export function AppSidebar() {
     const { can } = usePermission();
     const settings = Object.values(sections)
         .filter(({ permission }) => can(`${permission}.index`))
-        .map(({ title, routes }) => ({ title, href: routes.index(), icon: Settings2 }));
+        .map(({ title, routes, icon }) => ({ title, href: routes.index(), icon }));
 
     return (
         <Sidebar collapsible="offcanvas" variant="floating">
@@ -93,7 +93,7 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
                 <NavMain label="ERP" items={erpItems.filter(({ permissions }) => can(...permissions))} />
                 <NavMain label="Quick actions" items={quickLinks.filter(({ permissions }) => can(...permissions))} />
-                <NavMain label="Settings" items={settings} />
+                <NavMain label="Settings" icon={Settings2} items={settings} />
             </SidebarContent>
 
             <SidebarFooter>

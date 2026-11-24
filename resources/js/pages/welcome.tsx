@@ -1,5 +1,5 @@
 import AppLogoBig from '@/components/application/app-logo-big';
-import { Button } from '@/components/ui/button';
+import { LinkButton } from '@/components/ui/button';
 import { renderInertiaLink } from '@/lib/inertia-link';
 import { dashboard, login, register } from '@/routes';
 import { Head, usePage } from '@inertiajs/react';
@@ -21,22 +21,26 @@ export default function Welcome({ canRegister = true }: Readonly<WelcomeProps>) 
                 <header className="mb-6 w-full max-w-welcome text-sm not-has-[nav]:hidden lg:max-w-4xl">
                     <nav className="flex items-center justify-end gap-4">
                         {auth.user ? (
-                            <Button variant="outline" render={renderInertiaLink(dashboard())}>
+                            <LinkButton
+                                href={dashboard.url()}
+                                variant="outline"
+                                render={renderInertiaLink(dashboard())}
+                            >
                                 <GaugeIcon aria-hidden data-icon="inline-start" />
                                 Dashboard
-                            </Button>
+                            </LinkButton>
                         ) : (
                             <>
-                                <Button variant="outline" render={renderInertiaLink(login())}>
+                                <LinkButton href={login.url()} variant="outline" render={renderInertiaLink(login())}>
                                     <SquareArrowRightEnterIcon aria-hidden data-icon="inline-start" />
                                     Log in
-                                </Button>
+                                </LinkButton>
 
                                 <Activity mode={canRegister ? 'visible' : 'hidden'}>
-                                    <Button render={renderInertiaLink(register())}>
+                                    <LinkButton href={register.url()} render={renderInertiaLink(register())}>
                                         <UserPenIcon aria-hidden data-icon="inline-start" />
                                         Register
-                                    </Button>
+                                    </LinkButton>
                                 </Activity>
                             </>
                         )}

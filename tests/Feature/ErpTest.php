@@ -12,6 +12,8 @@ use App\Models\StockMovement;
 use App\Models\StorageLocation;
 use App\Models\UnitOfMeasure;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -103,6 +105,10 @@ it('filters server rows with grouped conditions, range bounds and literal search
     $this->getJson(route('erp.inventory.index', ['table' => [
         'filters' => [['id' => 'quantity', 'operator' => 'equals', 'value' => ['unexpected']]],
     ]]))->assertUnprocessable()->assertJsonValidationErrors('table.filters');
+
+    $this->getJson(route('erp.inventory.index', ['table' => [
+        'sorting' => [['id' => 'name', 'desc' => 1, 'unexpected' => true]],
+    ]]))->assertUnprocessable()->assertJsonValidationErrors('table.sorting.0');
 });
 
 it('registers products and posts receipts and issues without bypassing ledger constraints', function (): void {
@@ -112,7 +118,11 @@ it('registers products and posts receipts and issues without bypassing ledger co
     $category = Category::factory()->create();
     $this->actingAs($user);
 
-    $this->get(route('erp.inventory.products.create'))->assertInertia(fn (Assert $page) => $page->component('erp/form'));
+    $this->get(route('erp.inventory.products.create'))->assertInertia(fn (Assert $page) => $page
+        ->component('erp/inventory/products/create')
+        ->has('units')
+        ->has('locations')
+        ->has('categories'));
     $this->post(route('erp.inventory.products.store'), [
         'sku' => 'ERP-001', 'name' => 'Widget', 'unit_of_measure_id' => $unit->id, 'category_ids' => [$category->id],
         'cost_price_cents' => 100, 'sale_price_cents' => 200, 'minimum_stock_milliunits' => 0, 'is_active' => true,
@@ -133,8 +143,9 @@ it('registers products and posts receipts and issues without bypassing ledger co
     $batch = $product->batches()->firstOrFail();
 
     $this->get(route('erp.inventory.movements.issue'))->assertInertia(fn (Assert $page) => $page
-        ->component('erp/form')
-        ->where('choices.product_batch_id', fn ($options) => collect($options)->pluck('id')->contains($batch->id)));
+        ->component('erp/inventory/movements/create')
+        ->where('direction', 'issue')
+        ->where('options', fn ($options) => collect($options)->pluck('id')->contains($batch->id)));
 
     $issue = [
         'product_batch_id' => $batch->id, 'storage_location_id' => $location->id,
@@ -145,6 +156,44 @@ it('registers products and posts receipts and issues without bypassing ledger co
     $this->post(route('erp.inventory.movements.store-issue'), $issue)
         ->assertRedirect(route('erp.inventory.movements.index'));
     expect($product->currentStockMilliunits())->toBe(1000);
+});
+
+it('stores processed product images and enforces the limit across edits', function (): void {
+    $disk = Storage::fake('public');
+    $user = User::factory()->create()->givePermissionTo(['product.create', 'product.edit']);
+    $unit = UnitOfMeasure::factory()->create();
+    $this->actingAs($user);
+
+    $values = [
+        'name' => 'Product with photos', 'cost_price_cents' => 100, 'sale_price_cents' => 200,
+        'minimum_stock_milliunits' => 0, 'is_active' => '1',
+    ];
+    $create = [...$values, 'sku' => 'PHOTOS-1', 'unit_of_measure_id' => $unit->id];
+    $store = route('erp.inventory.products.store');
+
+    $this->post($store, [...$create, 'images' => [UploadedFile::fake()->create('notes.txt', 1, 'text/plain')]], ['Accept' => 'application/json'])
+        ->assertUnprocessable()->assertJsonValidationErrors('images.0');
+    $this->post($store, [...$create, 'images' => array_map(fn (int $index) => UploadedFile::fake()->image("image-$index.jpg"), range(1, 6))], ['Accept' => 'application/json'])
+        ->assertUnprocessable()->assertJsonValidationErrors('images');
+
+    $this->post($store, [...$create, 'images' => array_map(fn (int $index) => UploadedFile::fake()->image("image-$index.jpg"), range(1, 5))])
+        ->assertRedirect(route('dashboard'));
+    $product = Product::query()->where('sku', 'PHOTOS-1')->firstOrFail();
+    $photos = $product->images()->get();
+    expect($photos)->toHaveCount(5);
+    expect($photos->first()->path)->toEndWith('.webp');
+    $disk->assertExists($photos->pluck('path')->all());
+
+    $update = route('erp.inventory.products.update', $product);
+    $this->post($update, [...$values, '_method' => 'PATCH', 'images' => [UploadedFile::fake()->image('extra.png')]], ['Accept' => 'application/json'])
+        ->assertUnprocessable()->assertJsonValidationErrors('images');
+    $this->post($update, [
+        ...$values, '_method' => 'PATCH', 'images' => [UploadedFile::fake()->image('replacement.png')],
+        'remove_image_ids' => [$photos->first()->id],
+    ])->assertRedirect(route('dashboard'));
+    expect($product->images()->count())->toBe(5);
+    expect($product->images()->whereKey($photos->first()->id)->exists())->toBeFalse();
+    $disk->assertMissing($photos->first()->path);
 });
 
 it('reports period totals and settles only the remaining balance once', function (): void {
@@ -183,6 +232,11 @@ it('reports period totals and settles only the remaining balance once', function
     expect($payable->fresh()->status)->toBe(FinancialAccount::STATUS_PAID);
     expect($payable->cashEntries()->count())->toBe(2);
     expect($payable->cashEntries()->latest('id')->first()->amount_cents)->toBe(300);
+
+    $cancel = route('erp.cash-flow.payables.destroy', $payable);
+    $this->deleteJson($cancel)->assertForbidden();
+    $user->givePermissionTo('financial-account.cancel');
+    $this->deleteJson($cancel)->assertUnprocessable()->assertJsonValidationErrors('record');
 });
 
 it('permits administrators to delegate only permissions they hold and assigns custom roles to users', function (): void {

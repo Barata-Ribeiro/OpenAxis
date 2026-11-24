@@ -66,15 +66,17 @@ final class SettingsRecordRequest extends FormRequest
                 'code' => FluentRule::string()->required()->max(48)->unique(StorageLocation::class, 'code', fn (Unique $rule) => $rule->ignore($id)),
                 'is_active' => FluentRule::boolean()->required(),
             ],
-            'users' => $this->profileRules($id === null ? null : (int) $id) + [
+            'users' => $this->profileRules($id) + [
                 'password' => $id === null ? $password->required() : $password->nullable(),
-                'role_ids' => FluentRule::list()->max(50),
-                'role_ids.*' => FluentRule::integer()->required()->distinct()->exists(Role::class, 'id', fn (Exists $rule) => $rule->where('guard_name', $guard)),
+                'role_ids' => FluentRule::list()->max(50)->each(
+                    FluentRule::integer()->required()->distinct()->exists(Role::class, 'id', fn (Exists $rule) => $rule->where('guard_name', $guard)),
+                ),
             ],
             'roles' => [
                 'name' => $name->unique(Role::class, 'name', fn (Unique $rule) => $rule->where('guard_name', $guard)->ignore($id)),
-                'permission_ids' => FluentRule::list()->max(200),
-                'permission_ids.*' => FluentRule::integer()->required()->distinct()->exists(Permission::class, 'id', fn (Exists $rule) => $rule->where('guard_name', $guard)),
+                'permission_ids' => FluentRule::list()->max(200)->each(
+                    FluentRule::integer()->required()->distinct()->exists(Permission::class, 'id', fn (Exists $rule) => $rule->where('guard_name', $guard)),
+                ),
             ],
         };
     }

@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 use App\Actions\Erp\SettingsRecords;
+use App\Http\Controllers\Erp\CashEntryController;
 use App\Http\Controllers\Erp\CashFlowController;
 use App\Http\Controllers\Erp\InventoryController;
+use App\Http\Controllers\Erp\PayableController;
+use App\Http\Controllers\Erp\PayablePaymentController;
 use App\Http\Controllers\Erp\ProductController;
 use App\Http\Controllers\Erp\SettingsRecordController;
 use App\Http\Controllers\Erp\StockMovementController;
@@ -36,27 +39,30 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(func
         });
     });
 
-    Route::controller(CashFlowController::class)->prefix('cash-flow')->name('cash-flow.')->group(function (): void {
-        Route::get('/', 'index')->middleware('permission:cash-entry.index|financial-account.index')->name('index');
-        Route::middleware('permission:cash-entry.create')->group(function (): void {
-            Route::get('receipts/create', 'create')->defaults('kind', 'receipt')->name('create-receipt');
-            Route::post('receipts', 'store')->defaults('kind', 'receipt')->name('store-receipt');
-            Route::get('expenses/create', 'create')->defaults('kind', 'expense')->name('create-expense');
-            Route::post('expenses', 'store')->defaults('kind', 'expense')->name('store-expense');
-        });
-        Route::get('entries/{cashEntry}', 'showEntry')->middleware('permission:cash-entry.show')->name('show-entry');
+    Route::prefix('cash-flow')->name('cash-flow.')->group(function (): void {
+        Route::get('/', [CashFlowController::class, 'index'])->middleware('permission:cash-entry.index|financial-account.index')->name('index');
 
-        Route::prefix('payables')->name('payables.')->group(function (): void {
-            Route::get('create', 'create')->middleware('permission:financial-account.create')->defaults('kind', 'payable')->name('create');
+        Route::controller(CashEntryController::class)->group(function (): void {
+            Route::middleware('permission:cash-entry.create')->group(function (): void {
+                Route::get('receipts/create', 'create')->defaults('kind', 'receipt')->name('create-receipt');
+                Route::post('receipts', 'store')->defaults('kind', 'receipt')->name('store-receipt');
+                Route::get('expenses/create', 'create')->defaults('kind', 'expense')->name('create-expense');
+                Route::post('expenses', 'store')->defaults('kind', 'expense')->name('store-expense');
+            });
+            Route::get('entries/{cashEntry}', 'show')->middleware('permission:cash-entry.show')->name('show-entry');
+        });
+
+        Route::controller(PayableController::class)->prefix('payables')->name('payables.')->group(function (): void {
+            Route::get('create', 'create')->middleware('permission:financial-account.create')->name('create');
             Route::post('/', 'store')->middleware('permission:financial-account.create')->defaults('kind', 'payable')->name('store');
-            Route::get('{financialAccount}', 'showPayable')->middleware('permission:financial-account.show')->name('show');
-            Route::get('{financialAccount}/edit', 'editPayable')->middleware('permission:financial-account.edit')->name('edit');
-            Route::patch('{financialAccount}', 'updatePayable')->middleware('permission:financial-account.edit')->defaults('kind', 'payable')->name('update');
-            Route::get('{financialAccount}/cancel', 'cancelPayable')->middleware('permission:financial-account.cancel')->name('cancel');
-            Route::post('{financialAccount}/cancel', 'destroyPayable')->middleware('permission:financial-account.cancel')->name('destroy');
-            Route::middleware(['permission:cash-entry.create', 'permission:financial-account.show'])->group(function (): void {
-                Route::get('{financialAccount}/payment', 'confirmPayment')->name('confirm-payment');
-                Route::post('{financialAccount}/payment', 'pay')->defaults('kind', 'payment')->name('pay');
+            Route::get('{financialAccount}', 'show')->middleware('permission:financial-account.show')->name('show');
+            Route::get('{financialAccount}/edit', 'edit')->middleware('permission:financial-account.edit')->name('edit');
+            Route::patch('{financialAccount}', 'update')->middleware('permission:financial-account.edit')->defaults('kind', 'payable')->name('update');
+            Route::get('{financialAccount}/cancel', 'confirmDestroy')->middleware('permission:financial-account.cancel')->name('cancel');
+            Route::delete('{financialAccount}', 'destroy')->middleware('permission:financial-account.cancel')->name('destroy');
+            Route::controller(PayablePaymentController::class)->middleware(['permission:cash-entry.create', 'permission:financial-account.show'])->group(function (): void {
+                Route::get('{financialAccount}/payment', 'create')->name('confirm-payment');
+                Route::post('{financialAccount}/payment', 'store')->defaults('kind', 'payment')->name('pay');
             });
         });
     });
