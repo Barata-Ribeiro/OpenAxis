@@ -1,8 +1,8 @@
-type PermissionAction = 'index' | 'show' | 'create' | 'edit' | 'destroy';
+type PermissionAction = 'index' | 'show' | 'create' | 'edit' | 'destroy' | 'confirm' | 'complete' | 'cancel';
 
 export interface Role {
     id: number;
-    name: 'user' | 'super-admin';
+    name: string;
     guard_name?: string;
     permissions?: Permission[];
     created_at: string;

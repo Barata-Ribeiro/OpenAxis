@@ -23,7 +23,6 @@ pest()->extend(TestCase::class)
     ->in('Arch', 'Feature', 'Unit');
 
 arch()->preset()->php();
-arch()->preset()->laravel();
 arch()->preset()->security();
 
 /*

@@ -40,13 +40,14 @@ arch()
     ->toBeClasses()
     ->toUseStrictTypes()
     ->toBeFinal()
-    ->classes()
     ->toOnlyBeUsedIn([
         'App\Http\Controllers',
         'routes',
     ])
     ->toExtend(class: Controller::class)
-    ->toHaveSuffix('Controller');
+    ->toHaveSuffix('Controller')
+    ->toHavePublicMethods()
+    ->classes();
 
 arch()
     ->expect(value: 'App\Http\Requests')

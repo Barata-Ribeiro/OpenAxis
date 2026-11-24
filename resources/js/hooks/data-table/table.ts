@@ -21,7 +21,7 @@ export const { createAppColumnHelper, useAppTable, useTableContext, useCellConte
             filterFn: dynamicFilterFn,
         },
         globalFilterFn: 'fuzzy',
-        getRowId: (row: any) => row.id,
+        getRowId: (row: { id: string | number }) => String(row.id),
         enableRowSelection: true,
         columnResizeMode: 'onChange' as const,
 
