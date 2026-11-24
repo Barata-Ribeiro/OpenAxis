@@ -13,7 +13,7 @@ import {
     FileVideo,
     Trash,
 } from 'lucide-react';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useId, useRef, useState } from 'react';
 
 export type FileState = 'queued' | 'uploading' | 'completed' | 'failed';
 
@@ -29,6 +29,7 @@ export interface FileUploadAreaProps extends Omit<React.HTMLAttributes<HTMLDivEl
     title?: string;
     description?: string;
     maxFiles?: number;
+    multiple?: boolean;
     maxSizeMB?: number;
     accept?: string;
     files: FileEntry[];
@@ -97,6 +98,7 @@ export function FileUploadArea({
     title = 'Media Library',
     description = 'Upload and manage your project files.',
     maxFiles = 5,
+    multiple = maxFiles > 1,
     maxSizeMB = 10,
     accept,
     files,
@@ -107,6 +109,7 @@ export function FileUploadArea({
 }: Readonly<FileUploadAreaProps>) {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputId = useId();
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -154,7 +157,7 @@ export function FileUploadArea({
             <CardContent className="space-y-5">
                 <div
                     className={cn(
-                        'relative flex cursor-pointer flex-col items-center justify-between gap-4 rounded-none border-2 border-dashed p-6 transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row',
+                        'relative flex flex-col items-center justify-between gap-4 rounded-none border-2 border-dashed p-6 transition-all duration-300 sm:flex-row',
                         isDragging
                             ? 'border-primary bg-primary/5'
                             : 'border-border bg-muted/10 hover:border-primary/40 hover:bg-muted/30',
@@ -162,20 +165,13 @@ export function FileUploadArea({
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            fileInputRef.current?.click();
-                        }
-                    }}
                 >
                     <input
+                        id={fileInputId}
                         type="file"
                         ref={fileInputRef}
                         className="hidden"
-                        multiple={maxFiles > 1}
+                        multiple={multiple}
                         accept={accept}
                         onChange={handleFileSelect}
                         aria-hidden
@@ -192,13 +188,15 @@ export function FileUploadArea({
                             <CloudUpload aria-hidden className="size-6" />
                         </div>
                         <div>
-                            <p className="text-base font-medium text-foreground">Drop files here or click to browse</p>
+                            <p className="text-base font-medium text-foreground">Drop files here or browse</p>
                             <p className="mt-1 text-sm text-muted-foreground">
                                 Up to {maxFiles} files, {maxSizeMB}MB each
                             </p>
                         </div>
                     </div>
-                    <Button type="button">Select Files</Button>
+                    <Button type="button" onPress={() => fileInputRef.current?.click()}>
+                        Select files
+                    </Button>
                 </div>
 
                 {files.length > 0 && (

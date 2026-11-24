@@ -1,10 +1,9 @@
 import InputError from '@/components/common/input-error';
-import { ErpLink } from '@/components/erp/page';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { usePermission } from '@/hooks/use-permission';
+import { FieldGroup } from '@/components/ui/field';
+import { Spinner } from '@/components/ui/spinner';
+import type { Auth } from '@/types/auth';
+import type { Permission } from '@/types/role-permission';
 import { sections, type SettingsSection } from '@/lib/erp-settings';
 import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
@@ -12,32 +11,43 @@ import payables from '@/routes/erp/cash-flow/payables';
 import { index as inventory } from '@/routes/erp/inventory';
 import movements from '@/routes/erp/inventory/movements';
 import products from '@/routes/erp/inventory/products';
-import type { Permission } from '@/types/role-permission';
-import { useForm } from '@inertiajs/react';
-import type { SubmitEvent } from 'react';
-import { Activity, useId } from 'react';
+import { Form } from '@inertiajs/react';
+import {
+    CheckboxField,
+    CheckboxList,
+    fieldError,
+    InputField,
+    scaleFields,
+    scaledInput,
+    SelectField,
+    TextareaField,
+    type FormErrors,
+    type FormValues,
+    type Option,
+} from './form-fields';
+import { ErpDate, ErpFee, ErpMoney } from './format';
+import { ProductFields, useProductImages, type ProductFormData, type ProductImage } from './product-fields';
 
-type Value = string | number | boolean | (number | string)[];
-type Option = { id: number | string; name: string };
-type Fields = Record<string, Value | null>;
-type Kind =
-    | 'product'
-    | 'stock-movement'
-    | 'stock-receipt'
-    | 'stock-issue'
-    | 'receipt'
-    | 'expense'
-    | 'payable'
-    | 'payment'
-    | SettingsSection;
+type Value = string | number | boolean | number[] | string[] | null;
+type Detail =
+    | string
+    | number
+    | null
+    | { date: string; withTime?: boolean }
+    | { cents: number }
+    | { feeRate: number; feeType: string };
+type Kind = 'product' | 'stock-movement' | 'receipt' | 'expense' | 'payable' | 'payment' | SettingsSection;
+
 export type RecordProps = {
     title: string;
     kind: Kind;
     mode: 'create' | 'edit' | 'archive' | 'show';
-    id?: number;
-    values?: Fields;
+    id?: number | null;
+    values?: Record<string, Value>;
     choices?: Record<string, Option[]>;
-    details?: Record<string, string | number | null>;
+    details?: Record<string, Detail>;
+    productForm?: ProductFormData;
+    images?: ProductImage[];
     self?: boolean;
 };
 
@@ -46,72 +56,23 @@ type Field = {
     label: string;
     type?: 'number' | 'date' | 'datetime-local' | 'password' | 'email' | 'textarea' | 'checkbox' | 'select' | 'multi';
     required?: boolean;
-    decimals?: number;
     options?: Option[];
 };
 
-const location: Field = { name: 'storage_location_id', label: 'Storage location', type: 'select' };
-const category: Field = { name: 'expense_category_id', label: 'Expense category', type: 'select', required: true };
 const description: Field = { name: 'description', label: 'Description', required: true };
-const amount: Field = { name: 'amount_cents', label: 'Amount (BRL)', type: 'number', decimals: 2, required: true };
-const occurred: Field = { name: 'occurred_at', label: 'Date and time (UTC)', type: 'datetime-local', required: true };
+const amount: Field = { name: 'amount_cents', label: 'Amount (BRL)', type: 'number', required: true };
+const category: Field = { name: 'expense_category_id', label: 'Expense category', type: 'select', required: true };
 const notes: Field = { name: 'notes', label: 'Notes', type: 'textarea' };
-const active: Field = { name: 'is_active', label: 'Active', type: 'checkbox' };
 const name: Field = { name: 'name', label: 'Name', required: true };
 const code: Field = { name: 'code', label: 'Code', required: true };
+const active: Field = { name: 'is_active', label: 'Active', type: 'checkbox' };
+const emptyImages: ProductImage[] = [];
 
 function fieldsFor({ kind, mode, self }: RecordProps): Field[] {
+    if (mode === 'archive' || mode === 'show') return [];
     const editing = mode === 'edit';
-    if (mode === 'show' || mode === 'archive') return [];
 
     switch (kind) {
-        case 'product':
-            return [
-                ...(editing
-                    ? []
-                    : ([
-                          { name: 'sku', label: 'SKU', required: true },
-                          { name: 'unit_of_measure_id', label: 'Unit of measure', type: 'select', required: true },
-                      ] satisfies Field[])),
-                name,
-                { ...description, type: 'textarea', required: false },
-                location,
-                { name: 'category_ids', label: 'Product categories', type: 'multi' },
-                {
-                    name: 'cost_price_cents',
-                    label: 'Reference unit cost (BRL)',
-                    type: 'number',
-                    decimals: 2,
-                    required: true,
-                },
-                { name: 'sale_price_cents', label: 'Sale price (BRL)', type: 'number', decimals: 2, required: true },
-                {
-                    name: 'minimum_stock_milliunits',
-                    label: 'Minimum stock',
-                    type: 'number',
-                    decimals: 3,
-                    required: true,
-                },
-                active,
-            ];
-        case 'stock-receipt':
-        case 'stock-issue':
-            return [
-                kind === 'stock-receipt'
-                    ? { name: 'product_id', label: 'Product', type: 'select', required: true }
-                    : { name: 'product_batch_id', label: 'Batch', type: 'select', required: true },
-                { ...location, required: true },
-                ...(kind === 'stock-receipt'
-                    ? ([
-                          { name: 'supplier_lot_code', label: 'Supplier lot code' },
-                          { name: 'expires_on', label: 'Expiry date', type: 'date' },
-                          { name: 'cost_cents', label: 'Total acquisition cost (BRL)', type: 'number', decimals: 2 },
-                      ] satisfies Field[])
-                    : []),
-                { name: 'quantity_milliunits', label: 'Quantity', type: 'number', decimals: 3, required: true },
-                occurred,
-                notes,
-            ];
         case 'receipt':
         case 'expense':
         case 'payment':
@@ -119,7 +80,7 @@ function fieldsFor({ kind, mode, self }: RecordProps): Field[] {
                 ...(kind === 'payment' ? [] : [description, amount]),
                 ...(kind === 'expense' ? [category] : []),
                 { name: 'payment_method_id', label: 'Payment method', type: 'select', required: true },
-                occurred,
+                { name: 'occurred_at', label: 'Date and time (UTC)', type: 'datetime-local', required: true },
                 notes,
             ];
         case 'payable':
@@ -172,277 +133,269 @@ function fieldsFor({ kind, mode, self }: RecordProps): Field[] {
             return [name, { name: 'permission_ids', label: 'Permissions', type: 'multi' }];
         case 'expense-categories':
             return [name];
-        case 'stock-movement':
+        default:
             return [];
     }
 }
 
 function operation({ kind, mode, id }: RecordProps) {
-    if (mode === 'show') return undefined;
-    if (!id) return undefined;
-
     switch (kind) {
-        case 'product': {
-            const productOperationResult = mode === 'archive' ? products.destroy(id) : products.update(id);
-            return id === undefined ? products.store() : productOperationResult;
-        }
-        case 'stock-receipt':
-            return movements.storeReceipt();
-        case 'stock-issue':
-            return movements.storeIssue();
+        case 'product':
+            return id == null
+                ? products.store.form()
+                : mode === 'archive'
+                  ? products.destroy.form(id)
+                  : { action: products.update.url(id), method: 'post' as const };
         case 'receipt':
-            return cash.storeReceipt();
+            return cash.storeReceipt.form();
         case 'expense':
-            return cash.storeExpense();
-        case 'payable': {
-            const updatedOrArchivedPayable = mode === 'archive' ? payables.destroy(id) : payables.update(id);
-            return id === undefined ? payables.store() : updatedOrArchivedPayable;
-        }
+            return cash.storeExpense.form();
+        case 'payable':
+            return id == null
+                ? payables.store.form()
+                : mode === 'archive'
+                  ? payables.destroy.form(id)
+                  : payables.update.form(id);
         case 'payment':
-            return payables.pay(id!);
+            return id == null ? null : payables.pay.form(id);
         case 'stock-movement':
-            return undefined;
+            return null;
         default: {
             const routes = sections[kind].routes;
-            const archivedRoute = mode === 'archive' ? routes.destroy(id) : routes.update(id);
-            return id === undefined ? routes.store() : archivedRoute;
+            return id == null
+                ? routes.store.form()
+                : mode === 'archive'
+                  ? routes.destroy.form(id)
+                  : routes.update.form(id);
         }
     }
 }
 
-function backLink(kind: Kind): { href: string; permissions: Permission['name'][] } {
+export function recordBreadcrumbs({ kind, title, auth }: RecordProps & { auth: Auth }) {
+    const dashboardItem = { title: 'Dashboard', href: dashboard() };
+    const current = { title, href: dashboard() };
+    const permissions: Permission['name'][] = auth.permissions;
     switch (kind) {
         case 'product':
-            return { href: inventory.url(), permissions: ['product.index'] };
+            return [
+                dashboardItem,
+                ...(permissions.includes('product.index') ? [{ title: 'Inventory', href: inventory() }] : []),
+                current,
+            ];
         case 'stock-movement':
-        case 'stock-receipt':
-        case 'stock-issue':
-            return { href: movements.index.url(), permissions: ['stock-movement.index'] };
+            return [
+                dashboardItem,
+                ...(permissions.includes('stock-movement.index')
+                    ? [{ title: 'Stock movements', href: movements.index() }]
+                    : []),
+                current,
+            ];
         case 'receipt':
         case 'expense':
         case 'payable':
         case 'payment':
-            return { href: cash.index.url(), permissions: ['cash-entry.index', 'financial-account.index'] };
-        default:
-            return { href: sections[kind].routes.index.url(), permissions: [`${sections[kind].permission}.index`] };
+            return [
+                dashboardItem,
+                ...(permissions.some(
+                    (permission) => permission === 'cash-entry.index' || permission === 'financial-account.index',
+                )
+                    ? [{ title: 'Cash flow', href: cash.index() }]
+                    : []),
+                current,
+            ];
+        default: {
+            const section = sections[kind];
+            return [
+                dashboardItem,
+                ...(permissions.includes((section.permission + '.index') as Permission['name'])
+                    ? [{ title: section.title, href: section.routes.index() }]
+                    : []),
+                current,
+            ];
+        }
     }
 }
 
-export function RecordBack({ kind }: Readonly<{ kind: Kind }>) {
-    const { can } = usePermission();
-    const { href, permissions } = backLink(kind);
-    return <ErpLink href={can(...permissions) ? href : dashboard.url()}>Back</ErpLink>;
-}
-
-export function RecordDetails({ details }: Readonly<Pick<RecordProps, 'details'>>) {
-    if (!details) return null;
+function RecordDetails({ details, images }: Readonly<Pick<RecordProps, 'details' | 'images'>>) {
     return (
-        <dl className="grid gap-3 sm:grid-cols-2">
-            {Object.entries(details).map(([label, value]) => (
-                <div className="min-w-0 rounded-md border p-3" key={label}>
-                    <dt className="text-sm text-muted-foreground">{label}</dt>
-                    <dd className="mt-1 text-sm font-medium wrap-break-word">
-                        {value === null || value === '' ? '—' : value}
-                    </dd>
+        <>
+            {details && (
+                <dl className="grid gap-3 sm:grid-cols-2">
+                    {Object.entries(details).map(([label, value]) => (
+                        <div className="min-w-0 rounded-md border p-3" key={label}>
+                            <dt className="text-sm text-muted-foreground">{label}</dt>
+                            <dd className="mt-1 text-sm font-medium wrap-break-word">
+                                {value === null || value === '' ? (
+                                    '—'
+                                ) : typeof value !== 'object' ? (
+                                    value
+                                ) : 'date' in value ? (
+                                    <ErpDate value={value.date} withTime={value.withTime} />
+                                ) : 'feeRate' in value ? (
+                                    <ErpFee rate={value.feeRate} type={value.feeType} />
+                                ) : (
+                                    <ErpMoney amount={value.cents / 100} />
+                                )}
+                            </dd>
+                        </div>
+                    ))}
+                </dl>
+            )}
+            {images?.some((image) => image.url) && (
+                <div className="mt-4 flex flex-wrap gap-3">
+                    {images.map(
+                        ({ url, id }, index) =>
+                            url && (
+                                <img
+                                    key={id}
+                                    className="aspect-square w-28 rounded-md border object-cover"
+                                    src={url}
+                                    alt={'Product image ' + (index + 1)}
+                                />
+                            ),
+                    )}
                 </div>
-            ))}
-        </dl>
+            )}
+        </>
     );
 }
 
-export function useRecordForm(props: RecordProps) {
-    const fields = fieldsFor(props);
-    const form = useForm<Fields>(
-        Object.fromEntries(
-            fields.map((field) => {
-                const value = props.values?.[field.name];
-                const fieldDefault = field.type === 'checkbox' ? false : '';
-                const initial = value ?? (field.type === 'multi' ? [] : fieldDefault);
-                return [
-                    field.name,
-                    field.decimals && typeof value === 'number'
-                        ? (value / 10 ** field.decimals).toFixed(field.decimals)
-                        : initial,
-                ];
-            }),
-        ),
-    );
+function RecordField({ field, props, errors }: Readonly<{ field: Field; props: RecordProps; errors: FormErrors }>) {
+    const { name, label, required, type } = field;
+    const value = props.values?.[name];
+    const options = field.options ?? props.choices?.[name] ?? [];
+    const error = fieldError(errors, name);
+    const text = typeof value === 'string' || typeof value === 'number' ? value : undefined;
 
-    function submit(event: SubmitEvent<HTMLFormElement>, close?: () => void) {
-        event.preventDefault();
-        const target = operation(props);
-        if (!target) return;
-
-        form.transform((data) => {
-            const payload = { ...data };
-            if (props.kind === 'payment')
-                payload['expected_amount_cents'] = props.values?.['expected_amount_cents'] ?? null;
-            for (const field of fields) {
-                const value = payload[field.name];
-                if (field.decimals && typeof value === 'string' && value !== '') {
-                    payload[field.name] = Math.round(Number(value) * 10 ** field.decimals);
-                }
-            }
-            return payload;
-        });
-        form.submit(target.method, target.url, { preserveScroll: true, onSuccess: close });
+    switch (type) {
+        case 'textarea':
+            return <TextareaField name={name} label={label} error={error} defaultValue={String(text ?? '')} />;
+        case 'checkbox':
+            return <CheckboxField name={name} label={label} error={error} defaultSelected={Boolean(value)} />;
+        case 'select':
+            return (
+                <SelectField
+                    name={name}
+                    label={label}
+                    error={error}
+                    defaultValue={text}
+                    options={options}
+                    required={required}
+                />
+            );
+        case 'multi':
+            return (
+                <CheckboxList
+                    name={name}
+                    label={label}
+                    error={error}
+                    options={options}
+                    selected={Array.isArray(value) ? value : undefined}
+                />
+            );
+        default: {
+            const currency = name === 'amount_cents';
+            return (
+                <InputField
+                    name={name}
+                    label={label}
+                    type={type ?? 'text'}
+                    required={required}
+                    error={error}
+                    defaultValue={currency && typeof value === 'number' ? scaledInput(value, 2) : text}
+                    min={type === 'number' ? 0 : undefined}
+                    step={currency ? 0.01 : undefined}
+                    autoComplete={type === 'password' ? 'new-password' : undefined}
+                />
+            );
+        }
     }
-
-    return { fields, form, submit };
 }
 
 export function RecordForm({
     props,
-    model,
     close,
+    onProcessing,
 }: Readonly<{
     props: RecordProps;
-    model: ReturnType<typeof useRecordForm>;
     close?: () => void;
+    onProcessing?: (processing: boolean) => void;
 }>) {
-    const prefix = useId();
-    const { form, fields, submit } = model;
-    if (props.mode === 'show') return <RecordDetails details={props.details} />;
+    const upload = useProductImages(props.productForm?.images ?? emptyImages);
+    if (props.mode === 'show') return <RecordDetails details={props.details} images={props.images} />;
+    const target = operation(props);
+    if (!target) return null;
 
+    const fields = fieldsFor(props);
     const confirm = props.mode === 'archive';
-    const payment = props.kind === 'payment';
     const deleteRecord = props.kind === 'users' || props.kind === 'roles';
+    const cancelPayable = props.kind === 'payable';
 
-    const confirmationMessage = deleteRecord ? 'Permanently delete this record?' : 'Archive this record?';
-    const submitButtonLabel = payment ? 'Confirm payment' : 'Save';
-    const recordAction = deleteRecord ? 'Delete' : 'Archive';
-    const cancelOrArchiveAction = props.kind === 'payable' ? 'Cancel payable' : recordAction;
+    function transform(data: FormValues) {
+        if (props.productForm) return { ...upload.transform(data), _method: 'PATCH' };
+        return {
+            ...scaleFields(data, { amount_cents: 2 }),
+            ...(fields.some((field) => field.name === 'is_active') ? { is_active: data['is_active'] === '1' } : {}),
+            ...(props.kind === 'payment'
+                ? { expected_amount_cents: Number(props.values?.['expected_amount_cents']) }
+                : {}),
+        };
+    }
 
     return (
-        <form className="space-y-4" onSubmit={(event) => submit(event, close)}>
-            <RecordDetails details={props.details} />
-            <Activity mode={confirm ? 'visible' : 'hidden'}>
-                <p className="text-sm text-muted-foreground">
-                    {props.kind === 'payable' ? 'Cancel this unpaid obligation?' : confirmationMessage}
-                </p>
-            </Activity>
-            <div className="grid gap-4 sm:grid-cols-2">
-                {fields.map((field) => {
-                    const id = prefix + '-' + field.name;
-                    const value = form.data[field.name];
-                    const options = field.options ?? props.choices?.[field.name] ?? [];
-                    const error =
-                        form.errors[field.name] ??
-                        Object.entries(form.errors).find(([key]) => key.startsWith(field.name + '.'))?.[1];
-                    const common = {
-                        id,
-                        required: field.required,
-                        'aria-invalid': Boolean(error),
-                        'aria-describedby': error ? id + '-error' : undefined,
-                    };
-                    const selectClass =
-                        'w-full rounded-md border border-input bg-background p-2 text-sm focus-visible:outline-2 focus-visible:outline-ring';
-                    const input = (() => {
-                        switch (field.type) {
-                            case 'textarea':
-                                return (
-                                    <Textarea
-                                        {...common}
-                                        value={String(value ?? '')}
-                                        onChange={(event) => form.setData(field.name, event.target.value)}
-                                    />
-                                );
-                            case 'checkbox':
-                                return (
-                                    <input
-                                        {...common}
-                                        type="checkbox"
-                                        checked={Boolean(value)}
-                                        onChange={(event) => form.setData(field.name, event.target.checked)}
-                                    />
-                                );
-                            case 'select':
-                                return (
-                                    <select
-                                        {...common}
-                                        className={selectClass}
-                                        value={String(value ?? '')}
-                                        onChange={(event) => form.setData(field.name, event.target.value)}
-                                    >
-                                        <option value="">{field.required ? 'Select an option' : 'None'}</option>
-                                        {options.map((option) => (
-                                            <option key={option.id} value={option.id}>
-                                                {option.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                );
-                            case 'multi':
-                                return (
-                                    <div
-                                        id={id}
-                                        className="max-h-40 space-y-1 overflow-auto rounded-md border p-2"
-                                        role="group"
-                                        aria-labelledby={id + '-label'}
-                                        aria-describedby={common['aria-describedby']}
-                                    >
-                                        {options.length === 0 && (
-                                            <p className="text-sm text-muted-foreground">No options available.</p>
-                                        )}
-                                        {options.map((option) => {
-                                            const selected = Array.isArray(value) ? value.map(String) : [];
-                                            const key = String(option.id);
-                                            return (
-                                                <label key={key} className="flex items-center gap-2 text-sm">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selected.includes(key)}
-                                                        onChange={(event) =>
-                                                            form.setData(
-                                                                field.name,
-                                                                event.target.checked
-                                                                    ? [...selected, key]
-                                                                    : selected.filter((item) => item !== key),
-                                                            )
-                                                        }
-                                                    />
-                                                    {option.name}
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-                                );
-                            default:
-                                return (
-                                    <Input
-                                        {...common}
-                                        type={field.type ?? 'text'}
-                                        value={String(value ?? '')}
-                                        min={field.type === 'number' ? 0 : undefined}
-                                        step={field.decimals ? 1 / 10 ** field.decimals : undefined}
-                                        autoComplete={field.type === 'password' ? 'new-password' : undefined}
-                                        onChange={(event) => form.setData(field.name, event.target.value)}
-                                    />
-                                );
-                        }
-                    })();
-                    return (
-                        <div
-                            className={field.type === 'checkbox' ? 'flex items-center gap-2' : 'space-y-1'}
-                            key={field.name}
-                        >
-                            {field.type === 'multi' ? (
-                                <p className="text-sm font-medium" id={id + '-label'}>
-                                    {field.label}
-                                </p>
-                            ) : (
-                                <Label htmlFor={id}>{field.label}</Label>
-                            )}
-                            {input}
-                            <InputError id={id + '-error'} message={error} />
-                        </div>
-                    );
-                })}
-            </div>
-            <InputError role="alert" message={form.errors['record']} />
-            <Button type="submit" variant={confirm ? 'destructive' : 'default'} isDisabled={form.processing}>
-                {confirm ? cancelOrArchiveAction : submitButtonLabel}
-            </Button>
-        </form>
+        <Form
+            {...target}
+            transform={transform}
+            className="space-y-5"
+            disableWhileProcessing
+            options={{ preserveScroll: true }}
+            onStart={() => onProcessing?.(true)}
+            onFinish={() => onProcessing?.(false)}
+            onSuccess={close}
+        >
+            {({ errors, processing, progress }) => (
+                <>
+                    <RecordDetails details={props.details} />
+                    {confirm && (
+                        <p className="text-sm text-muted-foreground">
+                            {cancelPayable
+                                ? 'Cancel this unpaid obligation?'
+                                : deleteRecord
+                                  ? 'Permanently delete this record?'
+                                  : 'Archive this record?'}
+                        </p>
+                    )}
+                    {props.productForm ? (
+                        <ProductFields
+                            data={props.productForm}
+                            errors={errors}
+                            upload={upload}
+                            uploadProgress={progress?.percentage}
+                        />
+                    ) : (
+                        fields.length > 0 && (
+                            <FieldGroup className="grid gap-4 sm:grid-cols-2">
+                                {fields.map((field) => (
+                                    <RecordField key={field.name} field={field} props={props} errors={errors} />
+                                ))}
+                            </FieldGroup>
+                        )
+                    )}
+                    <InputError role="alert" message={errors['record']} />
+                    <Button type="submit" variant={confirm ? 'destructive' : 'default'} isDisabled={processing}>
+                        {processing && <Spinner />}
+                        {confirm
+                            ? cancelPayable
+                                ? 'Cancel payable'
+                                : deleteRecord
+                                  ? 'Delete'
+                                  : 'Archive'
+                            : props.kind === 'payment'
+                              ? 'Confirm payment'
+                              : 'Save'}
+                    </Button>
+                </>
+            )}
+        </Form>
     );
 }

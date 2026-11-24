@@ -4,17 +4,9 @@ import { index as inventory } from '@/routes/erp/inventory';
 import movements from '@/routes/erp/inventory/movements';
 import products from '@/routes/erp/inventory/products';
 import { ImageIcon, PackagePlus, Plus } from 'lucide-react';
-import {
-    actionColumn,
-    choices,
-    currency,
-    ErpLink,
-    ErpPage,
-    humanize,
-    Metrics,
-    quantity,
-    tableColumn,
-} from '@/components/erp/page';
+import { dashboard } from '@/routes';
+import { ErpDate, ErpMoney, ErpQuantity, useErpFormatting } from '@/components/erp/format';
+import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
 
 type ProductRow = {
     id: number;
@@ -56,9 +48,9 @@ const columns = [
             ),
     },
     column('name', 'Name'),
-    column('quantity', 'Current quantity', 'number', (row) => quantity.format(row.quantity)),
+    column('quantity', 'Current quantity', 'number', (row) => <ErpQuantity amount={row.quantity} />),
     column('unit', 'Unit of measure'),
-    column('expires_on', 'Expiry date', 'date'),
+    column('expires_on', 'Expiry date', 'date', (row) => <ErpDate value={row.expires_on} />),
     column('days_remaining', 'Days remaining', 'number'),
     column(
         'status',
@@ -71,10 +63,10 @@ const columns = [
         ),
         choices(statuses),
     ),
-    column('minimum_stock', 'Minimum stock', 'number', (row) => quantity.format(row.minimum_stock)),
+    column('minimum_stock', 'Minimum stock', 'number', (row) => <ErpQuantity amount={row.minimum_stock} />),
     column('category', 'Category'),
-    column('average_cost', 'Average unit cost', 'number', (row) => currency.format(row.average_cost)),
-    column('current_value', 'Current value', 'number', (row) => currency.format(row.current_value)),
+    column('average_cost', 'Average unit cost', 'number', (row) => <ErpMoney amount={row.average_cost} />),
+    column('current_value', 'Current value', 'number', (row) => <ErpMoney amount={row.current_value} />),
     actionColumn<ProductRow>((row) => (
         <>
             <ErpLink href={products.show.url(row.id)} permission="product.show" compact modal>
@@ -98,6 +90,7 @@ export default function Inventory({
     summary,
     table,
 }: Readonly<{ summary: Summary; table: ServerTableData<ProductRow> }>) {
+    const { quantity } = useErpFormatting();
     return (
         <ErpPage
             title="Inventory"
@@ -125,3 +118,10 @@ export default function Inventory({
         </ErpPage>
     );
 }
+
+Inventory.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: 'Inventory', href: inventory() },
+    ],
+};

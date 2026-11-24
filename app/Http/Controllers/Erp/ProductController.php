@@ -6,14 +6,19 @@ namespace App\Http\Controllers\Erp;
 
 use App\Http\Requests\Erp\ProductRequest;
 use App\Models\Category;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\StorageLocation;
 use App\Models\UnitOfMeasure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Image\ImageException;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Image as LaravelImage;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,7 +28,7 @@ final class ProductController extends Controller
 {
     public function create(): Response
     {
-        return Inertia::render('erp/form', $this->form());
+        return Inertia::render('erp/inventory/products/create', $this->formData());
     }
 
     public function store(ProductRequest $request): RedirectResponse
@@ -41,6 +46,7 @@ final class ProductController extends Controller
             'title' => $product->name,
             'kind' => 'product',
             'mode' => 'show',
+            'images' => $this->images($product),
             'details' => [
                 'SKU' => $product->sku,
                 'Description' => $product->description,
@@ -48,15 +54,21 @@ final class ProductController extends Controller
                 'Preferred location' => $product->storageLocation?->name,
                 'Categories' => $product->categories->pluck('name')->implode(', '),
                 'Current quantity' => $product->currentStockMilliunits() / 1000,
-                'Reference unit cost (cents)' => $product->cost_price_cents,
-                'Sale price (cents)' => $product->sale_price_cents,
+                'Reference unit cost' => ['cents' => $product->cost_price_cents],
+                'Sale price' => ['cents' => $product->sale_price_cents],
             ],
         ]);
     }
 
     public function edit(Request $request, Product $product): Modal|Response
     {
-        return $this->modal($request, $this->form($product));
+        return $this->modal($request, [
+            'title' => 'Edit '.$product->name,
+            'kind' => 'product',
+            'mode' => 'edit',
+            'id' => $product->id,
+            'productForm' => $this->formData($product),
+        ]);
     }
 
     public function update(ProductRequest $request, Product $product): RedirectResponse
@@ -97,35 +109,93 @@ final class ProductController extends Controller
         $data['description'] ??= '';
 
         DB::transaction(function () use ($product, $data): void {
-            $product->fill(Arr::except($data, ['category_ids', ...($product->exists ? ['sku', 'unit_of_measure_id'] : [])]))->save();
+            if ($product->exists) {
+                $product = Product::query()->lockForUpdate()->findOrFail($product->id);
+            }
+
+            $attributes = Arr::except($data, ['category_ids', 'images', 'remove_image_ids', ...($product->exists ? ['sku', 'unit_of_measure_id'] : [])]);
+            $product->fill($attributes)->save();
             $archived = $product->categories()->withTrashed()->whereNotNull('categories.deleted_at')->pluck('categories.id');
             $product->categories()->sync($archived->merge($data['category_ids'] ?? []));
-        }, attempts: 3);
+            $this->saveImages($product, $data['images'] ?? [], $data['remove_image_ids'] ?? []);
+        });
+    }
+
+    /**
+     * @param  list<UploadedFile>  $files
+     * @param  list<int|numeric-string>  $removeIds
+     */
+    private function saveImages(Product $product, array $files, array $removeIds): void
+    {
+        if ($files === [] && $removeIds === []) {
+            return;
+        }
+
+        $existing = $product->images()->get();
+        $removed = $existing->whereIn('id', $removeIds);
+
+        if ($removed->count() !== count($removeIds)) {
+            throw ValidationException::withMessages(['remove_image_ids' => 'Select images belonging to this product.']);
+        }
+
+        if ($files !== [] && $existing->count() - $removed->count() + count($files) > 5) {
+            throw ValidationException::withMessages(['images' => 'A product can have at most five images.']);
+        }
+
+        $directory = 'products/'.$product->id;
+        $disk = Storage::disk('public');
+        $sortOrder = (int) $existing->max('sort_order');
+
+        foreach ($removed as $image) {
+            $image->delete();
+
+            if ($image->disk === 'public' && str_starts_with($image->path, $directory.'/')) {
+                DB::afterCommit(fn () => $disk->delete($image->path));
+            }
+        }
+
+        foreach ($files as $index => $file) {
+            try {
+                $path = LaravelImage::fromUpload($file)->orient()->scale(1600, 1600)->toWebp()->storePublicly($directory, 'public');
+            } catch (ImageException $exception) {
+                report($exception);
+                $path = false;
+            }
+
+            if ($path === false) {
+                throw ValidationException::withMessages(["images.$index" => 'This image could not be processed.']);
+            }
+
+            DB::afterRollBack(fn () => $disk->delete($path));
+            $product->images()->create(['disk' => 'public', 'path' => $path, 'sort_order' => ++$sortOrder]);
+        }
     }
 
     /** @return array<string, mixed> */
-    private function form(?Product $product = null): array
+    private function formData(?Product $product = null): array
     {
         return [
-            'title' => $product === null ? 'New product' : 'Edit product',
-            'kind' => 'product',
-            'mode' => $product === null ? 'create' : 'edit',
-            'id' => $product?->getKey(),
-            'values' => $product === null ? [
-                'cost_price_cents' => 0, 'sale_price_cents' => 0, 'minimum_stock_milliunits' => 0, 'is_active' => true,
-            ] : [
+            'product' => $product === null ? null : [
                 ...$product->only(['name', 'description', 'storage_location_id', 'cost_price_cents', 'sale_price_cents', 'minimum_stock_milliunits', 'is_active']),
                 'category_ids' => $product->categories()->pluck('categories.id'),
             ],
-            'choices' => [
-                'unit_of_measure_id' => UnitOfMeasure::query()->orderBy('name')->get(['id', 'name']),
-                'storage_location_id' => StorageLocation::query()->withTrashed()
-                    ->where(fn ($query) => $query->where(fn ($active) => $active->whereNull('deleted_at')->where('is_active', true))
-                        ->orWhere('id', $product?->storage_location_id))
-                    ->orderBy('name')->get(['id', 'name']),
-                'category_ids' => Category::query()->orderBy('name')->get(['id', 'name']),
-            ],
+            'units' => $product === null ? UnitOfMeasure::query()->orderBy('name')->get(['id', 'name']) : [],
+            'locations' => StorageLocation::query()->withTrashed()
+                ->where(fn ($query) => $query->where(fn ($active) => $active->whereNull('deleted_at')->where('is_active', true))
+                    ->orWhere('id', $product?->storage_location_id))
+                ->orderBy('name')->get(['id', 'name']),
+            'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
+            'images' => $product === null ? [] : $this->images($product),
         ];
+    }
+
+    /** @return list<array{id: int, url: string|null}> */
+    private function images(Product $product): array
+    {
+        return array_values($product->images()->get()->map(fn (Image $image): array => [
+            'id' => $image->id,
+            'url' => $image->disk === 'public' ? Storage::disk('public')->url($image->path) : null,
+        ])->all());
     }
 
     /** @param array<string, mixed> $props */

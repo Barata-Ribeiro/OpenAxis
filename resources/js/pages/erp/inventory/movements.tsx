@@ -1,6 +1,8 @@
 import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
 import movements from '@/routes/erp/inventory/movements';
-import { actionColumn, choices, ErpLink, ErpPage, humanize, quantity, tableColumn } from '@/components/erp/page';
+import { actionColumn, choices, ErpLink, ErpPage, humanize, tableColumn } from '@/components/erp/page';
+import { ErpDate, ErpQuantity } from '@/components/erp/format';
+import { dashboard } from '@/routes';
 
 type MovementRow = {
     id: number;
@@ -14,12 +16,12 @@ type MovementRow = {
 
 const column = tableColumn<MovementRow>;
 const columns = [
-    column('occurred_at', 'Date and time', 'date'),
+    column('occurred_at', 'Date and time', 'date', (row) => <ErpDate value={row.occurred_at} withTime />),
     column('type', 'Type', 'select', (row) => humanize(row.type), choices(['opening', 'receipt', 'issue', 'return'])),
     column('product', 'Product'),
     column('batch', 'Batch'),
     column('location', 'Location'),
-    column('quantity', 'Quantity', 'number', (row) => quantity.format(Number(row.quantity))),
+    column('quantity', 'Quantity', 'number', (row) => <ErpQuantity amount={Number(row.quantity)} />),
     actionColumn<MovementRow>((row) => (
         <ErpLink href={movements.show.url(row.id)} permission="stock-movement.show" compact modal>
             View
@@ -46,3 +48,10 @@ export default function Movements({ table }: Readonly<{ table: ServerTableData<M
         </ErpPage>
     );
 }
+
+Movements.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: 'Stock movements', href: movements.index() },
+    ],
+};

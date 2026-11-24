@@ -47,27 +47,20 @@ final class StockMovementController extends Controller
 
     public function create(Request $request): Response
     {
-        $receipt = $request->route('direction') === StockMovement::TYPE_RECEIPT;
-        $choices = [
-            'storage_location_id' => StorageLocation::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
-        ];
-
-        if ($receipt) {
-            $choices['product_id'] = Product::query()->where('is_active', true)->orderBy('name')->get(['id', 'name', 'sku'])
-                ->map(fn (Product $product): array => ['id' => $product->id, 'name' => "$product->sku · $product->name"]);
-        } else {
-            $choices['product_batch_id'] = ProductBatch::query()
-                ->whereHas('stockMovements', fn ($query) => $query->selectRaw('SUM(quantity_milliunits)')->groupBy('product_batch_id')->havingRaw('SUM(quantity_milliunits) > 0'))
+        $direction = $request->route('direction');
+        $options = $direction === StockMovement::TYPE_RECEIPT
+            ? Product::query()->where('is_active', true)->orderBy('name')->get(['id', 'name', 'sku'])
+                ->map(fn (Product $product): array => ['id' => $product->id, 'name' => "$product->sku · $product->name"])
+            : ProductBatch::query()
+                ->whereHas('stockMovements', fn ($query) => $query->select('product_batch_id')->groupBy('product_batch_id')->havingRaw('SUM(quantity_milliunits) > 0'))
                 ->with('product:id,name')->orderBy('code')->get()
                 ->map(fn (ProductBatch $batch): array => ['id' => $batch->id, 'name' => $batch->code.' · '.$batch->product->name]);
-        }
 
-        return Inertia::render('erp/form', [
-            'title' => $receipt ? 'New stock receipt' : 'New stock issue',
-            'kind' => $receipt ? 'stock-receipt' : 'stock-issue',
-            'mode' => 'create',
-            'values' => ['occurred_at' => now()->format('Y-m-d\TH:i')],
-            'choices' => $choices,
+        return Inertia::render('erp/inventory/movements/create', [
+            'direction' => $direction,
+            'occurredAt' => now()->format('Y-m-d\TH:i'),
+            'locations' => StorageLocation::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'options' => $options,
         ]);
     }
 
@@ -126,7 +119,7 @@ final class StockMovementController extends Controller
                 'Quantity' => $stockMovement->quantity_milliunits / 1000,
                 'Type' => ucfirst($stockMovement->type),
                 'Recorded by' => $stockMovement->createdBy?->name,
-                'Date and time' => $stockMovement->occurred_at->toDateTimeString(),
+                'Date and time' => ['date' => $stockMovement->occurred_at->toDateTimeString(), 'withTime' => true],
                 'Notes' => $stockMovement->notes,
             ],
         ];

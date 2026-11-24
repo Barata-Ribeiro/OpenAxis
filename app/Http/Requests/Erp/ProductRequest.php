@@ -41,9 +41,17 @@ final class ProductRequest extends FormRequest
             'sale_price_cents' => FluentRule::integer()->required()->between(0, 4_294_967_295),
             'minimum_stock_milliunits' => FluentRule::integer()->required()->between(0, 1_000_000_000_000),
             'is_active' => FluentRule::boolean()->required(),
-            'category_ids' => FluentRule::list()->max(50),
-            'category_ids.*' => FluentRule::integer()->required()->distinct()
-                ->exists(Category::class, 'id', fn (Exists $rule) => $rule->withoutTrashed()),
+            'category_ids' => FluentRule::list()->max(50)->each(
+                FluentRule::integer()->required()->distinct()
+                    ->exists(Category::class, 'id', fn (Exists $rule) => $rule->withoutTrashed()),
+            ),
+            'images' => FluentRule::list()->max(5)->each(
+                FluentRule::image()->required()->mimes('jpg', 'jpeg', 'png', 'webp')
+                    ->max('2mb')->maxWidth(4096)->maxHeight(4096),
+            ),
+            'remove_image_ids' => $editing
+                ? FluentRule::list()->max(5)->each(FluentRule::integer()->required()->min(1)->distinct())
+                : FluentRule::field()->prohibited(),
         ];
     }
 }

@@ -24,15 +24,22 @@ export default function Modal({ title, description, processing, children }: Read
                     onOpenChange={(open) => {
                         if (!open && !processing) close();
                     }}
-                    className="max-h-9/10 overflow-hidden"
+                    className="flex max-h-9/10 flex-col overflow-hidden *:data-[slot=dialog]:min-h-0 *:data-[slot=dialog]:flex-col sm:max-w-2xl"
                     showCloseButton={!processing}
                 >
-                    <DialogHeader className="shrink-0">
+                    <DialogHeader className="shrink-0 pr-8">
                         <DialogTitle>{title}</DialogTitle>
                         <DialogDescription>{description}</DialogDescription>
                     </DialogHeader>
 
-                    <ScrollArea className="grid min-h-0">{children(close)}</ScrollArea>
+                    <ScrollArea
+                        className="min-h-0 overflow-x-hidden overscroll-contain p-1"
+                        role="region"
+                        tabIndex={0}
+                        aria-label={title}
+                    >
+                        {children(close)}
+                    </ScrollArea>
                 </Dialog>
             )}
         </HeadlessModal>

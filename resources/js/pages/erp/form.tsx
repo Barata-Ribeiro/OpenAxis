@@ -1,17 +1,18 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { RecordBack, RecordForm, useRecordForm, type RecordProps } from '@/components/erp/record-form';
+import { RecordForm, recordBreadcrumbs, type RecordProps } from '@/components/erp/record-form';
 import { ErpPage } from '@/components/erp/page';
+import type { Auth } from '@/types/auth';
 
 export default function FormPage(props: Readonly<RecordProps>) {
-    const model = useRecordForm(props);
-
     return (
-        <ErpPage title={props.title} actions={<RecordBack kind={props.kind} />}>
+        <ErpPage title={props.title}>
             <Card className="w-full max-w-3xl">
                 <CardContent>
-                    <RecordForm props={props} model={model} />
+                    <RecordForm props={props} />
                 </CardContent>
             </Card>
         </ErpPage>
     );
 }
+
+FormPage.layout = (props: RecordProps & { auth: Auth }) => ({ breadcrumbs: recordBreadcrumbs(props) });
