@@ -87,7 +87,9 @@ function useComposedRefs<T>(...refs: Array<PossibleRef<T>>): React.RefCallback<T
 export function useCallbackRef<T extends (...args: any[]) => any>(callback: T | undefined): T {
     const callbackRef = React.useRef(callback);
 
-    React.useEffect(() => (callbackRef.current = callback));
+    React.useEffect(() => {
+        callbackRef.current = callback;
+    }, [callback]);
 
     return React.useMemo(() => ((...args) => callbackRef.current?.(...args)) as T, []);
 }
