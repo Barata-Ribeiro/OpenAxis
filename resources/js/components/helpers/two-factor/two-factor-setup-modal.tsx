@@ -47,7 +47,7 @@ function TwoFactorSetupStep({
     errors: string[];
 }>) {
     const { resolvedAppearance } = useAppearance();
-    const [copiedText, copy] = useClipboard();
+    const { value: copiedText, copy } = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
     return (
