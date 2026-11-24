@@ -1,9 +1,11 @@
 import InputError from '@/components/common/input-error';
+import { ErpLink } from '@/components/erp/page';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { usePermission } from '@/hooks/use-permission';
+import { sections, type SettingsSection } from '@/lib/erp-settings';
 import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
 import payables from '@/routes/erp/cash-flow/payables';
@@ -12,10 +14,8 @@ import movements from '@/routes/erp/inventory/movements';
 import products from '@/routes/erp/inventory/products';
 import type { Permission } from '@/types/role-permission';
 import { useForm } from '@inertiajs/react';
-import type { FormEvent } from 'react';
-import { useId } from 'react';
-import { sections, type SettingsSection } from '@/lib/erp-settings';
-import { ErpLink } from '@/components/erp/page';
+import type { SubmitEvent } from 'react';
+import { Activity, useId } from 'react';
 
 type Value = string | number | boolean | (number | string)[];
 type Option = { id: number | string; name: string };
@@ -179,13 +179,13 @@ function fieldsFor({ kind, mode, self }: RecordProps): Field[] {
 
 function operation({ kind, mode, id }: RecordProps) {
     if (mode === 'show') return undefined;
+    if (!id) return undefined;
+
     switch (kind) {
-        case 'product':
-            return id === undefined
-                ? products.store()
-                : mode === 'archive'
-                  ? products.destroy(id)
-                  : products.update(id);
+        case 'product': {
+            const productOperationResult = mode === 'archive' ? products.destroy(id) : products.update(id);
+            return id === undefined ? products.store() : productOperationResult;
+        }
         case 'stock-receipt':
             return movements.storeReceipt();
         case 'stock-issue':
@@ -194,19 +194,18 @@ function operation({ kind, mode, id }: RecordProps) {
             return cash.storeReceipt();
         case 'expense':
             return cash.storeExpense();
-        case 'payable':
-            return id === undefined
-                ? payables.store()
-                : mode === 'archive'
-                  ? payables.destroy(id)
-                  : payables.update(id);
+        case 'payable': {
+            const updatedOrArchivedPayable = mode === 'archive' ? payables.destroy(id) : payables.update(id);
+            return id === undefined ? payables.store() : updatedOrArchivedPayable;
+        }
         case 'payment':
             return payables.pay(id!);
         case 'stock-movement':
             return undefined;
         default: {
             const routes = sections[kind].routes;
-            return id === undefined ? routes.store() : mode === 'archive' ? routes.destroy(id) : routes.update(id);
+            const archivedRoute = mode === 'archive' ? routes.destroy(id) : routes.update(id);
+            return id === undefined ? routes.store() : archivedRoute;
         }
     }
 }
@@ -242,7 +241,7 @@ export function RecordDetails({ details }: Readonly<Pick<RecordProps, 'details'>
             {Object.entries(details).map(([label, value]) => (
                 <div className="min-w-0 rounded-md border p-3" key={label}>
                     <dt className="text-sm text-muted-foreground">{label}</dt>
-                    <dd className="mt-1 text-sm font-medium break-words">
+                    <dd className="mt-1 text-sm font-medium wrap-break-word">
                         {value === null || value === '' ? '—' : value}
                     </dd>
                 </div>
@@ -257,14 +256,8 @@ export function useRecordForm(props: RecordProps) {
         Object.fromEntries(
             fields.map((field) => {
                 const value = props.values?.[field.name];
-                const initial =
-                    value === undefined || value === null
-                        ? field.type === 'multi'
-                            ? []
-                            : field.type === 'checkbox'
-                              ? false
-                              : ''
-                        : value;
+                const fieldDefault = field.type === 'checkbox' ? false : '';
+                const initial = value ?? (field.type === 'multi' ? [] : fieldDefault);
                 return [
                     field.name,
                     field.decimals && typeof value === 'number'
@@ -275,7 +268,7 @@ export function useRecordForm(props: RecordProps) {
         ),
     );
 
-    const submit = (event: FormEvent<HTMLFormElement>, close?: () => void) => {
+    function submit(event: SubmitEvent<HTMLFormElement>, close?: () => void) {
         event.preventDefault();
         const target = operation(props);
         if (!target) return;
@@ -293,7 +286,7 @@ export function useRecordForm(props: RecordProps) {
             return payload;
         });
         form.submit(target.method, target.url, { preserveScroll: true, onSuccess: close });
-    };
+    }
 
     return { fields, form, submit };
 }
@@ -315,18 +308,19 @@ export function RecordForm({
     const payment = props.kind === 'payment';
     const deleteRecord = props.kind === 'users' || props.kind === 'roles';
 
+    const confirmationMessage = deleteRecord ? 'Permanently delete this record?' : 'Archive this record?';
+    const submitButtonLabel = payment ? 'Confirm payment' : 'Save';
+    const recordAction = deleteRecord ? 'Delete' : 'Archive';
+    const cancelOrArchiveAction = props.kind === 'payable' ? 'Cancel payable' : recordAction;
+
     return (
         <form className="space-y-4" onSubmit={(event) => submit(event, close)}>
             <RecordDetails details={props.details} />
-            {confirm && (
+            <Activity mode={confirm ? 'visible' : 'hidden'}>
                 <p className="text-sm text-muted-foreground">
-                    {props.kind === 'payable'
-                        ? 'Cancel this unpaid obligation?'
-                        : deleteRecord
-                          ? 'Permanently delete this record?'
-                          : 'Archive this record?'}
+                    {props.kind === 'payable' ? 'Cancel this unpaid obligation?' : confirmationMessage}
                 </p>
-            )}
+            </Activity>
             <div className="grid gap-4 sm:grid-cols-2">
                 {fields.map((field) => {
                     const id = prefix + '-' + field.name;
@@ -447,15 +441,7 @@ export function RecordForm({
             </div>
             <InputError role="alert" message={form.errors['record']} />
             <Button type="submit" variant={confirm ? 'destructive' : 'default'} isDisabled={form.processing}>
-                {confirm
-                    ? props.kind === 'payable'
-                        ? 'Cancel payable'
-                        : deleteRecord
-                          ? 'Delete'
-                          : 'Archive'
-                    : payment
-                      ? 'Confirm payment'
-                      : 'Save'}
+                {confirm ? cancelOrArchiveAction : submitButtonLabel}
             </Button>
         </form>
     );
