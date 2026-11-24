@@ -18,21 +18,26 @@ final class DataTableRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'table' => FluentRule::array(['page', 'perPage', 'search', 'filters', 'sorting']),
-            'table.page' => FluentRule::integer()->between(1, 1_000_000),
-            'table.perPage' => FluentRule::integer()->between(1, 100),
-            'table.search' => FluentRule::string()->nullable()->max(200),
-            'table.filters' => FluentRule::list()->max(20),
-            'table.filters.*' => FluentRule::array(['id', 'operator', 'value', 'filterId', 'joinOperator']),
-            'table.filters.*.id' => FluentRule::string()->required()->max(64),
-            'table.filters.*.operator' => FluentRule::string()->required()->in(TableQuery::operators()),
-            'table.filters.*.value' => FluentRule::field()->nullable(),
-            'table.filters.*.filterId' => FluentRule::string()->max(64),
-            'table.filters.*.joinOperator' => FluentRule::string()->in(['and', 'or']),
-            'table.sorting' => FluentRule::list()->max(12),
-            'table.sorting.*' => FluentRule::array(['id', 'desc']),
-            'table.sorting.*.id' => FluentRule::string()->required()->distinct()->max(64),
-            'table.sorting.*.desc' => FluentRule::boolean()->required(),
+            'table' => FluentRule::array(['page', 'perPage', 'search', 'filters', 'sorting'])->children([
+                'page' => FluentRule::integer()->between(1, 1_000_000),
+                'perPage' => FluentRule::integer()->between(1, 100),
+                'search' => FluentRule::string()->nullable()->max(200),
+                'filters' => FluentRule::list()->max(20)->each(
+                    FluentRule::array(['id', 'operator', 'value', 'filterId', 'joinOperator'])->children([
+                        'id' => FluentRule::string()->required()->max(64),
+                        'operator' => FluentRule::string()->required()->in(TableQuery::operators()),
+                        'value' => FluentRule::field()->nullable(),
+                        'filterId' => FluentRule::string()->max(64),
+                        'joinOperator' => FluentRule::string()->in(['and', 'or']),
+                    ]),
+                ),
+                'sorting' => FluentRule::list()->max(12)->each(
+                    FluentRule::array(['id', 'desc'])->children([
+                        'id' => FluentRule::string()->required()->distinct()->max(64),
+                        'desc' => FluentRule::boolean()->required(),
+                    ]),
+                ),
+            ]),
             'tab' => FluentRule::string()->in(['summary', 'receipts', 'expenses', 'payables']),
             'period' => FluentRule::string()->in(['today', 'week', 'month', 'custom']),
             'start' => FluentRule::date()->format('Y-m-d')->requiredIf('period', 'custom'),
