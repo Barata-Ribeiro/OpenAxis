@@ -40,6 +40,7 @@ export function actionColumn<T extends { id: number }>(actions: (row: T) => read
         header: 'Actions',
         meta: { label: 'Actions' },
         enableHiding: false,
+        size: 76,
         cell: ({ cell, row }) => <cell.ActionsCell actions={actions(row.original)} modal />,
     });
 }

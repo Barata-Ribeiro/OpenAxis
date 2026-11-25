@@ -5,9 +5,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { features } from '@/hooks/data-table/features';
 import { useAppTable } from '@/hooks/data-table/table';
 import { useDebouncedCallback } from '@/hooks/use-debounce-callback';
+import { cn } from '@/lib/utils';
 import type { ExtendedColumnFilter } from '@/types/data-table';
 import { router } from '@inertiajs/react';
-import type { Column, ColumnDef, PaginationState, SortingState, Updater } from '@tanstack/react-table';
+import type {
+    Column,
+    ColumnDef,
+    ColumnPinningState,
+    PaginationState,
+    SortingState,
+    Updater,
+} from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ChevronsUpDown, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -23,32 +31,31 @@ export type ServerTableData<TData> = {
 
 type Props<TData extends { id: string | number }> = {
     columns: ColumnDef<typeof features, TData>[];
+    initialColumnPinning?: ColumnPinningState;
     result: ServerTableData<TData>;
     url: string;
     label: string;
 };
 
-/**
- * TODO: Implement pinning styles for columns
- */
 function getCommonPinningStyles<TData extends { id: string | number }>(
     column: Column<typeof features, TData>,
-    isSelected = false,
-): React.CSSProperties {
-    const isPinned = column.getIsPinned();
-    const isLastLeftPinnedColumn = isPinned === 'start' && column.getIsLastColumn('start');
-    const isFirstRightPinnedColumn = isPinned === 'end' && column.getIsFirstColumn('end');
+): React.CSSProperties | undefined {
+    const pinned = column.getIsPinned();
+    if (!pinned) return undefined;
 
-    const rightPinnedBoxShadow = isFirstRightPinnedColumn ? '4px 0 4px -4px var(--border) inset' : undefined;
-    const pinnedBackground = isPinned ? 'var(--background)' : undefined;
-
+    const size = column.getSize();
     return {
-        boxShadow: isLastLeftPinnedColumn ? '-4px 0 4px -4px var(--border) inset' : rightPinnedBoxShadow,
-        insetInlineStart: isPinned === 'start' ? `${column.getStart('start')}px` : undefined,
-        insetInlineEnd: isPinned === 'end' ? `${column.getAfter('end')}px` : undefined,
-        position: isPinned ? 'sticky' : 'relative',
-        background: isSelected ? 'var(--muted)' : pinnedBackground,
-        zIndex: isPinned ? 1 : 0,
+        insetInlineStart: pinned === 'start' ? column.getStart('start') : undefined,
+        insetInlineEnd: pinned === 'end' ? column.getAfter('end') : undefined,
+        borderInlineEnd: pinned === 'start' && column.getIsLastColumn('start') ? '1px solid var(--border)' : undefined,
+        borderInlineStart: pinned === 'end' && column.getIsFirstColumn('end') ? '1px solid var(--border)' : undefined,
+        width: size,
+        minWidth: size,
+        maxWidth: size,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        position: 'sticky',
+        zIndex: 1,
     };
 }
 
@@ -64,6 +71,7 @@ function activeFilter(filter: ExtendedColumnFilter) {
 
 export default function DataTable<TData extends { id: string | number }>({
     columns,
+    initialColumnPinning = { start: [], end: ['actions'] },
     result,
     url,
     label,
@@ -138,6 +146,7 @@ export default function DataTable<TData extends { id: string | number }>({
         enableRowSelection: false,
         sortDescFirst: false,
         maxMultiSortColCount: 12,
+        initialState: { columnPinning: initialColumnPinning },
         state: { pagination, sorting, columnFilters: filters, globalFilter: search },
         onPaginationChange: (value) => {
             const next = update(value, pagination);
@@ -156,7 +165,9 @@ export default function DataTable<TData extends { id: string | number }>({
         },
     });
 
-    const headers = table.getFlatHeaders().filter((header) => header.column.getIsVisible());
+    const { columnOrder, columnPinning, columnSizing } = table.state;
+    const columnLayout = [columnOrder, columnPinning, columnSizing];
+    const headers = table.getLeafHeaders();
     const primarySort = sorting.find((sort) => headers.some((header) => header.column.id === sort.id));
     const rowHeader = headers.find((header) => header.column.accessorFn)?.column.id;
 
@@ -208,6 +219,7 @@ export default function DataTable<TData extends { id: string | number }>({
                     )}
                     <Table
                         aria-label={label}
+                        className="border-separate border-spacing-0"
                         sortDescriptor={
                             primarySort
                                 ? { column: primarySort.id, direction: primarySort.desc ? 'descending' : 'ascending' }
@@ -217,7 +229,7 @@ export default function DataTable<TData extends { id: string | number }>({
                             table.getColumn(String(column))?.toggleSorting(direction === 'descending')
                         }
                     >
-                        <TableHeader columns={headers}>
+                        <TableHeader columns={headers} dependencies={[...columnLayout, sorting]}>
                             {(header) => {
                                 const label = header.column.columnDef.meta?.label ?? header.column.id;
                                 const sorted = header.column.getIsSorted();
@@ -229,7 +241,8 @@ export default function DataTable<TData extends { id: string | number }>({
                                         isRowHeader={header.column.id === rowHeader}
                                         allowsSorting={primarySort?.id === header.column.id}
                                         textValue={label}
-                                        className="px-3"
+                                        className="border-b bg-card px-3"
+                                        style={getCommonPinningStyles(header.column)}
                                     >
                                         {header.column.getCanSort() ? (
                                             <Button
@@ -248,16 +261,36 @@ export default function DataTable<TData extends { id: string | number }>({
                                 );
                             }}
                         </TableHeader>
-                        <TableBody items={table.getRowModel().rows} renderEmptyState={() => 'No records found.'}>
+                        <TableBody
+                            items={table.getRowModel().rows}
+                            dependencies={columnLayout}
+                            renderEmptyState={() => 'No records found.'}
+                        >
                             {(row) => (
-                                <TableRow id={'row:' + row.id} columns={row.getVisibleCells()}>
-                                    {(cell) => (
-                                        <TableCell id={'cell:' + cell.id} className="px-3">
-                                            <table.AppCell cell={cell}>
-                                                {(appCell) => <appCell.FlexRender />}
-                                            </table.AppCell>
-                                        </TableCell>
-                                    )}
+                                <TableRow
+                                    id={'row:' + row.id}
+                                    columns={row.getVisibleCells()}
+                                    dependencies={columnLayout}
+                                    className="group/table-row"
+                                >
+                                    {(cell) => {
+                                        const pinningStyles = getCommonPinningStyles(cell.column);
+                                        return (
+                                            <TableCell
+                                                id={'cell:' + cell.id}
+                                                className={cn(
+                                                    'border-b px-3 group-last/table-row:border-b-0',
+                                                    pinningStyles &&
+                                                        'bg-card group-hover/table-row:bg-muted group-data-selected/table-row:bg-muted',
+                                                )}
+                                                style={pinningStyles}
+                                            >
+                                                <table.AppCell cell={cell}>
+                                                    {(appCell) => <appCell.FlexRender />}
+                                                </table.AppCell>
+                                            </TableCell>
+                                        );
+                                    }}
                                 </TableRow>
                             )}
                         </TableBody>
