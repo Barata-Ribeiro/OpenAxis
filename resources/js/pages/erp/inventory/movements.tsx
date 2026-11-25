@@ -3,6 +3,7 @@ import movements from '@/routes/erp/inventory/movements';
 import { actionColumn, choices, ErpLink, ErpPage, humanize, tableColumn } from '@/components/erp/page';
 import { ErpDate, ErpQuantity } from '@/components/erp/format';
 import { dashboard } from '@/routes';
+import { Eye } from 'lucide-react';
 
 type MovementRow = {
     id: number;
@@ -22,11 +23,9 @@ const columns = [
     column('batch', 'Batch'),
     column('location', 'Location'),
     column('quantity', 'Quantity', 'number', (row) => <ErpQuantity amount={Number(row.quantity)} />),
-    actionColumn<MovementRow>((row) => (
-        <ErpLink href={movements.show.url(row.id)} permission="stock-movement.show" compact modal>
-            View
-        </ErpLink>
-    )),
+    actionColumn<MovementRow>((row) => [
+        { label: 'View', href: movements.show.url(row.id), permissions: ['stock-movement.show'], icon: Eye },
+    ]),
 ];
 
 export default function Movements({ table }: Readonly<{ table: ServerTableData<MovementRow> }>) {

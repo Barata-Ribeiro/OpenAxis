@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { index as inventory } from '@/routes/erp/inventory';
 import movements from '@/routes/erp/inventory/movements';
 import products from '@/routes/erp/inventory/products';
-import { ImageIcon, PackagePlus, Plus } from 'lucide-react';
+import { Eye, ImageIcon, PackagePlus, PencilLine, Plus, Trash } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { ErpDate, ErpMoney, ErpQuantity, useErpFormatting } from '@/components/erp/format';
 import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
@@ -67,21 +67,17 @@ const columns = [
     column('category', 'Category'),
     column('average_cost', 'Average unit cost', 'number', (row) => <ErpMoney amount={row.average_cost} />),
     column('current_value', 'Current value', 'number', (row) => <ErpMoney amount={row.current_value} />),
-    actionColumn<ProductRow>((row) => (
-        <>
-            <ErpLink href={products.show.url(row.id)} permission="product.show" compact modal>
-                View
-            </ErpLink>
-            <ErpLink href={products.edit.url(row.id)} permission="product.edit" compact modal>
-                Edit
-            </ErpLink>
-            {row.quantity === 0 && (
-                <ErpLink href={products.archive.url(row.id)} permission="product.destroy" compact modal>
-                    Archive
-                </ErpLink>
-            )}
-        </>
-    )),
+    actionColumn<ProductRow>((row) => [
+        { label: 'View', href: products.show.url(row.id), permissions: ['product.show'], icon: Eye },
+        { label: 'Edit', href: products.edit.url(row.id), permissions: ['product.edit'], icon: PencilLine },
+        row.quantity === 0 && {
+            label: 'Archive',
+            href: products.archive.url(row.id),
+            permissions: ['product.destroy'],
+            icon: Trash,
+            destructive: true,
+        },
+    ]),
 ];
 
 type Summary = Record<'products' | 'critical' | 'in_stock' | 'expiring' | 'expired', number>;

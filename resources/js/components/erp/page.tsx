@@ -1,3 +1,4 @@
+import type { RowAction } from '@/components/data-table/cell-components';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { features, MyColumnMeta } from '@/hooks/data-table/features';
@@ -33,13 +34,13 @@ export function tableColumn<T extends { id: number }>(
     }) as ColumnDef<typeof features, T>;
 }
 
-export function actionColumn<T extends { id: number }>(render: (row: T) => ReactNode) {
+export function actionColumn<T extends { id: number }>(actions: (row: T) => readonly (RowAction | false)[]) {
     return createAppColumnHelper<T>().display({
         id: 'actions',
         header: 'Actions',
         meta: { label: 'Actions' },
         enableHiding: false,
-        cell: ({ row }) => <div className="flex gap-1">{render(row.original)}</div>,
+        cell: ({ cell, row }) => <cell.ActionsCell actions={actions(row.original)} modal />,
     });
 }
 
@@ -83,25 +84,17 @@ export function ErpLink({
     permission,
     modal,
     primary,
-    compact,
 }: Readonly<{
     href: string;
     children: ReactNode;
     permission?: Permission['name'];
     modal?: boolean;
     primary?: boolean;
-    compact?: boolean;
 }>) {
     const { can } = usePermission();
     if (permission && !can(permission)) return null;
 
-    const className = cn(
-        buttonVariants({
-            variant: primary ? 'default' : compact ? 'ghost' : 'outline',
-            size: compact ? 'sm' : 'default',
-        }),
-        'whitespace-nowrap',
-    );
+    const className = cn(buttonVariants({ variant: primary ? 'default' : 'outline' }), 'whitespace-nowrap');
     return modal ? (
         <ModalLink href={href} className={className} navigate>
             {children}

@@ -253,7 +253,9 @@ export default function DataTable<TData extends { id: string | number }>({
                                 <TableRow id={'row:' + row.id} columns={row.getVisibleCells()}>
                                     {(cell) => (
                                         <TableCell id={'cell:' + cell.id} className="px-3">
-                                            <table.FlexRender cell={cell} />
+                                            <table.AppCell cell={cell}>
+                                                {(appCell) => <appCell.FlexRender />}
+                                            </table.AppCell>
                                         </TableCell>
                                     )}
                                 </TableRow>

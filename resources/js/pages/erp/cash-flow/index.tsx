@@ -6,14 +6,13 @@ import { Button } from '@/components/ui/button';
 import { RangeCalendar } from '@/components/ui/calendar';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
 import payables from '@/routes/erp/cash-flow/payables';
 import { router } from '@inertiajs/react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, CircleCheck, CircleX, Eye, PencilLine } from 'lucide-react';
 import { useState } from 'react';
 
 type CashRow = {
@@ -52,11 +51,31 @@ const dateColumn = column('occurred_at', 'Date and time', 'date', (row) => (
 const descriptionColumn = column('description', 'Description');
 const categoryColumn = column('category', 'Category');
 const amountColumn = column('amount', 'Amount', 'number', (row) => <ErpMoney amount={Number(row.amount)} />);
-const entryActions = actionColumn<CashRow>((row) => (
-    <ErpLink href={cash.showEntry.url(row.id)} permission="cash-entry.show" compact modal>
-        View
-    </ErpLink>
-));
+const entryActions = actionColumn<CashRow>((row) => [
+    { label: 'View', href: cash.showEntry.url(row.id), permissions: ['cash-entry.show'], icon: Eye },
+]);
+const payableActions = actionColumn<CashRow>((row) => [
+    { label: 'View', href: payables.show.url(row.id), permissions: ['financial-account.show'], icon: Eye },
+    row.status !== 'cancelled' && {
+        label: 'Edit',
+        href: payables.edit.url(row.id),
+        permissions: ['financial-account.edit'],
+        icon: PencilLine,
+    },
+    Number(row.outstanding_cents) > 0 && {
+        label: 'Confirm payment',
+        href: payables.confirmPayment.url(row.id),
+        permissions: ['financial-account.show', 'cash-entry.create'],
+        icon: CircleCheck,
+    },
+    Number(row.outstanding_cents) === Math.round(Number(row.amount) * 100) && {
+        label: 'Cancel',
+        href: payables.cancel.url(row.id),
+        permissions: ['financial-account.cancel'],
+        icon: CircleX,
+        destructive: true,
+    },
+]);
 
 function DueDate({ value, today }: Readonly<{ value: string; today: string }>) {
     const days = differenceInCalendarDays(parseISO(value), parseISO(today));
@@ -69,32 +88,6 @@ function DueDate({ value, today }: Readonly<{ value: string; today: string }>) {
                 {days === 0 ? 'Due today' : dueStatusMessage}
             </span>
         </div>
-    );
-}
-
-function PayableActions({ row }: Readonly<{ row: CashRow }>) {
-    const { can } = usePermission();
-    return (
-        <>
-            <ErpLink href={payables.show.url(row.id)} permission="financial-account.show" compact modal>
-                View
-            </ErpLink>
-            {row.status !== 'cancelled' && (
-                <ErpLink href={payables.edit.url(row.id)} permission="financial-account.edit" compact modal>
-                    Edit
-                </ErpLink>
-            )}
-            {Number(row.outstanding_cents) > 0 && can('financial-account.show') && (
-                <ErpLink href={payables.confirmPayment.url(row.id)} permission="cash-entry.create" compact modal>
-                    Confirm payment
-                </ErpLink>
-            )}
-            {Number(row.outstanding_cents) === Math.round(Number(row.amount) * 100) && (
-                <ErpLink href={payables.cancel.url(row.id)} permission="financial-account.cancel" compact modal>
-                    Cancel
-                </ErpLink>
-            )}
-        </>
     );
 }
 
@@ -160,7 +153,7 @@ export default function CashFlow({
             ),
             choices(['pending', 'partially_paid', 'paid', 'overdue', 'cancelled']),
         ),
-        actionColumn<CashRow>((row) => <PayableActions row={row} />),
+        payableActions,
     ];
     const transactionColumns = tab === 'expenses' ? expenseColumns : payableColumns;
     const columns = tab === 'receipts' ? receiptColumns : transactionColumns;

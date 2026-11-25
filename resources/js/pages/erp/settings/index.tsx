@@ -3,7 +3,7 @@ import { ErpFee } from '@/components/erp/format';
 import { actionColumn, ErpLink, ErpPage, humanize, tableColumn } from '@/components/erp/page';
 import { sections, type SettingsSection } from '@/lib/erp-settings';
 import { dashboard } from '@/routes';
-import { Activity } from 'react';
+import { Eye, PencilLine, Trash } from 'lucide-react';
 
 type RecordRow = {
     id: number;
@@ -46,25 +46,23 @@ export default function SettingsIndex({
             const protectedRole = section === 'roles' && row.name === 'super-admin';
             const protectedCategory = section === 'expense-categories' && row.is_system;
 
-            return (
-                <>
-                    <ErpLink href={routes.show.url(row.id)} permission={`${permission}.show`} compact modal>
-                        View
-                    </ErpLink>
-
-                    <Activity mode={!protectedRole ? 'visible' : 'hidden'}>
-                        <ErpLink href={routes.edit.url(row.id)} permission={`${permission}.edit`} compact modal>
-                            Edit
-                        </ErpLink>
-                    </Activity>
-
-                    <Activity mode={!protectedRole && !protectedCategory ? 'visible' : 'hidden'}>
-                        <ErpLink href={routes.archive.url(row.id)} permission={`${permission}.destroy`} compact modal>
-                            {section === 'users' || section === 'roles' ? 'Delete' : 'Archive'}
-                        </ErpLink>
-                    </Activity>
-                </>
-            );
+            return [
+                { label: 'View', href: routes.show.url(row.id), permissions: [`${permission}.show`], icon: Eye },
+                !protectedRole && {
+                    label: 'Edit',
+                    href: routes.edit.url(row.id),
+                    permissions: [`${permission}.edit`],
+                    icon: PencilLine,
+                },
+                !protectedRole &&
+                    !protectedCategory && {
+                        label: section === 'users' || section === 'roles' ? 'Delete' : 'Archive',
+                        href: routes.archive.url(row.id),
+                        permissions: [`${permission}.destroy`],
+                        icon: Trash,
+                        destructive: true,
+                    },
+            ];
         }),
     ];
 
