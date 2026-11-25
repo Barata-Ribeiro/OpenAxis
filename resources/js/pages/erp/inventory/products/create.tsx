@@ -1,6 +1,6 @@
+import InputError from '@/components/common/input-error';
 import { ErpPage } from '@/components/erp/page';
 import { ProductFields, useProductImages, type ProductFormData } from '@/components/erp/product-fields';
-import InputError from '@/components/common/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -8,6 +8,7 @@ import { dashboard } from '@/routes';
 import { index as inventory } from '@/routes/erp/inventory';
 import products from '@/routes/erp/inventory/products';
 import { Form } from '@inertiajs/react';
+import { Activity } from 'react';
 
 const title = 'New product';
 
@@ -34,7 +35,10 @@ export default function CreateProduct(props: Readonly<ProductFormData>) {
                                 />
                                 <InputError role="alert" message={errors['record']} />
                                 <Button type="submit" isDisabled={processing}>
-                                    {processing && <Spinner />} Create product
+                                    <Activity mode={processing ? 'visible' : 'hidden'}>
+                                        <Spinner />
+                                    </Activity>
+                                    Create product
                                 </Button>
                             </>
                         )}
