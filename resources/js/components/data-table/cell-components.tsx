@@ -101,10 +101,10 @@ export function ActionsCell({
 
     if (availableActions.length === 0) return null;
 
+    const visibleDataCells = cell.row.getVisibleCells().filter(({ column }) => column.accessorFn);
+
     async function copyRow() {
-        const text = cell.row
-            .getVisibleCells()
-            .filter(({ column }) => column.accessorFn)
+        const text = visibleDataCells
             .map((valueCell) => {
                 const value = valueCell.getValue();
                 return value == null || typeof value === 'string' ? value : JSON.stringify(value);
@@ -125,11 +125,15 @@ export function ActionsCell({
             </Button>
 
             <DropdownMenu placement="bottom end">
-                <DropdownMenuItem textValue="Copy row" onAction={() => void copyRow()}>
-                    <Copy aria-hidden data-icon="inline-start" />
-                    Copy row
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {visibleDataCells.length > 0 && (
+                    <>
+                        <DropdownMenuItem textValue="Copy row" onAction={() => void copyRow()}>
+                            <Copy aria-hidden data-icon="inline-start" />
+                            Copy row
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
                 {availableActions.map(({ href, label, icon: Icon, destructive }) => (
                     <DropdownMenuItem
                         key={label}

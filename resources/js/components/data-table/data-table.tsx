@@ -165,11 +165,11 @@ export default function DataTable<TData extends { id: string | number }>({
         },
     });
 
-    const { columnOrder, columnPinning, columnSizing } = table.state;
-    const columnLayout = [columnOrder, columnPinning, columnSizing];
+    const { columnOrder, columnPinning, columnSizing, columnVisibility } = table.state;
+    const columnLayout = [columnOrder, columnPinning, columnSizing, columnVisibility];
     const headers = table.getLeafHeaders();
     const primarySort = sorting.find((sort) => headers.some((header) => header.column.id === sort.id));
-    const rowHeader = headers.find((header) => header.column.accessorFn)?.column.id;
+    const rowHeader = (headers.find((header) => header.column.accessorFn) ?? headers[0])?.column.id;
 
     return (
         <table.AppTable>
