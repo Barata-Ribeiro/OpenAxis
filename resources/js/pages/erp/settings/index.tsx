@@ -1,8 +1,9 @@
 import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
 import { ErpFee } from '@/components/erp/format';
-import { dashboard } from '@/routes';
 import { actionColumn, ErpLink, ErpPage, humanize, tableColumn } from '@/components/erp/page';
 import { sections, type SettingsSection } from '@/lib/erp-settings';
+import { dashboard } from '@/routes';
+import { Activity } from 'react';
 
 type RecordRow = {
     id: number;
@@ -50,16 +51,18 @@ export default function SettingsIndex({
                     <ErpLink href={routes.show.url(row.id)} permission={`${permission}.show`} compact modal>
                         View
                     </ErpLink>
-                    {!protectedRole && (
+
+                    <Activity mode={!protectedRole ? 'visible' : 'hidden'}>
                         <ErpLink href={routes.edit.url(row.id)} permission={`${permission}.edit`} compact modal>
                             Edit
                         </ErpLink>
-                    )}
-                    {!protectedRole && !protectedCategory && (
+                    </Activity>
+
+                    <Activity mode={!protectedRole && !protectedCategory ? 'visible' : 'hidden'}>
                         <ErpLink href={routes.archive.url(row.id)} permission={`${permission}.destroy`} compact modal>
                             {section === 'users' || section === 'roles' ? 'Delete' : 'Archive'}
                         </ErpLink>
-                    )}
+                    </Activity>
                 </>
             );
         }),

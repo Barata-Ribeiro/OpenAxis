@@ -1,4 +1,6 @@
 import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
+import { ErpDate, ErpMoney, useErpFormatting } from '@/components/erp/format';
+import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RangeCalendar } from '@/components/ui/calendar';
@@ -10,11 +12,9 @@ import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
 import payables from '@/routes/erp/cash-flow/payables';
 import { router } from '@inertiajs/react';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
 import { useState } from 'react';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { ErpDate, ErpMoney, useErpFormatting } from '@/components/erp/format';
-import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
 
 type CashRow = {
     id: number;
@@ -60,11 +60,13 @@ const entryActions = actionColumn<CashRow>((row) => (
 
 function DueDate({ value, today }: Readonly<{ value: string; today: string }>) {
     const days = differenceInCalendarDays(parseISO(value), parseISO(today));
+    const dueStatusMessage = days < 0 ? `${-days}d overdue` : `In ${days}d`;
+
     return (
         <div className="flex flex-col">
             <ErpDate value={value} />
             <span className={cn('text-xs text-muted-foreground', days < 0 && 'text-destructive')}>
-                {days === 0 ? 'Due today' : days < 0 ? `${-days}d overdue` : `In ${days}d`}
+                {days === 0 ? 'Due today' : dueStatusMessage}
             </span>
         </div>
     );
@@ -160,14 +162,12 @@ export default function CashFlow({
         ),
         actionColumn<CashRow>((row) => <PayableActions row={row} />),
     ];
-    const columns = tab === 'receipts' ? receiptColumns : tab === 'expenses' ? expenseColumns : payableColumns;
-    const total =
-        tab === 'receipts'
-            ? summary.receipts
-            : tab === 'expenses' && summary.expenses !== null
-              ? -summary.expenses
-              : null;
+    const transactionColumns = tab === 'expenses' ? expenseColumns : payableColumns;
+    const columns = tab === 'receipts' ? receiptColumns : transactionColumns;
+    const negativeExpenseTotal = tab === 'expenses' && summary.expenses !== null ? -summary.expenses : null;
+    const total = tab === 'receipts' ? summary.receipts : negativeExpenseTotal;
     const url = cash.index.url({ query: rangeQuery(period, tab) });
+    const totalPositiveClass = total && total > 0 ? 'text-emerald-700 dark:text-emerald-400' : '';
 
     return (
         <ErpPage
@@ -250,11 +250,7 @@ export default function CashFlow({
                         <div
                             className={cn(
                                 'flex justify-between rounded-lg border px-4 py-3 font-semibold tabular-nums',
-                                total < 0
-                                    ? 'text-destructive'
-                                    : total > 0
-                                      ? 'text-emerald-700 dark:text-emerald-400'
-                                      : '',
+                                total < 0 ? 'text-destructive' : totalPositiveClass,
                             )}
                         >
                             <span>Period total</span>
