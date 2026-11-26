@@ -1,9 +1,27 @@
 import InputError from '@/components/common/input-error';
+import {
+    CheckboxField,
+    CheckboxList,
+    fieldError,
+    InputField,
+    scaledInput,
+    scaleFields,
+    SelectField,
+    TextareaField,
+    type FormErrors,
+    type FormValues,
+    type Option,
+} from '@/components/erp/form-fields';
+import { ErpDate, ErpFee, ErpMoney } from '@/components/erp/format';
+import {
+    ProductFields,
+    useProductImages,
+    type ProductFormData,
+    type ProductImage,
+} from '@/components/erp/product-fields';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
-import type { Auth } from '@/types/auth';
-import type { Permission } from '@/types/role-permission';
 import { sections, type SettingsSection } from '@/lib/erp-settings';
 import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
@@ -11,22 +29,9 @@ import payables from '@/routes/erp/cash-flow/payables';
 import { index as inventory } from '@/routes/erp/inventory';
 import movements from '@/routes/erp/inventory/movements';
 import products from '@/routes/erp/inventory/products';
+import type { Auth } from '@/types/auth';
+import type { Permission } from '@/types/role-permission';
 import { Form } from '@inertiajs/react';
-import {
-    CheckboxField,
-    CheckboxList,
-    fieldError,
-    InputField,
-    scaleFields,
-    scaledInput,
-    SelectField,
-    TextareaField,
-    type FormErrors,
-    type FormValues,
-    type Option,
-} from './form-fields';
-import { ErpDate, ErpFee, ErpMoney } from './format';
-import { ProductFields, useProductImages, type ProductFormData, type ProductImage } from './product-fields';
 
 type Value = string | number | boolean | number[] | string[] | null;
 type Detail =
