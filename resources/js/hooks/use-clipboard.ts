@@ -1,32 +1,44 @@
-// Credit: https://usehooks-ts.com/
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
-export type CopiedValue = string | null;
-export type CopyFn = (text: string) => Promise<boolean>;
-export type UseClipboardReturn = [CopiedValue, CopyFn];
+type UseClipboardReturn = {
+    value: string | null;
+    copy: (text: string) => Promise<boolean>;
+    copied: boolean;
+    error: string | null;
+};
 
 export function useClipboard(): UseClipboardReturn {
-    const [copiedText, setCopiedText] = useState<CopiedValue>(null);
+    const [value, setValue] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const copy: CopyFn = async (text) => {
+    const copy = useCallback(async (text: string): Promise<boolean> => {
         if (!navigator?.clipboard) {
-            console.warn('Clipboard not supported');
-
+            setError('Clipboard not supported');
             return false;
         }
 
         try {
             await navigator.clipboard.writeText(text);
-            setCopiedText(text);
+            setValue(text);
+            setCopied(true);
+            setError(null);
+
+            // Reset copied state after 2 seconds
+            setTimeout(() => setCopied(false), 2000);
 
             return true;
-        } catch (error) {
-            console.warn('Copy failed', error);
-            setCopiedText(null);
-
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to copy');
+            setCopied(false);
             return false;
         }
-    };
+    }, []);
 
-    return [copiedText, copy];
+    return {
+        value,
+        copy,
+        copied,
+        error,
+    };
 }

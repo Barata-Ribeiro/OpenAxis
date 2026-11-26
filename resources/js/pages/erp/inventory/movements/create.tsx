@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { dashboard } from '@/routes';
 import movements from '@/routes/erp/inventory/movements';
 import { Form } from '@inertiajs/react';
+import { Activity } from 'react';
 
 type Props = { direction: 'receipt' | 'issue'; options: Option[]; locations: Option[]; occurredAt: string };
 
@@ -69,35 +70,36 @@ export default function CreateMovement({ direction, options, locations, occurred
                                             required
                                             error={errors['occurred_at']}
                                         />
-                                        {receipt && (
-                                            <>
-                                                <InputField
-                                                    name="supplier_lot_code"
-                                                    label="Supplier lot code"
-                                                    error={errors['supplier_lot_code']}
-                                                />
-                                                <InputField
-                                                    name="expires_on"
-                                                    label="Expiry date"
-                                                    type="date"
-                                                    error={errors['expires_on']}
-                                                />
-                                                <InputField
-                                                    name="cost_cents"
-                                                    label="Total acquisition cost (BRL)"
-                                                    type="number"
-                                                    min={0}
-                                                    step={0.01}
-                                                    error={errors['cost_cents']}
-                                                />
-                                            </>
-                                        )}
+                                        <Activity mode={receipt ? 'visible' : 'hidden'}>
+                                            <InputField
+                                                name="supplier_lot_code"
+                                                label="Supplier lot code"
+                                                error={errors['supplier_lot_code']}
+                                            />
+                                            <InputField
+                                                name="expires_on"
+                                                label="Expiry date"
+                                                type="date"
+                                                error={errors['expires_on']}
+                                            />
+                                            <InputField
+                                                name="cost_cents"
+                                                label="Total acquisition cost (BRL)"
+                                                type="number"
+                                                min={0}
+                                                step={0.01}
+                                                error={errors['cost_cents']}
+                                            />
+                                        </Activity>
                                     </div>
                                     <TextareaField name="notes" label="Notes" error={errors['notes']} />
                                 </FieldGroup>
                                 <InputError role="alert" message={errors['record']} />
                                 <Button type="submit" isDisabled={processing}>
-                                    {processing && <Spinner />} {receipt ? 'Record receipt' : 'Record issue'}
+                                    <Activity mode={processing ? 'visible' : 'hidden'}>
+                                        <Spinner />
+                                    </Activity>
+                                    {receipt ? 'Record receipt' : 'Record issue'}
                                 </Button>
                             </>
                         )}

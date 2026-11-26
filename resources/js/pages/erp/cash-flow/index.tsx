@@ -1,20 +1,19 @@
 import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
+import { ErpDate, ErpMoney, useErpFormatting } from '@/components/erp/format';
+import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RangeCalendar } from '@/components/ui/calendar';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
 import payables from '@/routes/erp/cash-flow/payables';
 import { router } from '@inertiajs/react';
-import { CalendarDays } from 'lucide-react';
-import { useState } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { ErpDate, ErpMoney, useErpFormatting } from '@/components/erp/format';
-import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
+import { CalendarDays, CircleCheck, CircleX, Eye, PencilLine } from 'lucide-react';
+import { useState } from 'react';
 
 type CashRow = {
     id: number;
@@ -52,47 +51,43 @@ const dateColumn = column('occurred_at', 'Date and time', 'date', (row) => (
 const descriptionColumn = column('description', 'Description');
 const categoryColumn = column('category', 'Category');
 const amountColumn = column('amount', 'Amount', 'number', (row) => <ErpMoney amount={Number(row.amount)} />);
-const entryActions = actionColumn<CashRow>((row) => (
-    <ErpLink href={cash.showEntry.url(row.id)} permission="cash-entry.show" compact modal>
-        View
-    </ErpLink>
-));
+const entryActions = actionColumn<CashRow>((row) => [
+    { label: 'View', href: cash.showEntry.url(row.id), permissions: ['cash-entry.show'], icon: Eye },
+]);
+const payableActions = actionColumn<CashRow>((row) => [
+    { label: 'View', href: payables.show.url(row.id), permissions: ['financial-account.show'], icon: Eye },
+    row.status !== 'cancelled' && {
+        label: 'Edit',
+        href: payables.edit.url(row.id),
+        permissions: ['financial-account.edit'],
+        icon: PencilLine,
+    },
+    Number(row.outstanding_cents) > 0 && {
+        label: 'Confirm payment',
+        href: payables.confirmPayment.url(row.id),
+        permissions: ['financial-account.show', 'cash-entry.create'],
+        icon: CircleCheck,
+    },
+    Number(row.outstanding_cents) === Math.round(Number(row.amount) * 100) && {
+        label: 'Cancel',
+        href: payables.cancel.url(row.id),
+        permissions: ['financial-account.cancel'],
+        icon: CircleX,
+        destructive: true,
+    },
+]);
 
 function DueDate({ value, today }: Readonly<{ value: string; today: string }>) {
     const days = differenceInCalendarDays(parseISO(value), parseISO(today));
+    const dueStatusMessage = days < 0 ? `${-days}d overdue` : `In ${days}d`;
+
     return (
         <div className="flex flex-col">
             <ErpDate value={value} />
             <span className={cn('text-xs text-muted-foreground', days < 0 && 'text-destructive')}>
-                {days === 0 ? 'Due today' : days < 0 ? `${-days}d overdue` : `In ${days}d`}
+                {days === 0 ? 'Due today' : dueStatusMessage}
             </span>
         </div>
-    );
-}
-
-function PayableActions({ row }: Readonly<{ row: CashRow }>) {
-    const { can } = usePermission();
-    return (
-        <>
-            <ErpLink href={payables.show.url(row.id)} permission="financial-account.show" compact modal>
-                View
-            </ErpLink>
-            {row.status !== 'cancelled' && (
-                <ErpLink href={payables.edit.url(row.id)} permission="financial-account.edit" compact modal>
-                    Edit
-                </ErpLink>
-            )}
-            {Number(row.outstanding_cents) > 0 && can('financial-account.show') && (
-                <ErpLink href={payables.confirmPayment.url(row.id)} permission="cash-entry.create" compact modal>
-                    Confirm payment
-                </ErpLink>
-            )}
-            {Number(row.outstanding_cents) === Math.round(Number(row.amount) * 100) && (
-                <ErpLink href={payables.cancel.url(row.id)} permission="financial-account.cancel" compact modal>
-                    Cancel
-                </ErpLink>
-            )}
-        </>
     );
 }
 
@@ -158,16 +153,14 @@ export default function CashFlow({
             ),
             choices(['pending', 'partially_paid', 'paid', 'overdue', 'cancelled']),
         ),
-        actionColumn<CashRow>((row) => <PayableActions row={row} />),
+        payableActions,
     ];
-    const columns = tab === 'receipts' ? receiptColumns : tab === 'expenses' ? expenseColumns : payableColumns;
-    const total =
-        tab === 'receipts'
-            ? summary.receipts
-            : tab === 'expenses' && summary.expenses !== null
-              ? -summary.expenses
-              : null;
+    const transactionColumns = tab === 'expenses' ? expenseColumns : payableColumns;
+    const columns = tab === 'receipts' ? receiptColumns : transactionColumns;
+    const negativeExpenseTotal = tab === 'expenses' && summary.expenses !== null ? -summary.expenses : null;
+    const total = tab === 'receipts' ? summary.receipts : negativeExpenseTotal;
     const url = cash.index.url({ query: rangeQuery(period, tab) });
+    const totalPositiveClass = total && total > 0 ? 'text-emerald-700 dark:text-emerald-400' : '';
 
     return (
         <ErpPage
@@ -250,11 +243,7 @@ export default function CashFlow({
                         <div
                             className={cn(
                                 'flex justify-between rounded-lg border px-4 py-3 font-semibold tabular-nums',
-                                total < 0
-                                    ? 'text-destructive'
-                                    : total > 0
-                                      ? 'text-emerald-700 dark:text-emerald-400'
-                                      : '',
+                                total < 0 ? 'text-destructive' : totalPositiveClass,
                             )}
                         >
                             <span>Period total</span>

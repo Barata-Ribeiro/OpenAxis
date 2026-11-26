@@ -1,9 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useCellContext, useTableContext } from '@/hooks/data-table/table';
+import { useClipboard } from '@/hooks/use-clipboard';
+import { usePermission } from '@/hooks/use-permission';
+import { renderInertiaLink } from '@/lib/inertia-link';
+import type { Permission } from '@/types/role-permission';
+import { useModalStack } from '@inertiaui/modal-react';
 import { Subscribe } from '@tanstack/react-table';
 import { formatDate } from 'date-fns/format';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy, EllipsisVertical, type LucideIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function SelectCell(): React.ReactNode {
     const cell = useCellContext();
@@ -32,7 +44,7 @@ export function TextCell(): React.ReactNode {
 
 export function DateCell(): React.ReactNode {
     const cell = useCellContext<string>();
-    return <>{formatDate(cell.getValue(), 'PPP')}</>;
+    return <time dateTime={cell.getValue()}>{formatDate(cell.getValue(), 'PPP')}</time>;
 }
 
 export function GroupedCell(): React.ReactNode {
@@ -66,4 +78,81 @@ export function JoinDateAggregatedCell(): React.ReactNode {
     return <span className="text-muted-foreground">Earliest: {earliest ? formatDate(earliest, 'PPP') : '—'}</span>;
 }
 
-// Additional aggregated cells can be added below as needed; e.g. ActionsCell, StatusCell, etc.
+export type RowAction = {
+    label: string;
+    href: string;
+    icon: LucideIcon;
+    permissions?: readonly Permission['name'][];
+    destructive?: boolean;
+};
+
+export function ActionsCell({
+    actions,
+    modal = false,
+}: Readonly<{ actions: readonly (RowAction | false)[]; modal?: boolean }>): React.ReactNode {
+    const { copy } = useClipboard();
+    const { can } = usePermission();
+    const { visitModal } = useModalStack();
+    const cell = useCellContext();
+    const availableActions = actions.filter(
+        (action): action is RowAction =>
+            action !== false && (!action.permissions || action.permissions.every((permission) => can(permission))),
+    );
+
+    if (availableActions.length === 0) return null;
+
+    const visibleDataCells = cell.row.getVisibleCells().filter(({ column }) => column.accessorFn);
+
+    async function copyRow() {
+        const text = visibleDataCells
+            .map((valueCell) => {
+                const value = valueCell.getValue();
+                return value == null || typeof value === 'string' ? value : JSON.stringify(value);
+            })
+            .join('\t');
+
+        if (await copy(text)) {
+            toast.success('Row copied');
+        } else {
+            toast.error('Could not copy row');
+        }
+    }
+
+    return (
+        <DropdownMenuTrigger>
+            <Button variant="ghost" size="icon-sm" aria-label="Row actions">
+                <EllipsisVertical aria-hidden />
+            </Button>
+
+            <DropdownMenu placement="bottom end">
+                {visibleDataCells.length > 0 && (
+                    <>
+                        <DropdownMenuItem textValue="Copy row" onAction={() => void copyRow()}>
+                            <Copy aria-hidden data-icon="inline-start" />
+                            Copy row
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
+                {availableActions.map(({ href, label, icon: Icon, destructive }) => (
+                    <DropdownMenuItem
+                        key={label}
+                        textValue={label}
+                        variant={destructive ? 'destructive' : 'default'}
+                        {...(modal
+                            ? {
+                                  onAction: () =>
+                                      void visitModal(href, { navigate: true }).catch(() =>
+                                          toast.error('Could not open action'),
+                                      ),
+                              }
+                            : { href, render: renderInertiaLink(href) })}
+                    >
+                        <Icon aria-hidden data-icon="inline-start" />
+                        {label}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenu>
+        </DropdownMenuTrigger>
+    );
+}
