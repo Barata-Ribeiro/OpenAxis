@@ -38,6 +38,7 @@ final class DataTableRequest extends FormRequest
                     ]),
                 ),
             ]),
+            'trashed' => FluentRule::string()->in(['only']),
             'tab' => FluentRule::string()->in(['summary', 'receipts', 'expenses', 'payables']),
             'period' => FluentRule::string()->in(['today', 'week', 'month', 'custom']),
             'start' => FluentRule::date()->format('Y-m-d')->requiredIf('period', 'custom'),

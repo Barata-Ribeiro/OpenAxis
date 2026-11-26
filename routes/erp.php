@@ -2,15 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Actions\Erp\SettingsRecords;
-use App\Http\Controllers\Erp\CashEntryController;
-use App\Http\Controllers\Erp\CashFlowController;
-use App\Http\Controllers\Erp\InventoryController;
-use App\Http\Controllers\Erp\PayableController;
-use App\Http\Controllers\Erp\PayablePaymentController;
-use App\Http\Controllers\Erp\ProductController;
-use App\Http\Controllers\Erp\SettingsRecordController;
-use App\Http\Controllers\Erp\StockMovementController;
+use App\Http\Controllers\Erp\CashFlow\CashEntryController;
+use App\Http\Controllers\Erp\CashFlow\CashFlowController;
+use App\Http\Controllers\Erp\CashFlow\PayableController;
+use App\Http\Controllers\Erp\CashFlow\PayablePaymentController;
+use App\Http\Controllers\Erp\Inventory\InventoryController;
+use App\Http\Controllers\Erp\Inventory\ProductController;
+use App\Http\Controllers\Erp\Inventory\StockMovementController;
+use App\Http\Controllers\Erp\Settings\CategoryController;
+use App\Http\Controllers\Erp\Settings\ExpenseCategoryController;
+use App\Http\Controllers\Erp\Settings\PaymentMethodController;
+use App\Http\Controllers\Erp\Settings\RoleController;
+use App\Http\Controllers\Erp\Settings\StorageLocationController;
+use App\Http\Controllers\Erp\Settings\UnitOfMeasureController;
+use App\Http\Controllers\Erp\Settings\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(function (): void {
@@ -18,12 +23,14 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(func
         Route::get('/', InventoryController::class)->middleware('permission:product.index')->name('index');
 
         Route::controller(ProductController::class)->prefix('products')->name('products.')->group(function (): void {
+            Route::get('/', 'index')->middleware('permission:product.index')->name('index');
             Route::get('create', 'create')->middleware('permission:product.create')->name('create');
             Route::post('/', 'store')->middleware('permission:product.create')->name('store');
-            Route::get('{product}', 'show')->middleware('permission:product.show')->name('show');
+            Route::get('{product}', 'show')->withTrashed()->middleware('permission:product.show')->name('show');
             Route::get('{product}/edit', 'edit')->middleware('permission:product.edit')->name('edit');
             Route::patch('{product}', 'update')->middleware('permission:product.edit')->name('update');
             Route::get('{product}/archive', 'archive')->middleware('permission:product.destroy')->name('archive');
+            Route::patch('{product}/restore', 'restore')->withTrashed()->middleware('permission:product.destroy')->name('restore');
             Route::delete('{product}', 'destroy')->middleware('permission:product.destroy')->name('destroy');
         });
 
@@ -67,18 +74,46 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(func
         });
     });
 
-    Route::controller(SettingsRecordController::class)->prefix('settings')->name('settings.')->group(function (): void {
-        foreach (SettingsRecords::MODULES as $section => $module) {
-            Route::prefix($section)->name("$section.")->where(['record' => '[0-9]+'])->group(function () use ($section, $module): void {
-                Route::get('/', 'index')->defaults('section', $section)->middleware("permission:$module.index")->name('index');
-                Route::get('create', 'create')->defaults('section', $section)->middleware("permission:$module.create")->name('create');
-                Route::post('/', 'store')->defaults('section', $section)->middleware("permission:$module.create")->name('store');
-                Route::get('{record}', 'show')->defaults('section', $section)->middleware("permission:$module.show")->name('show');
-                Route::get('{record}/edit', 'edit')->defaults('section', $section)->middleware("permission:$module.edit")->name('edit');
-                Route::patch('{record}', 'update')->defaults('section', $section)->middleware("permission:$module.edit")->name('update');
-                Route::get('{record}/archive', 'archive')->defaults('section', $section)->middleware("permission:$module.destroy")->name('archive');
-                Route::delete('{record}', 'destroy')->defaults('section', $section)->middleware("permission:$module.destroy")->name('destroy');
-            });
+    Route::prefix('settings')->name('settings.')->group(function (): void {
+        $resources = [
+            'payment-methods' => [PaymentMethodController::class, 'paymentMethod', 'payment-method', true],
+            'expense-categories' => [ExpenseCategoryController::class, 'expenseCategory', 'expense-category', true],
+            'categories' => [CategoryController::class, 'category', 'category', true],
+            'units' => [UnitOfMeasureController::class, 'unit', 'unit-of-measure', true],
+            'locations' => [StorageLocationController::class, 'location', 'storage-location', true],
+            'users' => [UserController::class, 'user', 'user', false],
+            'roles' => [RoleController::class, 'role', 'role', false],
+        ];
+
+        foreach ($resources as $resource => [$controller, $parameter, $permission, $softDeletes]) {
+            $record = "$resource/{{$parameter}}";
+            $canDestroy = "permission:$permission.destroy";
+
+            Route::get("$record/archive", [$controller, $softDeletes ? 'archive' : 'confirmDestroy'])
+                ->whereNumber($parameter)->middleware($canDestroy)->name("$resource.archive");
+
+            if ($softDeletes) {
+                Route::patch("$record/restore", [$controller, 'restore'])
+                    ->whereNumber($parameter)->name("$resource.restore")->withTrashed()->middleware($canDestroy);
+            } else {
+                Route::get("$record/delete", [$controller, 'confirmDestroy'])
+                    ->whereNumber($parameter)->middleware($canDestroy)->name("$resource.confirm-destroy");
+            }
+
+            $routes = Route::resource($resource, $controller)
+                ->parameters([$resource => $parameter])
+                ->where([$parameter => '[0-9]+'])
+                ->middlewareFor('index', "permission:$permission.index")
+                ->middlewareFor(['create', 'store'], "permission:$permission.create")
+                ->middlewareFor('show', "permission:$permission.show")
+                ->middlewareFor(['edit', 'update'], "permission:$permission.edit")
+                ->middlewareFor('destroy', $canDestroy);
+
+            if ($softDeletes) {
+                $routes->withTrashed(['show']);
+            }
+
+            $routes->register();
         }
     });
 });

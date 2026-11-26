@@ -1,20 +1,4 @@
-import { usePage } from '@inertiajs/react';
-import { intlFormat, parseISO } from 'date-fns';
-
-export function useErpFormatting() {
-    const locale = (usePage().props.auth.locale || 'en').replaceAll('_', '-');
-
-    return {
-        money: new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL' }),
-        quantity: new Intl.NumberFormat(locale, { maximumFractionDigits: 3 }),
-        date: (value: string, withTime = false) =>
-            intlFormat(
-                parseISO(value),
-                { dateStyle: 'medium', ...(withTime ? { timeStyle: 'short' } : {}) },
-                { locale },
-            ),
-    };
-}
+import { useErpFormatting, useErpLocale } from '@/hooks/erp/use-erp-formatting';
 
 export function ErpDate({ value, withTime = false }: Readonly<{ value: string | null; withTime?: boolean }>) {
     const { date } = useErpFormatting();
@@ -27,7 +11,7 @@ export function ErpMoney({ amount }: Readonly<{ amount: number }>) {
 }
 
 export function ErpFee({ rate, type }: Readonly<{ rate: number; type: string }>) {
-    const locale = (usePage().props.auth.locale || 'en').replaceAll('_', '-');
+    const locale = useErpLocale();
     if (type === 'fixed') return <ErpMoney amount={rate / 100} />;
 
     return new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 2 }).format(rate / 10_000);

@@ -3,7 +3,7 @@ import { NavMain } from '@/components/helpers/nav/nav-main';
 import { NavUser } from '@/components/helpers/nav/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { usePermission } from '@/hooks/use-permission';
-import { sections } from '@/lib/erp-settings';
+import { sections } from '@/lib/erp/settings/sections';
 import { dashboard } from '@/routes';
 import { index as cashFlow } from '@/routes/erp/cash-flow';
 import { index as inventory } from '@/routes/erp/inventory';

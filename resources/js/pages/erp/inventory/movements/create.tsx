@@ -1,22 +1,26 @@
 import InputError from '@/components/common/input-error';
-import { InputField, scaleFields, SelectField, TextareaField, type Option } from '@/components/erp/form-fields';
-import { ErpPage } from '@/components/erp/page';
+import { InputField, SelectField, TextareaField } from '@/components/erp/forms/fields';
+import { scaleFields } from '@/lib/erp/forms';
+import type { Option } from '@/types/erp/forms';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { FieldGroup } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { dashboard } from '@/routes';
 import movements from '@/routes/erp/inventory/movements';
-import { Form } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { Activity } from 'react';
 
 type Props = { direction: 'receipt' | 'issue'; options: Option[]; locations: Option[]; occurredAt: string };
 
 export default function CreateMovement({ direction, options, locations, occurredAt }: Readonly<Props>) {
     const receipt = direction === 'receipt';
+    const title = receipt ? 'New stock receipt' : 'New stock issue';
 
     return (
-        <ErpPage title={receipt ? 'New stock receipt' : 'New stock issue'}>
+        <section className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+            <Head title={title} />
+            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
             <Card className="w-full max-w-3xl">
                 <CardContent>
                     <Form
@@ -106,7 +110,7 @@ export default function CreateMovement({ direction, options, locations, occurred
                     </Form>
                 </CardContent>
             </Card>
-        </ErpPage>
+        </section>
     );
 }
 

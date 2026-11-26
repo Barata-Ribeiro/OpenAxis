@@ -17,15 +17,15 @@ final class InventoryReport
     private const int EXPIRING_DAYS = 30;
 
     /** @return array<string, mixed> */
-    public function table(TableQuery $table): array
+    public function table(TableQuery $table, bool $archived = false): array
     {
         $fields = [
             'sku' => 'text', 'name' => 'text', 'quantity' => 'number', 'unit' => 'text',
             'expires_on' => 'date', 'days_remaining' => 'number', 'status' => 'select',
             'minimum_stock' => 'number', 'category' => 'text', 'average_cost' => 'number', 'current_value' => 'number',
         ];
-        $page = $table->paginate($this->rows(), $fields, ['sku', 'name', 'description', 'category'], 'name');
-        $products = Product::query()->with([
+        $page = $table->paginate($this->rows($archived), $fields, ['sku', 'name', 'description', 'category'], 'name');
+        $products = Product::withTrashed()->with([
             'images' => fn ($images) => $images->limit(1),
             'categories:id,name',
         ])->whereKey($page->getCollection()->pluck('id'))->get()->keyBy('id');
@@ -36,6 +36,7 @@ final class InventoryReport
 
             return [
                 'id' => $row->id,
+                'deleted_at' => $row->deleted_at,
                 'sku' => $row->sku,
                 'name' => $row->name,
                 'quantity' => (float) $row->quantity,
@@ -74,7 +75,7 @@ final class InventoryReport
         ];
     }
 
-    private function rows(): Builder
+    private function rows(bool $archived = false): Builder
     {
         $ledger = StockMovement::query()->toBase()
             ->select('product_batch_id')
@@ -113,10 +114,10 @@ final class InventoryReport
         };
         $stockValue = '(COALESCE(stock.valued_stock, 0) + COALESCE(stock.unpriced_stock, 0) * (products.cost_price_cents / 1000.0))';
         $unitCost = "COALESCE($stockValue * 1000 / NULLIF(stock.balance, 0), products.cost_price_cents) / 100.0";
-        $products = Product::query()->toBase()
+        $products = ($archived ? Product::onlyTrashed() : Product::query())->toBase()
             ->join('unit_of_measures', 'unit_of_measures.id', '=', 'products.unit_of_measure_id')
             ->leftJoinSub($batches, 'stock', 'stock.product_id', 'products.id')
-            ->select('products.id', 'products.sku', 'products.name', 'products.description', 'unit_of_measures.code as unit', 'stock.expires_on')
+            ->select('products.id', 'products.deleted_at', 'products.sku', 'products.name', 'products.description', 'unit_of_measures.code as unit', 'stock.expires_on')
             ->selectSub($category->selectRaw($categoryAggregate), 'category')
             ->selectRaw("$days AS days_remaining", [$today])
             ->selectRaw('COALESCE(stock.balance, 0) / 1000.0 AS quantity, products.minimum_stock_milliunits / 1000.0 AS minimum_stock')
