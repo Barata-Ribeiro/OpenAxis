@@ -1,58 +1,15 @@
-import InputError from '@/components/common/input-error';
-import { ErpPage } from '@/components/erp/page';
-import { ProductFields, useProductImages, type ProductFormData } from '@/components/erp/product-fields';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
-import { dashboard } from '@/routes';
+import { ProductEditor } from '@/components/erp/inventory/products/product-editor';
+import { recordLayout } from '@/lib/erp/navigation';
 import { index as inventory } from '@/routes/erp/inventory';
 import products from '@/routes/erp/inventory/products';
-import { Form } from '@inertiajs/react';
-import { Activity } from 'react';
+import type { ProductFormData } from '@/types/erp/products';
 
 const title = 'New product';
 
-export default function CreateProduct(props: Readonly<ProductFormData>) {
-    const upload = useProductImages(props.images);
-
-    return (
-        <ErpPage title={title}>
-            <Card className="w-full max-w-3xl">
-                <CardContent>
-                    <Form
-                        {...products.store.form()}
-                        transform={upload.transform}
-                        className="space-y-5"
-                        disableWhileProcessing
-                    >
-                        {({ errors, processing, progress }) => (
-                            <>
-                                <ProductFields
-                                    data={props}
-                                    errors={errors}
-                                    upload={upload}
-                                    uploadProgress={progress?.percentage}
-                                />
-                                <InputError role="alert" message={errors['record']} />
-                                <Button type="submit" isDisabled={processing}>
-                                    <Activity mode={processing ? 'visible' : 'hidden'}>
-                                        <Spinner />
-                                    </Activity>
-                                    Create product
-                                </Button>
-                            </>
-                        )}
-                    </Form>
-                </CardContent>
-            </Card>
-        </ErpPage>
-    );
+export default function CreateProduct(data: Readonly<ProductFormData>) {
+    return <ProductEditor title={title} data={data} target={products.store.form()} />;
 }
 
-CreateProduct.layout = (props: { auth: { permissions: string[] } }) => ({
-    breadcrumbs: [
-        { title: 'Dashboard', href: dashboard() },
-        ...(props.auth.permissions.includes('product.index') ? [{ title: 'Inventory', href: inventory() }] : []),
-        { title, href: products.create() },
-    ],
-});
+const layout = recordLayout({ title: 'Inventory', href: inventory() }, 'product.index');
+
+CreateProduct.layout = (props: Omit<Parameters<typeof layout>[0], 'title'>) => layout({ ...props, title });

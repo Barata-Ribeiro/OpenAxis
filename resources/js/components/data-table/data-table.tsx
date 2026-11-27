@@ -8,14 +8,8 @@ import { useDebouncedCallback } from '@/hooks/use-debounce-callback';
 import { cn } from '@/lib/utils';
 import type { ExtendedColumnFilter } from '@/types/data-table';
 import { router } from '@inertiajs/react';
-import type {
-    Column,
-    ColumnDef,
-    ColumnPinningState,
-    PaginationState,
-    SortingState,
-    Updater,
-} from '@tanstack/react-table';
+import { functionalUpdate } from '@tanstack/react-table';
+import type { Column, ColumnDef, ColumnPinningState, PaginationState, SortingState } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ChevronsUpDown, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -57,10 +51,6 @@ function getCommonPinningStyles<TData extends { id: string | number }>(
         position: 'sticky',
         zIndex: 1,
     };
-}
-
-function update<T>(updater: Updater<T>, previous: T): T {
-    return typeof updater === 'function' ? (updater as (value: T) => T)(previous) : updater;
 }
 
 function activeFilter(filter: ExtendedColumnFilter) {
@@ -149,16 +139,16 @@ export default function DataTable<TData extends { id: string | number }>({
         initialState: { columnPinning: initialColumnPinning },
         state: { pagination, sorting, columnFilters: filters, globalFilter: search },
         onPaginationChange: (value) => {
-            const next = update(value, pagination);
+            const next = functionalUpdate(value, pagination);
             visit(next.pageSize === pagination.pageSize ? next : { ...next, pageIndex: 0 }, search, filters, sorting);
         },
         onSortingChange: (value) => {
-            const next = update(value, sorting);
+            const next = functionalUpdate(value, sorting);
             setSorting(next);
             visit({ ...pagination, pageIndex: 0 }, search, filters, next);
         },
         onColumnFiltersChange: (value) => {
-            const next = update(value, filters) as ExtendedColumnFilter[];
+            const next = functionalUpdate(value, filters) as ExtendedColumnFilter[];
             if (next.length > 20) return;
             setFilters(next);
             visit({ ...pagination, pageIndex: 0 }, search, next, sorting);
@@ -251,11 +241,11 @@ export default function DataTable<TData extends { id: string | number }>({
                                                 className="-ml-2"
                                                 onPress={() => header.column.toggleSorting()}
                                             >
-                                                {label}
+                                                <table.FlexRender header={header} />
                                                 <Indicator aria-hidden className="size-3.5 text-muted-foreground" />
                                             </Button>
                                         ) : (
-                                            label
+                                            <table.FlexRender header={header} />
                                         )}
                                     </TableHead>
                                 );

@@ -11,6 +11,7 @@ import { useClipboard } from '@/hooks/use-clipboard';
 import { usePermission } from '@/hooks/use-permission';
 import { renderInertiaLink } from '@/lib/inertia-link';
 import type { Permission } from '@/types/role-permission';
+import { router } from '@inertiajs/react';
 import { useModalStack } from '@inertiaui/modal-react';
 import { Subscribe } from '@tanstack/react-table';
 import { formatDate } from 'date-fns/format';
@@ -84,6 +85,7 @@ export type RowAction = {
     icon: LucideIcon;
     permissions?: readonly Permission['name'][];
     destructive?: boolean;
+    method?: 'patch';
 };
 
 export function ActionsCell({
@@ -134,19 +136,21 @@ export function ActionsCell({
                         <DropdownMenuSeparator />
                     </>
                 )}
-                {availableActions.map(({ href, label, icon: Icon, destructive }) => (
+                {availableActions.map(({ href, label, icon: Icon, destructive, method }) => (
                     <DropdownMenuItem
                         key={label}
                         textValue={label}
                         variant={destructive ? 'destructive' : 'default'}
-                        {...(modal
-                            ? {
-                                  onAction: () =>
-                                      void visitModal(href, { navigate: true }).catch(() =>
-                                          toast.error('Could not open action'),
-                                      ),
-                              }
-                            : { href, render: renderInertiaLink(href) })}
+                        {...(method === 'patch'
+                            ? { onAction: () => router.patch(href, {}, { preserveScroll: true }) }
+                            : modal
+                              ? {
+                                    onAction: () =>
+                                        void visitModal(href, { navigate: true }).catch(() =>
+                                            toast.error('Could not open action'),
+                                        ),
+                                }
+                              : { href, render: renderInertiaLink(href) })}
                     >
                         <Icon aria-hidden data-icon="inline-start" />
                         {label}

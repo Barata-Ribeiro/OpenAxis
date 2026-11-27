@@ -139,8 +139,12 @@ it('registers products and posts receipts and issues without bypassing ledger co
         ->assertUnprocessable()->assertJsonValidationErrors('quantity_milliunits');
     expect($product->batches()->count())->toBe(0);
     $this->post(route('erp.inventory.movements.store-receipt'), $receipt)
-        ->assertRedirect(route('erp.inventory.movements.index'));
+        ->assertRedirect(route('erp.inventory.movements.index'))
+        ->assertInertiaFlash('toast', ['type' => 'success', 'message' => 'Stock movement recorded.']);
     $batch = $product->batches()->firstOrFail();
+
+    $this->get(route('erp.inventory.movements.index'))->assertInertia(fn (Assert $page) => $page
+        ->component('erp/inventory/movements/index'));
 
     $this->get(route('erp.inventory.movements.issue'))->assertInertia(fn (Assert $page) => $page
         ->component('erp/inventory/movements/create')
@@ -226,7 +230,8 @@ it('reports period totals and settles only the remaining balance once', function
     $url = route('erp.cash-flow.payables.pay', $payable);
     $this->postJson($url, [...$payment, 'expected_amount_cents' => 500])->assertUnprocessable()->assertJsonValidationErrors('record');
     $cashFlow = route('erp.cash-flow.index', ['tab' => 'payables', 'period' => 'month']);
-    $this->post($url, $payment, ['X-InertiaUI-Modal-Base-Url' => $cashFlow])->assertRedirect($cashFlow);
+    $this->post($url, $payment, ['X-InertiaUI-Modal-Base-Url' => $cashFlow])->assertRedirect($cashFlow)
+        ->assertInertiaFlash('toast', ['type' => 'success', 'message' => 'Payment recorded.']);
     $this->postJson($url, $payment)->assertUnprocessable()->assertJsonValidationErrors('record');
 
     expect($payable->fresh()->status)->toBe(FinancialAccount::STATUS_PAID);

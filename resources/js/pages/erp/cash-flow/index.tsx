@@ -1,32 +1,27 @@
-import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
-import { ErpDate, ErpMoney, useErpFormatting } from '@/components/erp/format';
-import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import type { ServerTableData } from '@/components/data-table/data-table';
+import DataTable from '@/components/data-table/data-table';
+import type { ExpenseRow } from '@/components/erp/cash-flow/entries/expense-columns';
+import { columns as expenseColumns } from '@/components/erp/cash-flow/entries/expense-columns';
+import type { ReceiptRow } from '@/components/erp/cash-flow/entries/receipt-columns';
+import { columns as receiptColumns } from '@/components/erp/cash-flow/entries/receipt-columns';
+import type { PayableRow } from '@/components/erp/cash-flow/payables/columns';
+import { columns as payableColumns } from '@/components/erp/cash-flow/payables/columns';
+import { ErpDate } from '@/components/erp/format';
+import { Metrics } from '@/components/erp/metrics';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { RangeCalendar } from '@/components/ui/calendar';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useErpFormatting } from '@/hooks/erp/use-erp-formatting';
+import { usePermission } from '@/hooks/use-permission';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import cash from '@/routes/erp/cash-flow';
 import payables from '@/routes/erp/cash-flow/payables';
-import { router } from '@inertiajs/react';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { CalendarDays, CircleCheck, CircleX, Eye, PencilLine } from 'lucide-react';
-import { useState } from 'react';
-
-type CashRow = {
-    id: number;
-    occurred_at: string;
-    description: string;
-    type: string;
-    payment: string;
-    category: string;
-    amount: string;
-    due_on: string;
-    outstanding_cents: number;
-    status: string;
-};
+import { Head, router } from '@inertiajs/react';
+import { ModalLink } from '@inertiaui/modal-react';
+import { CalendarDays } from 'lucide-react';
+import { Activity, useState } from 'react';
 
 const presets = { today: 'Today', week: 'This week', month: 'This month', custom: 'Custom' } as const;
 const tabLabels = {
@@ -44,68 +39,11 @@ type Summary = Record<
     number | null
 >;
 
-const column = tableColumn<CashRow>;
-const dateColumn = column('occurred_at', 'Date and time', 'date', (row) => (
-    <ErpDate value={row.occurred_at} withTime />
-));
-const descriptionColumn = column('description', 'Description');
-const categoryColumn = column('category', 'Category');
-const amountColumn = column('amount', 'Amount', 'number', (row) => <ErpMoney amount={Number(row.amount)} />);
-const entryActions = actionColumn<CashRow>((row) => [
-    { label: 'View', href: cash.showEntry.url(row.id), permissions: ['cash-entry.show'], icon: Eye },
-]);
-const payableActions = actionColumn<CashRow>((row) => [
-    { label: 'View', href: payables.show.url(row.id), permissions: ['financial-account.show'], icon: Eye },
-    row.status !== 'cancelled' && {
-        label: 'Edit',
-        href: payables.edit.url(row.id),
-        permissions: ['financial-account.edit'],
-        icon: PencilLine,
-    },
-    Number(row.outstanding_cents) > 0 && {
-        label: 'Confirm payment',
-        href: payables.confirmPayment.url(row.id),
-        permissions: ['financial-account.show', 'cash-entry.create'],
-        icon: CircleCheck,
-    },
-    Number(row.outstanding_cents) === Math.round(Number(row.amount) * 100) && {
-        label: 'Cancel',
-        href: payables.cancel.url(row.id),
-        permissions: ['financial-account.cancel'],
-        icon: CircleX,
-        destructive: true,
-    },
-]);
-
-function DueDate({ value, today }: Readonly<{ value: string; today: string }>) {
-    const days = differenceInCalendarDays(parseISO(value), parseISO(today));
-    const dueStatusMessage = days < 0 ? `${-days}d overdue` : `In ${days}d`;
-
-    return (
-        <div className="flex flex-col">
-            <ErpDate value={value} />
-            <span className={cn('text-xs text-muted-foreground', days < 0 && 'text-destructive')}>
-                {days === 0 ? 'Due today' : dueStatusMessage}
-            </span>
-        </div>
-    );
-}
-
-const receiptColumns = [
-    dateColumn,
-    column('type', 'Type', 'select', (row) => humanize(row.type), choices(['manual', 'settlement'])),
-    descriptionColumn,
-    column('payment', 'Payment method'),
-    amountColumn,
-    entryActions,
-];
-const expenseColumns = [
-    column('occurred_at', 'Date', 'date', (row) => <ErpDate value={row.occurred_at} />),
-    descriptionColumn,
-    categoryColumn,
-    amountColumn,
-    entryActions,
-];
+type CashFlowTable =
+    | { tab: 'summary'; table: null }
+    | { tab: 'receipts'; table: ServerTableData<ReceiptRow> }
+    | { tab: 'expenses'; table: ServerTableData<ExpenseRow> }
+    | { tab: 'payables'; table: ServerTableData<PayableRow> };
 
 function rangeQuery(period: Period, tab: Tab) {
     return {
@@ -124,13 +62,13 @@ export default function CashFlow({
     tabs,
 }: Readonly<{
     summary: Summary;
-    table: ServerTableData<CashRow> | null;
     period: Period;
-    tab: Tab;
     tabs: Tab[];
-}>) {
+}> &
+    CashFlowTable) {
     const [calendarOpen, setCalendarOpen] = useState(false);
     const { money: currency } = useErpFormatting();
+    const { can } = usePermission();
     const money = (cents: number | null) => (cents === null ? null : currency.format(cents / 100));
     const change = (next: Period, target = tab) => {
         router.get(
@@ -139,46 +77,46 @@ export default function CashFlow({
             { preserveScroll: true, viewTransition: false },
         );
     };
-    const payableColumns = [
-        descriptionColumn,
-        categoryColumn,
-        amountColumn,
-        column('due_on', 'Due date', 'date', (row) => <DueDate value={row.due_on} today={period.today} />),
-        column(
-            'status',
-            'Status',
-            'select',
-            (row) => (
-                <Badge variant={row.status === 'overdue' ? 'destructive' : 'secondary'}>{humanize(row.status)}</Badge>
-            ),
-            choices(['pending', 'partially_paid', 'paid', 'overdue', 'cancelled']),
-        ),
-        payableActions,
-    ];
-    const transactionColumns = tab === 'expenses' ? expenseColumns : payableColumns;
-    const columns = tab === 'receipts' ? receiptColumns : transactionColumns;
     const negativeExpenseTotal = tab === 'expenses' && summary.expenses !== null ? -summary.expenses : null;
     const total = tab === 'receipts' ? summary.receipts : negativeExpenseTotal;
     const url = cash.index.url({ query: rangeQuery(period, tab) });
     const totalPositiveClass = total && total > 0 ? 'text-emerald-700 dark:text-emerald-400' : '';
 
     return (
-        <ErpPage
-            title="Cash flow"
-            actions={
-                <>
-                    <ErpLink href={cash.createReceipt.url()} permission="cash-entry.create" modal>
-                        Manual receipt
-                    </ErpLink>
-                    <ErpLink href={payables.create.url()} permission="financial-account.create" modal>
-                        New payable
-                    </ErpLink>
-                    <ErpLink href={cash.createExpense.url()} permission="cash-entry.create" modal>
-                        New expense
-                    </ErpLink>
-                </>
-            }
-        >
+        <section className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+            <Head title="Cash flow" />
+            <header className="flex flex-wrap items-center justify-between gap-3">
+                <h1 className="text-2xl font-semibold tracking-tight">Cash flow</h1>
+                <div className="flex flex-wrap gap-2">
+                    <Activity mode={can('cash-entry.create') ? 'visible' : 'hidden'}>
+                        <ModalLink
+                            href={cash.createReceipt.url()}
+                            className={buttonVariants({ variant: 'outline' })}
+                            navigate
+                        >
+                            Manual receipt
+                        </ModalLink>
+                    </Activity>
+                    <Activity mode={can('financial-account.create') ? 'visible' : 'hidden'}>
+                        <ModalLink
+                            href={payables.create.url()}
+                            className={buttonVariants({ variant: 'outline' })}
+                            navigate
+                        >
+                            New payable
+                        </ModalLink>
+                    </Activity>
+                    <Activity mode={can('cash-entry.create') ? 'visible' : 'hidden'}>
+                        <ModalLink
+                            href={cash.createExpense.url()}
+                            className={buttonVariants({ variant: 'outline' })}
+                            navigate
+                        >
+                            New expense
+                        </ModalLink>
+                    </Activity>
+                </div>
+            </header>
             <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Reporting period">
                 {(['today', 'week', 'month'] as const).map((preset) => (
                     <Button
@@ -230,15 +168,27 @@ export default function CashFlow({
                 ]}
             />
             <Tabs selectedKey={tab} keyboardActivation="manual" onSelectionChange={(key) => change(period, key as Tab)}>
-                <TabsList aria-label="Cash flow sections" className="max-w-full justify-start overflow-x-auto">
+                <TabsList aria-label="Cash flow sections">
                     {tabs.map((item) => (
                         <TabsTrigger key={item} id={item} className="px-3">
                             {tabLabels[item]}
                         </TabsTrigger>
                     ))}
                 </TabsList>
-                <TabsContent id={tab} className="min-w-0 space-y-3">
-                    {table && <DataTable key={url} columns={columns} result={table} url={url} label={tabLabels[tab]} />}
+
+                <TabsContent id={tab}>
+                    {tab === 'receipts' && (
+                        <DataTable key={url} columns={receiptColumns} result={table} url={url} label={tabLabels[tab]} />
+                    )}
+
+                    {tab === 'expenses' && (
+                        <DataTable key={url} columns={expenseColumns} result={table} url={url} label={tabLabels[tab]} />
+                    )}
+
+                    {tab === 'payables' && (
+                        <DataTable key={url} columns={payableColumns} result={table} url={url} label={tabLabels[tab]} />
+                    )}
+
                     {total !== null && (
                         <div
                             className={cn(
@@ -252,7 +202,7 @@ export default function CashFlow({
                     )}
                 </TabsContent>
             </Tabs>
-        </ErpPage>
+        </section>
     );
 }
 

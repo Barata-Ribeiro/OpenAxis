@@ -47,7 +47,7 @@ arch()
     ->toExtend(class: Controller::class)
     ->toHaveSuffix('Controller')
     ->not->toHavePublicMethodsBesides([
-        '__invoke', 'index', 'create', 'store', 'show', 'edit', 'update', 'destroy', 'archive', 'confirmDestroy',
+        '__invoke', 'index', 'create', 'store', 'show', 'edit', 'update', 'destroy', 'archive', 'confirmDestroy', 'restore',
     ]);
 
 arch()

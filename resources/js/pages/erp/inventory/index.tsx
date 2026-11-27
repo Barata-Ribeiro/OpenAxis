@@ -1,84 +1,19 @@
-import DataTable, { type ServerTableData } from '@/components/data-table/data-table';
-import { Badge } from '@/components/ui/badge';
+import type { ServerTableData } from '@/components/data-table/data-table';
+import DataTable from '@/components/data-table/data-table';
+import { Metrics } from '@/components/erp/metrics';
+import { buttonVariants } from '@/components/ui/button';
+import { useErpFormatting } from '@/hooks/erp/use-erp-formatting';
+import { usePermission } from '@/hooks/use-permission';
+import { dashboard } from '@/routes';
 import { index as inventory } from '@/routes/erp/inventory';
 import movements from '@/routes/erp/inventory/movements';
 import products from '@/routes/erp/inventory/products';
-import { Eye, ImageIcon, PackagePlus, PencilLine, Plus, Trash } from 'lucide-react';
-import { dashboard } from '@/routes';
-import { ErpDate, ErpMoney, ErpQuantity, useErpFormatting } from '@/components/erp/format';
-import { actionColumn, choices, ErpLink, ErpPage, humanize, Metrics, tableColumn } from '@/components/erp/page';
+import { Head, Link } from '@inertiajs/react';
+import { PackagePlus, Plus } from 'lucide-react';
 
-type ProductRow = {
-    id: number;
-    sku: string;
-    image: string | null;
-    name: string;
-    quantity: number;
-    unit: string;
-    expires_on: string | null;
-    days_remaining: number | null;
-    status: string;
-    minimum_stock: number;
-    category: string | null;
-    average_cost: number;
-    current_value: number;
-};
-
-const statuses = ['in_stock', 'out_of_stock', 'critical', 'expiring', 'expired', 'inactive'];
-const column = tableColumn<ProductRow>;
-const columns = [
-    column('sku', 'SKU'),
-    {
-        id: 'image',
-        meta: { label: 'Image' },
-        cell: ({ row }: { row: { original: ProductRow } }) =>
-            row.original.image ? (
-                <img
-                    src={row.original.image}
-                    alt=""
-                    width={36}
-                    height={36}
-                    loading="lazy"
-                    className="size-9 rounded-md object-cover"
-                />
-            ) : (
-                <span className="grid size-9 place-items-center rounded-md border bg-muted text-muted-foreground">
-                    <ImageIcon aria-hidden className="size-4" />
-                </span>
-            ),
-    },
-    column('name', 'Name'),
-    column('quantity', 'Current quantity', 'number', (row) => <ErpQuantity amount={row.quantity} />),
-    column('unit', 'Unit of measure'),
-    column('expires_on', 'Expiry date', 'date', (row) => <ErpDate value={row.expires_on} />),
-    column('days_remaining', 'Days remaining', 'number'),
-    column(
-        'status',
-        'Status',
-        'select',
-        (row) => (
-            <Badge variant={['critical', 'expired', 'out_of_stock'].includes(row.status) ? 'destructive' : 'secondary'}>
-                {humanize(row.status)}
-            </Badge>
-        ),
-        choices(statuses),
-    ),
-    column('minimum_stock', 'Minimum stock', 'number', (row) => <ErpQuantity amount={row.minimum_stock} />),
-    column('category', 'Category'),
-    column('average_cost', 'Average unit cost', 'number', (row) => <ErpMoney amount={row.average_cost} />),
-    column('current_value', 'Current value', 'number', (row) => <ErpMoney amount={row.current_value} />),
-    actionColumn<ProductRow>((row) => [
-        { label: 'View', href: products.show.url(row.id), permissions: ['product.show'], icon: Eye },
-        { label: 'Edit', href: products.edit.url(row.id), permissions: ['product.edit'], icon: PencilLine },
-        row.quantity === 0 && {
-            label: 'Archive',
-            href: products.archive.url(row.id),
-            permissions: ['product.destroy'],
-            icon: Trash,
-            destructive: true,
-        },
-    ]),
-];
+import type { ProductRow } from '@/components/erp/inventory/products/columns';
+import { columns } from '@/components/erp/inventory/products/columns';
+import { Activity } from 'react';
 
 type Summary = Record<'products' | 'critical' | 'in_stock' | 'expiring' | 'expired', number>;
 
@@ -87,20 +22,32 @@ export default function Inventory({
     table,
 }: Readonly<{ summary: Summary; table: ServerTableData<ProductRow> }>) {
     const { quantity } = useErpFormatting();
+    const { can } = usePermission();
+
     return (
-        <ErpPage
-            title="Inventory"
-            actions={
-                <>
-                    <ErpLink href={products.create.url()} permission="product.create">
-                        <Plus /> New product
-                    </ErpLink>
-                    <ErpLink href={movements.receipt.url()} permission="stock-movement.create" primary>
-                        <PackagePlus /> New stock receipt
-                    </ErpLink>
-                </>
-            }
-        >
+        <section className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
+            <Head title="Inventory" />
+            <header className="flex flex-wrap items-center justify-between gap-3">
+                <h1 className="text-2xl font-semibold tracking-tight">Inventory</h1>
+                <div className="flex flex-wrap gap-2">
+                    <Link
+                        href={products.index({ query: { trashed: 'only' } })}
+                        className={buttonVariants({ variant: 'outline' })}
+                    >
+                        Archived products
+                    </Link>
+                    <Activity mode={can('product.create') ? 'visible' : 'hidden'}>
+                        <Link href={products.create()} className={buttonVariants({ variant: 'outline' })}>
+                            <Plus aria-hidden /> New product
+                        </Link>
+                    </Activity>
+                    <Activity mode={can('stock-movement.create') ? 'visible' : 'hidden'}>
+                        <Link href={movements.receipt()} className={buttonVariants()}>
+                            <PackagePlus aria-hidden /> New stock receipt
+                        </Link>
+                    </Activity>
+                </div>
+            </header>
             <Metrics
                 items={[
                     { title: 'Total products', value: quantity.format(summary.products) },
@@ -111,7 +58,7 @@ export default function Inventory({
                 ]}
             />
             <DataTable columns={columns} result={table} url={inventory.url()} label="Inventory products" />
-        </ErpPage>
+        </section>
     );
 }
 
