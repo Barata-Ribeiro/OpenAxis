@@ -1,11 +1,11 @@
-import DataTable from '@/components/data-table/data-table';
 import type { ServerTableData } from '@/components/data-table/data-table';
-import { columns as expenseColumns } from '@/components/erp/cash-flow/entries/expense-columns';
+import DataTable from '@/components/data-table/data-table';
 import type { ExpenseRow } from '@/components/erp/cash-flow/entries/expense-columns';
-import { columns as receiptColumns } from '@/components/erp/cash-flow/entries/receipt-columns';
+import { columns as expenseColumns } from '@/components/erp/cash-flow/entries/expense-columns';
 import type { ReceiptRow } from '@/components/erp/cash-flow/entries/receipt-columns';
-import { columns as payableColumns } from '@/components/erp/cash-flow/payables/columns';
+import { columns as receiptColumns } from '@/components/erp/cash-flow/entries/receipt-columns';
 import type { PayableRow } from '@/components/erp/cash-flow/payables/columns';
+import { columns as payableColumns } from '@/components/erp/cash-flow/payables/columns';
 import { ErpDate } from '@/components/erp/format';
 import { Metrics } from '@/components/erp/metrics';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -21,7 +21,7 @@ import payables from '@/routes/erp/cash-flow/payables';
 import { Head, router } from '@inertiajs/react';
 import { ModalLink } from '@inertiaui/modal-react';
 import { CalendarDays } from 'lucide-react';
-import { useState } from 'react';
+import { Activity, useState } from 'react';
 
 const presets = { today: 'Today', week: 'This week', month: 'This month', custom: 'Custom' } as const;
 const tabLabels = {
@@ -88,7 +88,7 @@ export default function CashFlow({
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <h1 className="text-2xl font-semibold tracking-tight">Cash flow</h1>
                 <div className="flex flex-wrap gap-2">
-                    {can('cash-entry.create') && (
+                    <Activity mode={can('cash-entry.create') ? 'visible' : 'hidden'}>
                         <ModalLink
                             href={cash.createReceipt.url()}
                             className={buttonVariants({ variant: 'outline' })}
@@ -96,8 +96,8 @@ export default function CashFlow({
                         >
                             Manual receipt
                         </ModalLink>
-                    )}
-                    {can('financial-account.create') && (
+                    </Activity>
+                    <Activity mode={can('financial-account.create') ? 'visible' : 'hidden'}>
                         <ModalLink
                             href={payables.create.url()}
                             className={buttonVariants({ variant: 'outline' })}
@@ -105,8 +105,8 @@ export default function CashFlow({
                         >
                             New payable
                         </ModalLink>
-                    )}
-                    {can('cash-entry.create') && (
+                    </Activity>
+                    <Activity mode={can('cash-entry.create') ? 'visible' : 'hidden'}>
                         <ModalLink
                             href={cash.createExpense.url()}
                             className={buttonVariants({ variant: 'outline' })}
@@ -114,7 +114,7 @@ export default function CashFlow({
                         >
                             New expense
                         </ModalLink>
-                    )}
+                    </Activity>
                 </div>
             </header>
             <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Reporting period">
@@ -168,23 +168,27 @@ export default function CashFlow({
                 ]}
             />
             <Tabs selectedKey={tab} keyboardActivation="manual" onSelectionChange={(key) => change(period, key as Tab)}>
-                <TabsList aria-label="Cash flow sections" className="max-w-full justify-start overflow-x-auto">
+                <TabsList aria-label="Cash flow sections">
                     {tabs.map((item) => (
                         <TabsTrigger key={item} id={item} className="px-3">
                             {tabLabels[item]}
                         </TabsTrigger>
                     ))}
                 </TabsList>
-                <TabsContent id={tab} className="min-w-0 space-y-3">
+
+                <TabsContent id={tab}>
                     {tab === 'receipts' && (
                         <DataTable key={url} columns={receiptColumns} result={table} url={url} label={tabLabels[tab]} />
                     )}
+
                     {tab === 'expenses' && (
                         <DataTable key={url} columns={expenseColumns} result={table} url={url} label={tabLabels[tab]} />
                     )}
+
                     {tab === 'payables' && (
                         <DataTable key={url} columns={payableColumns} result={table} url={url} label={tabLabels[tab]} />
                     )}
+
                     {total !== null && (
                         <div
                             className={cn(

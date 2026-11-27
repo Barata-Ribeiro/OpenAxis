@@ -1,5 +1,5 @@
-import DataTable from '@/components/data-table/data-table';
 import type { ServerTableData } from '@/components/data-table/data-table';
+import DataTable from '@/components/data-table/data-table';
 import { Metrics } from '@/components/erp/metrics';
 import { buttonVariants } from '@/components/ui/button';
 import { useErpFormatting } from '@/hooks/erp/use-erp-formatting';
@@ -11,8 +11,9 @@ import products from '@/routes/erp/inventory/products';
 import { Head, Link } from '@inertiajs/react';
 import { PackagePlus, Plus } from 'lucide-react';
 
-import { columns } from '@/components/erp/inventory/products/columns';
 import type { ProductRow } from '@/components/erp/inventory/products/columns';
+import { columns } from '@/components/erp/inventory/products/columns';
+import { Activity } from 'react';
 
 type Summary = Record<'products' | 'critical' | 'in_stock' | 'expiring' | 'expired', number>;
 
@@ -35,16 +36,16 @@ export default function Inventory({
                     >
                         Archived products
                     </Link>
-                    {can('product.create') && (
+                    <Activity mode={can('product.create') ? 'visible' : 'hidden'}>
                         <Link href={products.create()} className={buttonVariants({ variant: 'outline' })}>
                             <Plus aria-hidden /> New product
                         </Link>
-                    )}
-                    {can('stock-movement.create') && (
+                    </Activity>
+                    <Activity mode={can('stock-movement.create') ? 'visible' : 'hidden'}>
                         <Link href={movements.receipt()} className={buttonVariants()}>
                             <PackagePlus aria-hidden /> New stock receipt
                         </Link>
-                    )}
+                    </Activity>
                 </div>
             </header>
             <Metrics
