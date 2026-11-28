@@ -148,14 +148,13 @@ export default function CashFlow({
                         />
                     </Popover>
                 </PopoverTrigger>
+
                 <p className="text-sm text-muted-foreground" aria-live="polite">
                     <ErpDate value={period.start} />
-                    {period.end !== period.start && (
-                        <>
-                            {' '}
-                            – <ErpDate value={period.end} />
-                        </>
-                    )}
+                    <Activity mode={period.end !== period.start ? 'visible' : 'hidden'}>
+                        <span> - </span>
+                        <ErpDate value={period.end} />
+                    </Activity>
                 </p>
             </div>
             <Metrics
@@ -196,7 +195,7 @@ export default function CashFlow({
                                 total < 0 ? 'text-destructive' : totalPositiveClass,
                             )}
                         >
-                            <span>Period total</span>
+                            <span>Total Period</span>
                             <span>{money(total)}</span>
                         </div>
                     )}
