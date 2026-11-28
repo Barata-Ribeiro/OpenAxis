@@ -7,7 +7,14 @@ import { DataTablePagination } from '@/components/data-table/data-table-paginati
 import { DataTableSortList } from '@/components/data-table/data-table-sort-list';
 import { DataTableViewOptions } from '@/components/data-table/data-table-view-options';
 
-import { ActionsCell, DateCell, GroupedCell, SelectCell, TextCell } from '@/components/data-table/cell-components';
+import {
+    ActionsCell,
+    ActiveBadgeCell,
+    DateCell,
+    GroupedCell,
+    SelectCell,
+    TextCell,
+} from '@/components/data-table/cell-components';
 import { ColumnHeader } from '@/components/data-table/data-table-column-header';
 import { ResizeHandle, SelectAllHeader } from '@/components/data-table/header-components';
 
@@ -34,10 +41,11 @@ export const { createAppColumnHelper, useAppTable, useTableContext, useCellConte
 
         cellComponents: {
             ActionsCell,
-            SelectCell,
-            TextCell,
+            ActiveBadgeCell,
             DateCell,
             GroupedCell,
+            SelectCell,
+            TextCell,
         },
 
         headerComponents: {

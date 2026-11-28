@@ -34,7 +34,7 @@ export const columns = columnHelper.columns([
     columnHelper.accessor('is_active', {
         header: 'Active',
         meta: { label: 'Active', variant: 'number' },
-        cell: ({ getValue }) => (getValue() ? 'Yes' : 'No'),
+        cell: ({ cell }) => <cell.ActiveBadgeCell />,
     }),
     columnHelper.display({
         id: 'actions',
