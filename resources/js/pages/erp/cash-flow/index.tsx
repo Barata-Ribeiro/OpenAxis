@@ -81,6 +81,29 @@ export default function CashFlow({
     const total = tab === 'receipts' ? summary.receipts : negativeExpenseTotal;
     const url = cash.index.url({ query: rangeQuery(period, tab) });
     const totalPositiveClass = total && total > 0 ? 'text-emerald-700 dark:text-emerald-400' : '';
+    const metrics = (
+        <Metrics
+            items={[
+                { title: 'Receipts', value: money(summary.receipts) },
+                { title: 'Expenses', value: money(summary.expenses) },
+                { title: 'Balance', value: money(summary.balance) },
+                { title: 'Projected payables', value: money(summary.payables) },
+                { title: 'Net profit', value: money(summary.net_profit) },
+            ]}
+        />
+    );
+    const periodTotal =
+        total === null ? null : (
+            <div
+                className={cn(
+                    'flex justify-between rounded-lg border px-4 py-3 font-semibold tabular-nums',
+                    total < 0 ? 'text-destructive' : totalPositiveClass,
+                )}
+            >
+                <span>Total Period</span>
+                <span>{money(total)}</span>
+            </div>
+        );
 
     return (
         <section className="flex min-w-0 flex-col gap-5 p-4 sm:p-6">
@@ -91,7 +114,7 @@ export default function CashFlow({
                     <Activity mode={can('cash-entry.create') ? 'visible' : 'hidden'}>
                         <ModalLink
                             href={cash.createReceipt.url()}
-                            className={buttonVariants({ variant: 'outline' })}
+                            className={buttonVariants({ variant: 'secondary' })}
                             navigate
                         >
                             Manual receipt
@@ -100,7 +123,7 @@ export default function CashFlow({
                     <Activity mode={can('financial-account.create') ? 'visible' : 'hidden'}>
                         <ModalLink
                             href={payables.create.url()}
-                            className={buttonVariants({ variant: 'outline' })}
+                            className={buttonVariants({ variant: 'secondary' })}
                             navigate
                         >
                             New payable
@@ -109,7 +132,7 @@ export default function CashFlow({
                     <Activity mode={can('cash-entry.create') ? 'visible' : 'hidden'}>
                         <ModalLink
                             href={cash.createExpense.url()}
-                            className={buttonVariants({ variant: 'outline' })}
+                            className={buttonVariants({ variant: 'secondary' })}
                             navigate
                         >
                             New expense
@@ -117,6 +140,7 @@ export default function CashFlow({
                     </Activity>
                 </div>
             </header>
+
             <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Reporting period">
                 {(['today', 'week', 'month'] as const).map((preset) => (
                     <Button
@@ -157,47 +181,62 @@ export default function CashFlow({
                     </Activity>
                 </p>
             </div>
-            <Metrics
-                items={[
-                    { title: 'Receipts', value: money(summary.receipts) },
-                    { title: 'Expenses', value: money(summary.expenses) },
-                    { title: 'Balance', value: money(summary.balance) },
-                    { title: 'Projected payables', value: money(summary.payables) },
-                    { title: 'Net profit', value: money(summary.net_profit) },
-                ]}
-            />
             <Tabs selectedKey={tab} keyboardActivation="manual" onSelectionChange={(key) => change(period, key as Tab)}>
-                <TabsList aria-label="Cash flow sections">
+                <TabsList
+                    aria-label="Cash flow sections"
+                    className="max-w-full scrollbar-none justify-start overflow-x-auto"
+                >
                     {tabs.map((item) => (
-                        <TabsTrigger key={item} id={item} className="px-3">
+                        <TabsTrigger key={item} id={item} className="flex-none px-3">
                             {tabLabels[item]}
                         </TabsTrigger>
                     ))}
                 </TabsList>
 
-                <TabsContent id={tab}>
+                <TabsContent id="summary">{metrics}</TabsContent>
+
+                <TabsContent id="receipts" className="flex flex-col gap-5">
+                    {metrics}
                     {tab === 'receipts' && (
-                        <DataTable key={url} columns={receiptColumns} result={table} url={url} label={tabLabels[tab]} />
-                    )}
-
-                    {tab === 'expenses' && (
-                        <DataTable key={url} columns={expenseColumns} result={table} url={url} label={tabLabels[tab]} />
-                    )}
-
-                    {tab === 'payables' && (
-                        <DataTable key={url} columns={payableColumns} result={table} url={url} label={tabLabels[tab]} />
-                    )}
-
-                    {total !== null && (
-                        <div
-                            className={cn(
-                                'flex justify-between rounded-lg border px-4 py-3 font-semibold tabular-nums',
-                                total < 0 ? 'text-destructive' : totalPositiveClass,
-                            )}
-                        >
-                            <span>Total Period</span>
-                            <span>{money(total)}</span>
+                        <div>
+                            <DataTable
+                                key={url}
+                                columns={receiptColumns}
+                                result={table}
+                                url={url}
+                                label={tabLabels.receipts}
+                            />
+                            {periodTotal}
                         </div>
+                    )}
+                </TabsContent>
+
+                <TabsContent id="expenses" className="flex flex-col gap-5">
+                    {metrics}
+                    {tab === 'expenses' && (
+                        <div>
+                            <DataTable
+                                key={url}
+                                columns={expenseColumns}
+                                result={table}
+                                url={url}
+                                label={tabLabels.expenses}
+                            />
+                            {periodTotal}
+                        </div>
+                    )}
+                </TabsContent>
+
+                <TabsContent id="payables" className="flex flex-col gap-5">
+                    {metrics}
+                    {tab === 'payables' && (
+                        <DataTable
+                            key={url}
+                            columns={payableColumns}
+                            result={table}
+                            url={url}
+                            label={tabLabels.payables}
+                        />
                     )}
                 </TabsContent>
             </Tabs>
