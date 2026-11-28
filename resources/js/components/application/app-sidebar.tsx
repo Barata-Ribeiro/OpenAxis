@@ -15,7 +15,6 @@ import { Link } from '@inertiajs/react';
 import {
     ArrowDownToLine,
     ArrowUpFromLine,
-    BookOpen,
     CircleDollarSign,
     FolderGit2,
     History,
@@ -23,6 +22,7 @@ import {
     Package,
     PackagePlus,
     Settings2,
+    Signature,
 } from 'lucide-react';
 import AppLogoBig from './app-logo-big';
 
@@ -37,13 +37,13 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/Barata-Ribeiro/OpenAxis',
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Author',
+        href: 'https://barataribeiro.com',
+        icon: Signature,
     },
 ];
 
@@ -93,7 +93,7 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
                 <NavMain label="ERP" items={erpItems.filter(({ permissions }) => can(...permissions))} />
                 <NavMain label="Quick actions" items={quickLinks.filter(({ permissions }) => can(...permissions))} />
-                <NavMain label="Settings" icon={Settings2} items={settings} />
+                <NavMain label="System Settings" icon={Settings2} items={settings} />
             </SidebarContent>
 
             <SidebarFooter>
