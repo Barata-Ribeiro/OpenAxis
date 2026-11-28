@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -10,6 +11,7 @@ import { useCellContext, useTableContext } from '@/hooks/data-table/table';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { usePermission } from '@/hooks/use-permission';
 import { renderInertiaLink } from '@/lib/inertia-link';
+import { cn } from '@/lib/utils';
 import type { Permission } from '@/types/role-permission';
 import { router } from '@inertiajs/react';
 import { useModalStack } from '@inertiaui/modal-react';
@@ -17,6 +19,15 @@ import { Subscribe } from '@tanstack/react-table';
 import { formatDate } from 'date-fns/format';
 import { ChevronDown, ChevronRight, Copy, EllipsisVertical, type LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
+
+export type RowAction = {
+    label: string;
+    href: string;
+    icon: LucideIcon;
+    permissions?: readonly Permission['name'][];
+    destructive?: boolean;
+    method?: 'patch';
+};
 
 export function SelectCell(): React.ReactNode {
     const cell = useCellContext();
@@ -79,14 +90,16 @@ export function JoinDateAggregatedCell(): React.ReactNode {
     return <span className="text-muted-foreground">Earliest: {earliest ? formatDate(earliest, 'PPP') : '—'}</span>;
 }
 
-export type RowAction = {
-    label: string;
-    href: string;
-    icon: LucideIcon;
-    permissions?: readonly Permission['name'][];
-    destructive?: boolean;
-    method?: 'patch';
-};
+export function ActiveBadgeCell(): React.ReactNode {
+    const cell = useCellContext<boolean>();
+    const value = cell.getValue();
+    if (value == null) return null;
+
+    const activeBadgeClass = cn('bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300');
+    const inactiveBadgeClass = cn('bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300');
+
+    return <Badge className={cn(value ? activeBadgeClass : inactiveBadgeClass)}>{value ? 'Active' : 'Inactive'}</Badge>;
+}
 
 export function ActionsCell({
     actions,
@@ -136,26 +149,28 @@ export function ActionsCell({
                         <DropdownMenuSeparator />
                     </>
                 )}
-                {availableActions.map(({ href, label, icon: Icon, destructive, method }) => (
-                    <DropdownMenuItem
-                        key={label}
-                        textValue={label}
-                        variant={destructive ? 'destructive' : 'default'}
-                        {...(method === 'patch'
-                            ? { onAction: () => router.patch(href, {}, { preserveScroll: true }) }
-                            : modal
-                              ? {
-                                    onAction: () =>
-                                        void visitModal(href, { navigate: true }).catch(() =>
-                                            toast.error('Could not open action'),
-                                        ),
-                                }
-                              : { href, render: renderInertiaLink(href) })}
-                    >
-                        <Icon aria-hidden data-icon="inline-start" />
-                        {label}
-                    </DropdownMenuItem>
-                ))}
+                {availableActions.map(({ href, label, icon: Icon, destructive, method }) => {
+                    const modalActionConfig = {
+                        onAction: () =>
+                            void visitModal(href, { navigate: true }).catch(() => toast.error('Could not open action')),
+                    };
+                    const linkActionConfig = { href, render: renderInertiaLink(href) };
+                    const actionConfig = modal ? modalActionConfig : linkActionConfig;
+
+                    return (
+                        <DropdownMenuItem
+                            key={label}
+                            textValue={label}
+                            variant={destructive ? 'destructive' : 'default'}
+                            {...(method === 'patch'
+                                ? { onAction: () => router.patch(href, {}, { preserveScroll: true }) }
+                                : actionConfig)}
+                        >
+                            <Icon aria-hidden data-icon="inline-start" />
+                            {label}
+                        </DropdownMenuItem>
+                    );
+                })}
             </DropdownMenu>
         </DropdownMenuTrigger>
     );
